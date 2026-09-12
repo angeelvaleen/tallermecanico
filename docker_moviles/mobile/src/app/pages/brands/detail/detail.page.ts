@@ -1,8 +1,9 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { LoadingController } from '@ionic/angular';
+import { ChangeDetectorRef } from '@angular/core';
 import axios from 'axios';
-import { environment } from '../../../../environments/environment';
+import { environment } from 'src/environments/environment';
 
 interface Brand {
   id: number;
@@ -12,49 +13,57 @@ interface Brand {
 }
 
 @Component({
-  selector: 'app-detail',
+  selector: 'app-brands-detail',
   templateUrl: './detail.page.html',
   styleUrls: ['./detail.page.scss'],
   standalone: false,
 })
-export class DetailPage implements OnInit, OnDestroy {
+export class DetailPage implements OnInit{
   brand: Brand | null = null;
-  cargando: boolean = true;
-  mensajeError: string = '';
-  private routeSub: Subscription | null = null;
+  messageError: string = '';
+  
+  constructor(
+    private route: ActivatedRoute,
+    private loading: LoadingController,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
-  constructor(private route: ActivatedRoute) {}
-
-  ngOnInit(): void {
-    // Nos suscribimos para detectar cambios en el ID de la URL dinámicamente
-    this.routeSub = this.route.paramMap.subscribe(params => {
-      const id = params.get('id');
-      if (id) {
-        this.cargarDetalle(id);
-      }
-    });
+  ngOnInit():void{
+    this.chargerBrand();
   }
 
-  ngOnDestroy(): void {
-    if (this.routeSub) {
-      this.routeSub.unsubscribe();
-    }
-  }
+  async chargerBrand(): Promise<void> {
+     const id = this.route.snapshot.paramMap.get('id');
 
-  async cargarDetalle(id: string): Promise<void> {
-    this.cargando = true;
     this.brand = null;
+    this.messageError = '';
+
+    if(!id){
+      this.messageError = 'No se recibio ID';
+      return;
+    };
+
+    const loading = await this.loading.create({
+      message: 'Cargando marca...',
+      spinner: 'bubbles',
+    });
+
+    await loading.present();
 
     try {
-      const response = await axios.get(
-        `${environment.apiUrl}/items/brands/${encodeURIComponent(id)}`
-      );
-      this.brand = response.data.data;
+    const response = await axios.get<{ data: Brand }>(
+      `${environment.apiUrl}/brands/${encodeURIComponent(id)}`
+    );
+
+    this.brand = response.data.data;
+    this.cdr.detectChanges();
     } catch (error) {
-      console.error('Error al cargar el detalle:', error);
-      this.mensajeError = 'No se pudo cargar la información.';
+      console.error('Error al cargar el producto:', error);
+      this.messageError = 'No se pudo cargar el producto. Revisa el ID, la conexión y los permisos de lectura.';
     } finally {
-      this.cargando = false;
+      await loading.dismiss();
     }
+
   }
+
 }
