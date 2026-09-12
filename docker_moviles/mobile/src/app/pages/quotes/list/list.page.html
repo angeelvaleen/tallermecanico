@@ -1,0 +1,16 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Cotizaciones</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item *ngFor="let q of quotes">
+      <ion-label>
+        <h2>Cotizacion #{{ q.id }}</h2>
+        <p>Total: ${{ q.total }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

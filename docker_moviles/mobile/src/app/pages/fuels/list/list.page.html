@@ -1,0 +1,15 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Combustibles</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item *ngFor="let f of fuels">
+      <ion-label>
+        <h2>{{ f.name }}</h2>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

@@ -1,0 +1,29 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/brands/list"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle de Marca</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Muestra la tarjeta si ya hay datos -->
+  <ion-card *ngIf="brand">
+    <ion-card-content>
+      <h2>{{ brand.name }}</h2>
+      <p><strong>Estado:</strong> {{ brand.is_active ? 'Activo' : 'Inactivo' }}</p>
+      <p><strong>Registro:</strong> {{ brand.created_at | date:'yyyy-MM-dd' }}</p>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Muestra esto mientras está cargando -->
+  <div *ngIf="cargando" class="ion-text-center ion-padding">
+    <p>Cargando información...</p>
+  </div>
+
+  <!-- Muestra esto si hubo algún error -->
+  <div *ngIf="!cargando && !brand" class="ion-text-center ion-padding">
+    <p color="danger">{{ mensajeError }}</p>
+  </div>
+</ion-content>

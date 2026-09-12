@@ -1,0 +1,24 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/diagnoses/list"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle de Diagnostico</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="diagnosis">
+    <ion-card>
+      <ion-card-content>
+        <h2>Orden de Trabajo ID: {{ diagnosis.workorder_id }}</h2>
+        <p><strong>Descripcion:</strong> {{ diagnosis.description }}</p>
+        <p><strong>Resultado:</strong> {{ diagnosis.result || 'Sin resultado' }}</p>
+        <p><strong>Registro:</strong> {{ diagnosis.created_at | date:'yyyy-MM-dd' }}</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+  <div *ngIf="!diagnosis" class="ion-text-center">
+    <p>Cargando informacion...</p>
+  </div>
+</ion-content>

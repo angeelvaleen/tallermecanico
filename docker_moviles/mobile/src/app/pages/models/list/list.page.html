@@ -1,0 +1,16 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Modelos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item *ngFor="let mo of models">
+      <ion-label>
+        <h2>{{ mo.name }}</h2>
+        <p>Marca ID: {{ mo.brand_id }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

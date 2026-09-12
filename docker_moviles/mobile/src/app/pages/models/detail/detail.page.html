@@ -1,0 +1,24 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/models/list"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle de Modelo</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="modelItem">
+    <ion-card>
+      <ion-card-content>
+        <h2>Nombre: {{ modelItem.name }}</h2>
+        <p><strong>Marca ID:</strong> {{ modelItem.brand_id }}</p>
+        <p><strong>Estado:</strong> {{ modelItem.is_active ? 'Activo' : 'Inactivo' }}</p>
+        <p><strong>Registro:</strong> {{ modelItem.created_at | date:'yyyy-MM-dd' }}</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+  <div *ngIf="!modelItem" class="ion-text-center">
+    <p>Cargando informacion...</p>
+  </div>
+</ion-content>

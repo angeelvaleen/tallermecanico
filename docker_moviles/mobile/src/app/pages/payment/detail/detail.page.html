@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/payment/list"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle de Pago</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="payment">
+    <ion-card>
+      <ion-card-content>
+        <h2>Cotizacion ID: {{ payment.quote_id }}</h2>
+        <p><strong>Metodo ID:</strong> {{ payment.method_id }}</p>
+        <p><strong>Estado ID:</strong> {{ payment.status_id }}</p>
+        <p><strong>Monto:</strong> ${{ payment.amount }}</p>
+        <p><strong>Referencia:</strong> {{ payment.reference || 'Sin referencia' }}</p>
+        <p><strong>Fecha de Pago:</strong> {{ payment.paid_at || 'Pendiente' }}</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+  <div *ngIf="!payment" class="ion-text-center">
+    <p>Cargando informacion...</p>
+  </div>
+</ion-content>
