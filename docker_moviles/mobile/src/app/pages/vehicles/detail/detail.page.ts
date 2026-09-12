@@ -40,7 +40,7 @@ export class DetailPage implements OnInit {
   async chargerVehicleById(id: string): Promise<void> {
     try {
       const response = await axios.get<{ data: Vehicle }>(
-        `${environment.apiUrl}/items/vehicles/${id}`
+        `${environment.apiUrl}/vehicles/${id}`
       );
       this.vehicle = response.data.data;
     } catch (error) {

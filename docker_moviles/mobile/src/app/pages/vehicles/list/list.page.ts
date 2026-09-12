@@ -35,7 +35,7 @@ export class ListPage implements OnInit {
   async chargerVehicles(): Promise<void> {
     try {
       const response = await axios.get<{ data: Vehicle[] }>(
-        `${environment.apiUrl}/items/vehicles`
+        `${environment.apiUrl}/vehicles`
       );
       this.vehicles = response.data.data;
     } catch (error) {

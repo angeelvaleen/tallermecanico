@@ -1,15 +1,19 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Marcas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
 <ion-content>
   <ion-list>
-    <ion-item *ngFor="let item of brands">
+    <ion-item *ngFor="let brand of brands">
       <ion-label class="ion-text-wrap">
-        <h2>{{ item.name }}</h2>
-        <p>Estado: {{ item.is_active ? 'Activo' : 'Inactivo' }}</p>
-        <p>Registro: {{ item.created_at | date:'yyyy-MM-dd' }}</p>
+        <h2>{{ brand.name }}</h2>
+        <p>Estado: {{ brand.is_active ? 'Activo' : 'Inactivo' }}</p>
+        <p>Registro: {{ brand.created_at | date:'yyyy-MM-dd' }}</p>
       </ion-label>
-      <!-- Cambiamos routerLink por (click) para evitar el bloqueo de foco -->
-      <ion-button slot="end" (click)="verDetalle(item.id, $event)">
-        <ion-icon slot="start" name="eye-outline"></ion-icon>
-        Ver detalle
+      <ion-button slot="end" [routerLink]="['/brands/detail', brand.id]">
+        <ion-icon name="eye-outline"></ion-icon>
       </ion-button>
     </ion-item>
   </ion-list>

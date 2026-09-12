@@ -7,23 +7,18 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content>
+  <ion-text color="danger" *ngIf="messageError">
+    <p class="ion-padding">{{ messageError }}</p>
+  </ion-text>
+
+
   <!-- Muestra la tarjeta si ya hay datos -->
-  <ion-card *ngIf="brand">
+  <ion-card *ngIf="brand as detail">
     <ion-card-content>
-      <h2>{{ brand.name }}</h2>
-      <p><strong>Estado:</strong> {{ brand.is_active ? 'Activo' : 'Inactivo' }}</p>
-      <p><strong>Registro:</strong> {{ brand.created_at | date:'yyyy-MM-dd' }}</p>
+      <h2>{{ detail.name }}</h2>
+      <p><strong>Estado:</strong> {{ detail.is_active ? 'Activo' : 'Inactivo' }}</p>
+      <p><strong>Registro:</strong> {{ detail.created_at | date:'yyyy-MM-dd' }}</p>
     </ion-card-content>
   </ion-card>
-
-  <!-- Muestra esto mientras está cargando -->
-  <div *ngIf="cargando" class="ion-text-center ion-padding">
-    <p>Cargando información...</p>
-  </div>
-
-  <!-- Muestra esto si hubo algún error -->
-  <div *ngIf="!cargando && !brand" class="ion-text-center ion-padding">
-    <p color="danger">{{ mensajeError }}</p>
-  </div>
 </ion-content>
