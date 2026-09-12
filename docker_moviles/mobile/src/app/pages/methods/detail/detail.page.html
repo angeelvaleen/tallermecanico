@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/methods/list"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle de Metodo</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="method">
+    <ion-card>
+      <ion-card-content>
+        <h2>Nombre: {{ method.name }}</h2>
+        <p><strong>Estado:</strong> {{ method.is_active ? 'Activo' : 'Inactivo' }}</p>
+        <p><strong>Registro:</strong> {{ method.created_at | date:'yyyy-MM-dd' }}</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+  <div *ngIf="!method" class="ion-text-center">
+    <p>Cargando informacion...</p>
+  </div>
+</ion-content>

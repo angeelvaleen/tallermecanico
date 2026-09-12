@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/quotes/list"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle de Cotizacion</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="quote">
+    <ion-card>
+      <ion-card-content>
+        <h2>Orden de Trabajo ID: {{ quote.workorder_id }}</h2>
+        <p><strong>Usuario ID:</strong> {{ quote.user_id }}</p>
+        <p><strong>Estado ID:</strong> {{ quote.status_id }}</p>
+        <p><strong>Subtotal:</strong> ${{ quote.subtotal }}</p>
+        <p><strong>Impuesto:</strong> ${{ quote.tax }}</p>
+        <p><strong>Total:</strong> ${{ quote.total }}</p>
+        <p><strong>Validez:</strong> {{ quote.validity || 'Sin definir' }}</p>
+        <p><strong>Registro:</strong> {{ quote.created_at | date:'yyyy-MM-dd' }}</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+  <div *ngIf="!quote" class="ion-text-center">
+    <p>Cargando informacion...</p>
+  </div>
+</ion-content>

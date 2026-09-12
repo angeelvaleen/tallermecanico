@@ -1,0 +1,25 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/services/list"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle de Servicio</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="service">
+    <ion-card>
+      <ion-card-content>
+        <h2>Nombre: {{ service.name }}</h2>
+        <p><strong>Precio:</strong> ${{ service.price }}</p>
+        <p><strong>Descripcion:</strong> {{ service.description || 'Sin descripcion' }}</p>
+        <p><strong>Estado:</strong> {{ service.is_active ? 'Activo' : 'Inactivo' }}</p>
+        <p><strong>Registro:</strong> {{ service.created_at | date:'yyyy-MM-dd' }}</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+  <div *ngIf="!service" class="ion-text-center">
+    <p>Cargando informacion...</p>
+  </div>
+</ion-content>

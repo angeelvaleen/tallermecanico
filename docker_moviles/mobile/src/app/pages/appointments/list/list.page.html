@@ -1,0 +1,21 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Citas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item *ngFor="let item of appointments">
+      <ion-label class="ion-text-wrap">
+        <h2>Fecha: {{ item.date }} - {{ item.time }}</h2>
+        <p>Vehiculo ID: {{ item.vehicle_id }}</p>
+        <p>Motivo: {{ item.reason }}</p>
+      </ion-label>
+      <ion-button slot="end" [routerLink]="['/appointments/detail', item.id]">
+        <ion-icon slot="start" name="eye-outline"></ion-icon>
+        Ver detalle
+      </ion-button>
+    </ion-item>
+  </ion-list>
+</ion-content>

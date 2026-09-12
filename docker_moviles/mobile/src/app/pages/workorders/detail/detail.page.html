@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/workorders/list"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle de Orden</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="workorder">
+    <ion-card>
+      <ion-card-content>
+        <h2>Vehiculo ID: {{ workorder.vehicle_id }}</h2>
+        <p><strong>Mecanico ID:</strong> {{ workorder.mechanic_id }}</p>
+        <p><strong>Estado ID:</strong> {{ workorder.status_id }}</p>
+        <p><strong>Kilometraje:</strong> {{ workorder.mileage }}</p>
+        <p><strong>Entrega:</strong> {{ workorder.delivery || 'Sin fecha de entrega' }}</p>
+        <p><strong>Registro:</strong> {{ workorder.created_at | date:'yyyy-MM-dd' }}</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+  <div *ngIf="!workorder" class="ion-text-center">
+    <p>Cargando informacion...</p>
+  </div>
+</ion-content>

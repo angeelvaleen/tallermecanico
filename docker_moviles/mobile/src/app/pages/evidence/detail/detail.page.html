@@ -1,0 +1,25 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/evidence/list"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle de Evidencia</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="evidence">
+    <ion-card>
+      <ion-card-content>
+        <h2>Orden de Trabajo ID: {{ evidence.workorder_id }}</h2>
+        <p><strong>Ruta:</strong> {{ evidence.path }}</p>
+        <p><strong>Formato:</strong> {{ evidence.format }}</p>
+        <p><strong>Tamano:</strong> {{ evidence.size }} bytes</p>
+        <p><strong>Registro:</strong> {{ evidence.created_at | date:'yyyy-MM-dd' }}</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+  <div *ngIf="!evidence" class="ion-text-center">
+    <p>Cargando informacion...</p>
+  </div>
+</ion-content>

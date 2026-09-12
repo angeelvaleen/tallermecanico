@@ -1,0 +1,21 @@
+/* Estilos independientes para mantener el diseno separado de la logica */
+ion-content {
+  --background: #F8FAFC;
+}
+
+ion-list {
+  background: transparent;
+  padding-bottom: 20px;
+}
+
+/* Ajustes especificos para optimizar la experiencia en pantalla movil */
+.ion-text-wrap {
+  h2 {
+    font-size: 1rem;
+    margin-bottom: 4px;
+  }
+  p {
+    font-size: 0.85rem;
+    margin: 2px 0;
+  }
+}

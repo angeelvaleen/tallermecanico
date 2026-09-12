@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/colors/list"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle de Color</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="color">
+    <ion-card>
+      <ion-card-content>
+        <h2>Nombre: {{ color.name }}</h2>
+        <p><strong>Estado:</strong> {{ color.is_active ? 'Activo' : 'Inactivo' }}</p>
+        <p><strong>Registro:</strong> {{ color.created_at | date:'yyyy-MM-dd' }}</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+  <div *ngIf="!color" class="ion-text-center">
+    <p>Cargando informacion...</p>
+  </div>
+</ion-content>

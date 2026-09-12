@@ -1,0 +1,15 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Colores</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item *ngFor="let c of colors">
+      <ion-label>
+        <h2>{{ c.name }}</h2>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>
