@@ -26,7 +26,7 @@ export class ListPage implements OnInit {
   async chargerColors(): Promise<void> {
     try {
       const response = await axios.get<{ data: Color[] }>(
-        `${environment.apiUrl}/items/colors`
+        `${environment.apiUrl}/colors`
       );
       this.colors = response.data.data;
     } catch (error) {
