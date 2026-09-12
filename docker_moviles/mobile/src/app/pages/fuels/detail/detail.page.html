@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/fuels/list"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle de Combustible</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="fuel">
+    <ion-card>
+      <ion-card-content>
+        <h2>Nombre: {{ fuel.name }}</h2>
+        <p><strong>Estado:</strong> {{ fuel.is_active ? 'Activo' : 'Inactivo' }}</p>
+        <p><strong>Registro:</strong> {{ fuel.created_at | date:'yyyy-MM-dd' }}</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+  <div *ngIf="!fuel" class="ion-text-center">
+    <p>Cargando informacion...</p>
+  </div>
+</ion-content>

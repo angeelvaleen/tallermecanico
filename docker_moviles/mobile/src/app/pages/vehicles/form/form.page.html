@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/vehicles/list"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ vehicleId ? 'Editar Vehiculo' : 'Nuevo Vehiculo' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-item>
+    <ion-input label="Placa" labelPlacement="stacked" [(ngModel)]="vehicle.plate" placeholder="Ej: ABC1234"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-input label="VIN" labelPlacement="stacked" [(ngModel)]="vehicle.vin" placeholder="Número de serie"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-input label="Año" labelPlacement="stacked" [(ngModel)]="vehicle.year" placeholder="2023"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-input label="Kilometraje" labelPlacement="stacked" type="number" [(ngModel)]="vehicle.mileage" placeholder="0"></ion-input>
+  </ion-item>
+
+  <ion-button expand="block" class="ion-margin-top" (click)="guardar()">
+    Guardar
+  </ion-button>
+
+</ion-content>

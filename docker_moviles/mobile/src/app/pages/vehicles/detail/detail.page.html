@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/vehicles/list"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle del Vehiculo</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <div *ngIf="vehicle">
+    <ion-card>
+      <ion-card-content>
+        <h2>Placa: {{ vehicle.plate }}</h2>
+        <p><strong>VIN:</strong> {{ vehicle.vin }}</p>
+        <p><strong>Year:</strong> {{ vehicle.year }}</p>
+        <p><strong>Kilometraje:</strong> {{ vehicle.mileage }}</p>
+        <p><strong>Estado:</strong> {{ vehicle.is_active ? 'Activo' : 'Inactivo' }}</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <div *ngIf="!vehicle" class="ion-text-center">
+    <p>Cargando informacion...</p>
+  </div>
+
+</ion-content>
