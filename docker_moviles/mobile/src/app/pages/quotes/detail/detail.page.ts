@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { LoadingController } from '@ionic/angular';
 import axios from 'axios';
-import { environment } from '../../../../environments/environment';
+import { environment } from 'src/environments/environment';
 
 interface Quote {
   id: number;
@@ -23,24 +24,41 @@ interface Quote {
 })
 export class DetailPage implements OnInit {
   quote: Quote | null = null;
+  messageError:string="";
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(
+    private route: ActivatedRoute,
+    private loading: LoadingController,
+  ) {}
 
   ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.chargerQuoteById(id);
-    }
+    this.chargerQuote();
   }
 
-  async chargerQuoteById(id: string): Promise<void> {
+  async chargerQuote(): Promise<void> {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) {
+      this.messageError='No se proporciono id';
+      return;
+    }
+
+    const loading = await this.loading.create({
+      message:"Cargando couta...",
+      spinner:"crescent"
+    })
+
+    await loading.present();
+
     try {
       const response = await axios.get<{ data: Quote }>(
-        `${environment.apiUrl}/items/quotes/${id}`
+        `${environment.apiUrl}/quotes/${encodeURIComponent(id)}`
       );
       this.quote = response.data.data;
     } catch (error) {
+      this.messageError="Revisar id, conexion a base de datos o permisos";
       console.log('Error al cargar detalle de cotizacion', error);
+    }finally{
+      await loading.dismiss();
     }
   }
 }

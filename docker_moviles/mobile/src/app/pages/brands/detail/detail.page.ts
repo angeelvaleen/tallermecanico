@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
-import { ChangeDetectorRef } from '@angular/core';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
 
@@ -25,7 +24,6 @@ export class DetailPage implements OnInit{
   constructor(
     private route: ActivatedRoute,
     private loading: LoadingController,
-    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit():void{
@@ -56,7 +54,6 @@ export class DetailPage implements OnInit{
     );
 
     this.brand = response.data.data;
-    this.cdr.detectChanges();
     } catch (error) {
       console.error('Error al cargar el producto:', error);
       this.messageError = 'No se pudo cargar el producto. Revisa el ID, la conexión y los permisos de lectura.';

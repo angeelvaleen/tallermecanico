@@ -10,10 +10,9 @@
       <ion-label class="ion-text-wrap">
         <h2>Fecha: {{ item.date }} - {{ item.time }}</h2>
         <p>Vehiculo ID: {{ item.vehicle_id }}</p>
-        <p>Motivo: {{ item.reason }}</p>
       </ion-label>
       <ion-button slot="end" [routerLink]="['/appointments/detail', item.id]">
-        <ion-icon slot="start" name="eye-outline"></ion-icon>
+        <ion-icon  name="eye-outline"></ion-icon>
       </ion-button>
     </ion-item>
   </ion-list>

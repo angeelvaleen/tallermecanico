@@ -6,11 +6,14 @@
 
 <ion-content>
   <ion-list>
-    <ion-item *ngFor="let q of quotes">
+    <ion-item *ngFor="let quote of quotes">
       <ion-label>
-        <h2>Cotizacion #{{ q.id }}</h2>
-        <p>Total: ${{ q.total }}</p>
+        <h2>Cotizacion #{{ quote.id }}</h2>
+        <p>Total: ${{ quote.total }}</p>
       </ion-label>
+      <ion-button [routerLink]="['/quotes/detail',quote.id]">
+        <ion-icon name="eye-outline" ></ion-icon>
+      </ion-button>
     </ion-item>
   </ion-list>
 </ion-content>

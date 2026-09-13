@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { LoadingController } from '@ionic/angular';
 import axios from 'axios';
 import { environment } from '../../../../environments/environment';
 
@@ -27,24 +28,43 @@ interface Vehicle {
 export class DetailPage implements OnInit {
 
   vehicle: Vehicle | null = null;
+  messageError:string = "";
 
-  constructor(private route: ActivatedRoute) { }
+  constructor(
+    private route: ActivatedRoute,
+    private loading: LoadingController,
+  ) { }
 
   ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.chargerVehicleById(id);
-    }
+    this.chargerVehicle();
   }
 
-  async chargerVehicleById(id: string): Promise<void> {
+  async chargerVehicle(): Promise<void> {
+
+    const id = this.route.snapshot.paramMap.get('id');
+    
+    if (!id) {
+      this.messageError='No se proporciono ID';
+      return;
+    }
+
+    const loading = await this.loading.create({
+      message:"Cargando vehiculo...",
+      spinner:"crescent",
+    })
+
+    await loading.present();
+
     try {
       const response = await axios.get<{ data: Vehicle }>(
-        `${environment.apiUrl}/vehicles/${id}`
+        `${environment.apiUrl}/vehicles/${encodeURIComponent(id)}`
       );
       this.vehicle = response.data.data;
     } catch (error) {
+      this.messageError="Revisar id, conexion a base de datos o permisos"
       console.log('Error al cargar detalle del vehiculo', error);
+    }finally{
+      await loading.dismiss();
     }
   }
 

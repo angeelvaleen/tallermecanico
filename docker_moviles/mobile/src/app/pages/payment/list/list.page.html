@@ -6,11 +6,14 @@
 
 <ion-content>
   <ion-list>
-    <ion-item *ngFor="let pay of payments">
+    <ion-item *ngFor="let payment of payments">
       <ion-label>
-        <h2>Monto: ${{ pay.amount }}</h2>
-        <p>Referencia: {{ pay.reference || 'N/A' }}</p>
+        <h2>Monto: ${{ payment.amount }}</h2>
+        <p>Referencia: {{ payment.reference || 'N/A' }}</p>
       </ion-label>
+      <ion-button [routerLink]="['/payment/detail',payment.id]" >
+        <ion-icon name="eye-outline" ></ion-icon>
+      </ion-button>
     </ion-item>
   </ion-list>
 </ion-content>

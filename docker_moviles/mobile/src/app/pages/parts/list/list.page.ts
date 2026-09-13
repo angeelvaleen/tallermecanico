@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import axios from 'axios';
-import { environment } from '../../../../environments/environment';
+import { environment } from 'src/environments/environment';
 
 interface Part {
   id: number;
   name: string;
   price: number;
   description: string;
+  created_at:string;
 }
 
 @Component({
@@ -27,7 +28,7 @@ export class ListPage implements OnInit {
   async chargerParts(): Promise<void> {
     try {
       const response = await axios.get<{ data: Part[] }>(
-        `${environment.apiUrl}/items/parts`
+        `${environment.apiUrl}/parts`
       );
       this.parts = response.data.data;
     } catch (error) {
