@@ -1,12 +1,15 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { LoadingController } from '@ionic/angular';
 import axios from 'axios';
-import { environment } from '../../../../environments/environment';
+import { environment } from 'src/environments/environment';
 
 interface Diagnosis {
   id: number;
   workorder_id: number;
   description: string;
   result: string;
+  created_at: string;
 }
 
 @Component({
@@ -27,7 +30,7 @@ export class ListPage implements OnInit {
   async chargerDiagnoses(): Promise<void> {
     try {
       const response = await axios.get<{ data: Diagnosis[] }>(
-        `${environment.apiUrl}/items/diagnoses`
+        `${environment.apiUrl}/diagnoses`
       );
       this.diagnoses = response.data.data;
     } catch (error) {

@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { LoadingController } from '@ionic/angular';
 import axios from 'axios';
-import { environment } from '../../../../environments/environment';
+import { environment } from 'src/environments/environment';
 
-interface HistoryItem {
+interface History {
   id: number;
   vehicle_id: number;
   workorder_id: number;
@@ -17,25 +18,44 @@ interface HistoryItem {
   standalone: false,
 })
 export class DetailPage implements OnInit {
-  historyItem: HistoryItem | null = null;
+  history: History | null = null;
+  messageError:string = "";
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(
+    private route: ActivatedRoute,
+    private loading: LoadingController,
+  ) {}
 
   ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.chargerHistoryById(id);
-    }
+    this.chargerHistory();
   }
 
-  async chargerHistoryById(id: string): Promise<void> {
+  async chargerHistory(): Promise<void> {
+    const id = this.route.snapshot.paramMap.get('id');
+
+    if(!id){
+        this.messageError="No se proporciono ID";
+        return;
+    };
+
+    const loading = await this.loading.create({
+      message:'Cargando historial...',
+      spinner:'bubbles',
+    });
+
+    await loading.present();
+
     try {
-      const response = await axios.get<{ data: HistoryItem }>(
-        `${environment.apiUrl}/items/history/${id}`
+      const response = await axios.get<{ data: History }>(
+        `${environment.apiUrl}/history/${encodeURIComponent(id)}`
       );
-      this.historyItem = response.data.data;
+
+      this.history = response.data.data;
     } catch (error) {
+      this.messageError="No se pudo cargar el producto. Revisa el ID, la conexión y los permisos de lectura.";
       console.log('Error al cargar detalle de historial', error);
+    }finally{
+      await loading.dismiss();
     }
   }
 }

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { LoadingController } from '@ionic/angular';
 import axios from 'axios';
-import { environment } from '../../../../environments/environment';
+import { environment } from 'src/environments/environment';
 
 interface Part {
   id: number;
@@ -20,24 +21,42 @@ interface Part {
 })
 export class DetailPage implements OnInit {
   part: Part | null = null;
+  messageError:string = '';
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(
+    private route: ActivatedRoute,
+    private loading: LoadingController,
+  ) {}
 
   ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.chargerPartById(id);
-    }
+    this.chargerPart();
   }
 
-  async chargerPartById(id: string): Promise<void> {
+  async chargerPart(): Promise<void> {
+    const id = this.route.snapshot.paramMap.get('id');
+    
+    if (!id) {
+      this.messageError='No se proporciono ID';
+      return;
+    }
+    
+    const loading = await this.loading.create({
+      message:"Cargando refaccion...",
+      spinner:"bubbles",
+    });
+
+    await loading.present();
+
     try {
       const response = await axios.get<{ data: Part }>(
-        `${environment.apiUrl}/items/parts/${id}`
+        `${environment.apiUrl}/parts/${encodeURIComponent(id)}`
       );
       this.part = response.data.data;
     } catch (error) {
+      this.messageError="Revisar id, conexion a base de datos o permisos";
       console.log('Error al cargar detalle de refaccion', error);
+    }finally{
+      await loading.dismiss();
     }
   }
 }

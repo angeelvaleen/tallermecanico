@@ -6,11 +6,14 @@
 
 <ion-content>
   <ion-list>
-    <ion-item *ngFor="let mo of models">
+    <ion-item *ngFor="let model of models">
       <ion-label>
-        <h2>{{ mo.name }}</h2>
-        <p>Marca ID: {{ mo.brand_id }}</p>
+        <h2>{{ model.name }}</h2>
+        <p>Marca ID: {{ model.brand_id }}</p>
       </ion-label>
+      <ion-button [routerLink]="['/models/detail', model.id]">
+          <ion-icon name="eye-outline" ></ion-icon>
+      </ion-button>
     </ion-item>
   </ion-list>
 </ion-content>

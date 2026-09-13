@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { LoadingController } from '@ionic/angular';
 import axios from 'axios';
-import { environment } from '../../../../environments/environment';
+import { environment } from 'src/environments/environment';
 
 interface Evidence {
   id: number;
@@ -13,31 +14,50 @@ interface Evidence {
 }
 
 @Component({
-  selector: 'app-evidence-detail',
+  selector: 'app-evidences-detail',
   templateUrl: './detail.page.html',
   styleUrls: ['./detail.page.scss'],
   standalone: false,
 })
 export class DetailPage implements OnInit {
   evidence: Evidence | null = null;
+  messageError: string = "";
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(
+    private route: ActivatedRoute,
+    private loading: LoadingController,
+  ) {}
 
   ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.chargerEvidenceById(id);
-    }
+    this.chargerEvidence();
   }
 
-  async chargerEvidenceById(id: string): Promise<void> {
+  async chargerEvidence(): Promise<void> {
+    const id = this.route.snapshot.paramMap.get('id');
+
+    if(!id){
+      this.messageError="No se proporciono ID";
+      return;
+    }
+
+    const loading = await this.loading.create({
+        message:'Cargando evidencia...',
+        spinner:'bubbles',
+    });
+
+    await loading.present();
+    
     try {
       const response = await axios.get<{ data: Evidence }>(
-        `${environment.apiUrl}/items/evidence/${id}`
+        `${environment.apiUrl}/evidence/${encodeURIComponent(id)}`
       );
+      
       this.evidence = response.data.data;
     } catch (error) {
       console.log('Error al cargar detalle de evidencia', error);
+      this.messageError= "No se pudo cargar el producto. Revisa el ID, la conexión y los permisos de lectura.";
+    }finally{
+      await loading.dismiss();
     }
   }
 }

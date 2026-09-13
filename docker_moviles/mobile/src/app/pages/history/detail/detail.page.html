@@ -8,16 +8,17 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <div *ngIf="historyItem">
+  <ion-text color="danger" *ngIf="messageError">
+    <p class="ion-padding">{{ messageError }}</p>
+  </ion-text>
+
+  <div *ngIf="history">
     <ion-card>
       <ion-card-content>
-        <h2>Vehiculo ID: {{ historyItem.vehicle_id }}</h2>
-        <p><strong>Orden de Trabajo ID:</strong> {{ historyItem.workorder_id }}</p>
-        <p><strong>Registro:</strong> {{ historyItem.created_at | date:'yyyy-MM-dd' }}</p>
+        <h2>Vehiculo ID: {{ history.vehicle_id }}</h2>
+        <p><strong>Orden de Trabajo ID:</strong> {{ history.workorder_id }}</p>
+        <p><strong>Registro:</strong> {{ history.created_at | date:'yyyy-MM-dd' }}</p>
       </ion-card-content>
     </ion-card>
-  </div>
-  <div *ngIf="!historyItem" class="ion-text-center">
-    <p>Cargando informacion...</p>
   </div>
 </ion-content>

@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import axios from 'axios';
-import { environment } from '../../../../environments/environment';
+import { environment } from 'src/environments/environment';
 
 interface Evidence {
   id: number;
   workorder_id: number;
   path: string;
   format: string;
+  created_at: string;
 }
 
 @Component({
@@ -16,20 +17,20 @@ interface Evidence {
   standalone: false,
 })
 export class ListPage implements OnInit {
-  evidenceList: Evidence[] = [];
+  evidences: Evidence[] = [];
 
   constructor() {}
 
   ngOnInit() {
-    this.chargerEvidence();
+    this.chargerEvidences();
   }
 
-  async chargerEvidence(): Promise<void> {
+  async chargerEvidences(): Promise<void> {
     try {
       const response = await axios.get<{ data: Evidence[] }>(
-        `${environment.apiUrl}/items/evidence`
+        `${environment.apiUrl}/evidence`
       );
-      this.evidenceList = response.data.data;
+      this.evidences = response.data.data;
     } catch (error) {
       console.log('Error al cargar evidencias', error);
     }

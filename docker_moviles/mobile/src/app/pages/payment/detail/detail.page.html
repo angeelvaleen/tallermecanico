@@ -8,6 +8,10 @@
 </ion-header>
 
 <ion-content class="ion-padding">
+  <ion-text color="danger" *ngIf="messageError">
+    <p class="ion-padding">{{ messageError }}</p>
+  </ion-text>
+
   <div *ngIf="payment">
     <ion-card>
       <ion-card-content>
@@ -19,8 +23,5 @@
         <p><strong>Fecha de Pago:</strong> {{ payment.paid_at || 'Pendiente' }}</p>
       </ion-card-content>
     </ion-card>
-  </div>
-  <div *ngIf="!payment" class="ion-text-center">
-    <p>Cargando informacion...</p>
   </div>
 </ion-content>

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import axios from 'axios';
-import { environment } from '../../../../environments/environment';
+import { environment } from 'src/environments/environment';
 
 interface Workorder {
   id: number;
@@ -27,7 +27,7 @@ export class ListPage implements OnInit {
   async chargerWorkorders(): Promise<void> {
     try {
       const response = await axios.get<{ data: Workorder[] }>(
-        `${environment.apiUrl}/items/workorders`
+        `${environment.apiUrl}/workorders`
       );
       this.workorders = response.data.data;
     } catch (error) {

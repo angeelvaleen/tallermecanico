@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import axios from 'axios';
-import { environment } from '../../../../environments/environment';
+import { environment } from 'src/environments/environment';
 
 interface Fuel {
   id: number;
   name: string;
   is_active: boolean;
+  created_at: string;
 }
 
 @Component({
@@ -26,8 +27,9 @@ export class ListPage implements OnInit {
   async chargerFuels(): Promise<void> {
     try {
       const response = await axios.get<{ data: Fuel[] }>(
-        `${environment.apiUrl}/items/fuels`
+        `${environment.apiUrl}/fuels`
       );
+      
       this.fuels = response.data.data;
     } catch (error) {
       console.log('Error al cargar combustibles', error);

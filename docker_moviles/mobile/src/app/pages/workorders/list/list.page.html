@@ -6,11 +6,14 @@
 
 <ion-content>
   <ion-list>
-    <ion-item *ngFor="let w of workorders">
+    <ion-item *ngFor="let workorder of workorders">
       <ion-label>
-        <h2>Orden #{{ w.id }}</h2>
-        <p>Kilometraje: {{ w.mileage }} km</p>
+        <h2>Orden #{{ workorder.id }}</h2>
+        <p>Kilometraje: {{ workorder.mileage }} km</p>
       </ion-label>
+      <ion-button [routerLink]="['/workorders/detail', workorder.id]" >
+          <ion-icon name="eye-outline" ></ion-icon>
+      </ion-button>
     </ion-item>
   </ion-list>
 </ion-content>

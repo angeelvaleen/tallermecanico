@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import axios from 'axios';
-import { environment } from '../../../../environments/environment';
+import { environment } from 'src/environments/environment';
 
-interface HistoryItem {
+interface History {
   id: number;
   vehicle_id: number;
   workorder_id: number;
@@ -16,7 +16,7 @@ interface HistoryItem {
   standalone: false,
 })
 export class ListPage implements OnInit {
-  historyItems: HistoryItem[] = [];
+  history: History[] = [];
 
   constructor() {}
 
@@ -26,10 +26,10 @@ export class ListPage implements OnInit {
 
   async chargerHistory(): Promise<void> {
     try {
-      const response = await axios.get<{ data: HistoryItem[] }>(
-        `${environment.apiUrl}/items/history`
+      const response = await axios.get<{ data: History[] }>(
+        `${environment.apiUrl}/history`
       );
-      this.historyItems = response.data.data;
+      this.history = response.data.data;
     } catch (error) {
       console.log('Error al cargar historial', error);
     }

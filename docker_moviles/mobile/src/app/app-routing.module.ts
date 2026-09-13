@@ -55,15 +55,15 @@ const routes: Routes = [
     loadChildren: () => import('./pages/diagnoses/list/list.module').then( m => m.ListPageModule)
   },
   {
-    path: 'evidence/detail/:id',
+    path: 'evidences/detail/:id',
     loadChildren: () => import('./pages/evidence/detail/detail.module').then( m => m.DetailPageModule)
   },
   {
-    path: 'evidence/form',
+    path: 'evidences/form',
     loadChildren: () => import('./pages/evidence/form/form.module').then( m => m.FormPageModule)
   },
   {
-    path: 'evidence/list',
+    path: 'evidences/list',
     loadChildren: () => import('./pages/evidence/list/list.module').then( m => m.ListPageModule)
   },
   {

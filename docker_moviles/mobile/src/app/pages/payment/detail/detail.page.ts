@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { LoadingController } from '@ionic/angular';
 import axios from 'axios';
 import { environment } from '../../../../environments/environment';
 
@@ -21,24 +22,42 @@ interface Payment {
 })
 export class DetailPage implements OnInit {
   payment: Payment | null = null;
+  messageError:string="";
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(
+    private route: ActivatedRoute,
+    private loading: LoadingController,
+  ) {}
 
   ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.chargerPaymentById(id);
-    }
+    this.chargerPayment();
   }
 
-  async chargerPaymentById(id: string): Promise<void> {
+  async chargerPayment(): Promise<void> {
+     const id = this.route.snapshot.paramMap.get('id');
+    
+     if(!id) {
+      this.messageError="No se proporciono ID";
+      return;
+    }
+
+    const loading = await this.loading.create({
+      message:"Cargando pago...",
+      spinner:"crescent",
+    });
+
+    await loading.present();
+
     try {
       const response = await axios.get<{ data: Payment }>(
-        `${environment.apiUrl}/items/payment/${id}`
+        `${environment.apiUrl}/payment/${encodeURIComponent(id)}`
       );
       this.payment = response.data.data;
     } catch (error) {
+      this.messageError="Revisar id, conexion a base de datos o permisos";
       console.log('Error al cargar detalle de pago', error);
+    }finally{
+      await loading.dismiss();
     }
   }
 }

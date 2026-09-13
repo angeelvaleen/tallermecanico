@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { LoadingController } from '@ionic/angular';
 import axios from 'axios';
-import { environment } from '../../../../environments/environment';
+import { environment } from 'src/environments/environment';
 
 interface Service {
   id: number;
@@ -20,24 +21,43 @@ interface Service {
 })
 export class DetailPage implements OnInit {
   service: Service | null = null;
+  messageError:string = '';
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(
+    private route: ActivatedRoute,
+    private loading: LoadingController,
+  ) {}
 
   ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.chargerServiceById(id);
-    }
+    this.chargerService();
   }
 
-  async chargerServiceById(id: string): Promise<void> {
+  async chargerService(): Promise<void> {
+
+    const id = this.route.snapshot.paramMap.get('id');
+    
+    if (!id) {
+      this.messageError='No se proporciono ID';
+      return;
+    }
+
+    const loading = await this.loading.create({
+      message:"Cargando servicio...",
+      spinner:"crescent",
+    })
+
+    await loading.present();
+
     try {
       const response = await axios.get<{ data: Service }>(
-        `${environment.apiUrl}/items/services/${id}`
+        `${environment.apiUrl}/services/${encodeURIComponent(id)}`
       );
       this.service = response.data.data;
     } catch (error) {
+      this.messageError='Revisar id, conexion a base de datos o permisos';
       console.log('Error al cargar detalle de servicio', error);
+    }finally{
+      await loading.dismiss();
     }
   }
 }

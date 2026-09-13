@@ -6,9 +6,12 @@
 
 <ion-content>
   <ion-list>
-    <ion-item *ngFor="let m of methods">
+    <ion-item *ngFor="let method of methods">
       <ion-label>
-        <h2>{{ m.name }}</h2>
+        <h2>{{ method.name }}</h2>
+        <ion-button [routerLink]="['/methods/detail',method.id]">
+          <ion-icon name="eye-outline" ></ion-icon>
+        </ion-button>
       </ion-label>
     </ion-item>
   </ion-list>
