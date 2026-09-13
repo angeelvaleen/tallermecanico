@@ -8,6 +8,10 @@
 </ion-header>
 
 <ion-content class="ion-padding">
+  <ion-text color="danger" *ngIf="messageError" >
+    <p class="ion-padding">{{ messageError }}</p>
+  </ion-text>
+
   <div *ngIf="quote">
     <ion-card>
       <ion-card-content>
@@ -21,8 +25,5 @@
         <p><strong>Registro:</strong> {{ quote.created_at | date:'yyyy-MM-dd' }}</p>
       </ion-card-content>
     </ion-card>
-  </div>
-  <div *ngIf="!quote" class="ion-text-center">
-    <p>Cargando informacion...</p>
   </div>
 </ion-content>

@@ -6,11 +6,14 @@
 
 <ion-content>
   <ion-list>
-    <ion-item *ngFor="let p of parts">
+    <ion-item *ngFor="let part of parts">
       <ion-label>
-        <h2>{{ p.name }}</h2>
-        <p>Precio: ${{ p.price }}</p>
+        <h2>{{ part.name }}</h2>
+        <p>Precio: ${{ part.price }}</p>
       </ion-label>
+      <ion-button [routerLink]="['/parts/detail',part.id]">
+          <ion-icon name="eye-outline"></ion-icon>
+      </ion-button>
     </ion-item>
   </ion-list>
 </ion-content>

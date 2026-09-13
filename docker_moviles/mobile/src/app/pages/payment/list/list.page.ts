@@ -1,12 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import axios from 'axios';
-import { environment } from '../../../../environments/environment';
+import { environment } from 'src/environments/environment';
 
 interface Payment {
   id: number;
   quote_id: number;
+  status_id: number;
+  method_id:number;
   amount: number;
   reference: string;
+  paid_at:string;
 }
 
 @Component({
@@ -27,7 +30,7 @@ export class ListPage implements OnInit {
   async chargerPayments(): Promise<void> {
     try {
       const response = await axios.get<{ data: Payment[] }>(
-        `${environment.apiUrl}/items/payment`
+        `${environment.apiUrl}/payment`
       );
       this.payments = response.data.data;
     } catch (error) {

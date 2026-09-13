@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { LoadingController } from '@ionic/angular';
 import axios from 'axios';
-import { environment } from '../../../../environments/environment';
+import { environment } from 'src/environments/environment';
 
-interface ModelItem {
+interface Model {
   id: number;
   brand_id: number;
   name: string;
@@ -18,25 +19,43 @@ interface ModelItem {
   standalone: false,
 })
 export class DetailPage implements OnInit {
-  modelItem: ModelItem | null = null;
+  model: Model | null = null;
+  messageError:string = "";
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(
+    private route: ActivatedRoute,
+    private loading: LoadingController,
+  ) {}
 
   ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.chargerModelById(id);
-    }
+    this.chargerModel();
   }
 
-  async chargerModelById(id: string): Promise<void> {
+  async chargerModel(): Promise<void> {
+    const id = this.route.snapshot.paramMap.get('id');
+
+    if(!id){
+      this.messageError="No se proporciono ID";
+      return;
+    }
+
+    const loading = await this.loading.create({
+      message:'Cargando modelo...',
+      spinner:'bubbles',
+    });
+
+    await loading.present();
+
     try {
-      const response = await axios.get<{ data: ModelItem }>(
-        `${environment.apiUrl}/items/models/${id}`
+      const response = await axios.get<{ data: Model }>(
+        `${environment.apiUrl}/models/${encodeURIComponent(id)}`
       );
-      this.modelItem = response.data.data;
+      this.model = response.data.data;
     } catch (error) {
+      this.messageError="Revisar id,conexion a base de datos o permisos";
       console.log('Error al cargar detalle de modelo', error);
+    }finally{
+      await loading.dismiss();
     }
   }
 }

@@ -8,17 +8,19 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <div *ngIf="modelItem">
+  <ion-text color="danger" *ngIf="messageError">
+    <p class="ion-padding">{{ messageError }}</p>
+  </ion-text>
+
+
+  <div *ngIf="model">
     <ion-card>
       <ion-card-content>
-        <h2>Nombre: {{ modelItem.name }}</h2>
-        <p><strong>Marca ID:</strong> {{ modelItem.brand_id }}</p>
-        <p><strong>Estado:</strong> {{ modelItem.is_active ? 'Activo' : 'Inactivo' }}</p>
-        <p><strong>Registro:</strong> {{ modelItem.created_at | date:'yyyy-MM-dd' }}</p>
+        <h2>Nombre: {{ model.name }}</h2>
+        <p><strong>Marca ID:</strong> {{ model.brand_id }}</p>
+        <p><strong>Estado:</strong> {{ model.is_active ? 'Activo' : 'Inactivo' }}</p>
+        <p><strong>Registro:</strong> {{ model.created_at | date:'yyyy-MM-dd' }}</p>
       </ion-card-content>
     </ion-card>
-  </div>
-  <div *ngIf="!modelItem" class="ion-text-center">
-    <p>Cargando informacion...</p>
   </div>
 </ion-content>
