@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { ModalController } from '@ionic/angular';
 import axios from 'axios';
-import { environment } from '../../../../environments/environment';
+import { environment } from 'src/environments/environment';
+import { FormPage } from '../form/form.page';
+
 
 interface Color {
   id: number;
@@ -18,7 +21,9 @@ interface Color {
 export class ListPage implements OnInit {
   colors: Color[] = [];
 
-  constructor() {}
+  constructor(
+    private modalController: ModalController,
+  ) {}
 
   ngOnInit() {
     this.chargerColors();
@@ -32,6 +37,22 @@ export class ListPage implements OnInit {
       this.colors = response.data.data;
     } catch (error) {
       console.log('Error al cargar colores', error);
+    }
+  }
+
+  async createColor():Promise<void>{
+    const modal = await this.modalController.create({
+      component: FormPage,
+      breakpoints: [0,0.5,0.95],
+      initialBreakpoint: 0.95,
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if(data?.saved){
+      await this.chargerColors();
     }
   }
 }
