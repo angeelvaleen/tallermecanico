@@ -1,13 +1,93 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>form</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="closeModal()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title>Nueva Cita</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">form</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+  <form
+    *ngIf="appointmentForm"
+    [formGroup]="appointmentForm"
+    (ngSubmit)="saveAppointment()"
+  >
+
+    <ion-list>
+
+      <!-- Vehículo -->
+      <ion-item>
+        <ion-input
+          label="Vehículo"
+          labelPlacement="stacked"
+          type="number"
+          formControlName="vehicle_id"
+        ></ion-input>
+      </ion-item>
+
+      <ion-note color="danger" *ngIf="getError('vehicle_id') as error">
+        {{ error }}
+      </ion-note>
+
+
+      <!-- Fecha -->
+      <ion-item>
+        <ion-input
+          label="Fecha"
+          labelPlacement="stacked"
+          type="date"
+          formControlName="date"
+        ></ion-input>
+      </ion-item>
+
+      <ion-note color="danger" *ngIf="getError('date') as error">
+        {{ error }}
+      </ion-note>
+
+
+      <!-- Hora -->
+      <ion-item>
+        <ion-input
+          label="Hora"
+          labelPlacement="stacked"
+          type="time"
+          formControlName="time"
+        ></ion-input>
+      </ion-item>
+
+      <ion-note color="danger" *ngIf="getError('time') as error">
+        {{ error }}
+      </ion-note>
+
+
+      <!-- Razón -->
+      <ion-item>
+        <ion-input
+          label="Razón"
+          labelPlacement="stacked"
+          type="text"
+          formControlName="reason"
+        ></ion-input>
+      </ion-item>
+
+      <ion-note color="danger" *ngIf="getError('reason') as error">
+        {{ error }}
+      </ion-note>
+
+    </ion-list>
+
+    <ion-button
+      expand="block"
+      type="submit"
+      class="ion-margin-top"
+      [disabled]="saved"
+    >
+      {{ saved ? 'Guardando...' : 'Guardar' }}
+    </ion-button>
+
+  </form>
 </ion-content>
