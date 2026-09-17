@@ -4,7 +4,7 @@ import { AlertController, ModalController } from '@ionic/angular';
 import axios from 'axios';
 import { environment } from "src/environments/environment";
 
-interface appointmentCreate {
+interface AppointmentCreate {
   vehicle_id: number;
   status_id: number;
   date: string;
@@ -90,7 +90,7 @@ export class FormPage implements OnInit {
 
     const values = this.appointmentForm.value;
 
-    const appointment: appointmentCreate = {
+    const appointment: AppointmentCreate = {
       vehicle_id: Number(values.vehicle_id),
       status_id: 1,
       date: values.date.trim(),
