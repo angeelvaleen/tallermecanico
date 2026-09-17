@@ -12,7 +12,11 @@
     <ion-card>
       <ion-card-content>
         <h2>Nombre: {{ color.name }}</h2>
-        <p><strong>Estado:</strong> {{ color.is_active ? 'Activo' : 'Inactivo' }}</p>
+        <p><strong>ID:</strong> {{ color.id }}</p>
+        <p>
+          <ion-badge color="success" *ngIf="color.is_active">Activo</ion-badge>
+          <ion-badge color="danger" *ngIf="!color.is_active">Inactivo</ion-badge>
+        </p>
         <p><strong>Registro:</strong> {{ color.created_at | date:'yyyy-MM-dd' }}</p>
       </ion-card-content>
     </ion-card>
@@ -21,3 +25,11 @@
     <p>Cargando informacion...</p>
   </div>
 </ion-content>
+
+<ion-footer *ngIf="color">
+  <ion-toolbar>
+    <ion-button expand="block" (click)="abrirPagina()">
+      Ver respuesta de la API
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

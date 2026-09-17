@@ -7,12 +7,12 @@
 <ion-content>
   <ion-list>
     <ion-item *ngFor="let color of colors">
-      <ion-label>
+      <ion-label class="ion-text-wrap">
         <h2>{{ color.name }}</h2>
-        <ion-button slot="end" [routerLink]="['/colors/detail', color.id]">
-          <ion-icon name="eye-outline"></ion-icon>
-        </ion-button>
       </ion-label>
+      <ion-button slot="end" [routerLink]="['/colors/detail', color.id]">
+        <ion-icon name="eye-outline"></ion-icon>
+      </ion-button>
     </ion-item>
   </ion-list>
 </ion-content>

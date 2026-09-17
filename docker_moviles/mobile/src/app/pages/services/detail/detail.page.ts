@@ -60,4 +60,12 @@ export class DetailPage implements OnInit {
       await loading.dismiss();
     }
   }
+
+  abrirPagina(): void {
+    if (!this.service) {
+      return;
+    }
+    const url = `${environment.apiUrl}/services/${this.service.id}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
 }

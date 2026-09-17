@@ -58,4 +58,12 @@ export class DetailPage implements OnInit {
       await loading.dismiss();
     }
   }
+
+  abrirPagina(): void {
+    if (!this.history) {
+      return;
+    }
+    const url = `${environment.apiUrl}/history/${this.history.id}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
 }

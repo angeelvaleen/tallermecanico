@@ -59,4 +59,12 @@ export class DetailPage implements OnInit {
       await loading.dismiss();
     }
   }
+
+  abrirPagina(): void {
+    if (!this.diagnosis) {
+      return;
+    }
+    const url = `${environment.apiUrl}/diagnoses/${this.diagnosis.id}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
 }

@@ -16,9 +16,18 @@
     <ion-card>
       <ion-card-content>
         <h2>Vehiculo ID: {{ history.vehicle_id }}</h2>
+        <p><strong>ID:</strong> {{ history.id }}</p>
         <p><strong>Orden de Trabajo ID:</strong> {{ history.workorder_id }}</p>
         <p><strong>Registro:</strong> {{ history.created_at | date:'yyyy-MM-dd' }}</p>
       </ion-card-content>
     </ion-card>
   </div>
 </ion-content>
+
+<ion-footer *ngIf="history">
+  <ion-toolbar>
+    <ion-button expand="block" (click)="abrirPagina()">
+      Ver respuesta de la API
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

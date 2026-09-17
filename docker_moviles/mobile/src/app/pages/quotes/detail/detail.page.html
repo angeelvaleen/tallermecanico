@@ -16,6 +16,7 @@
     <ion-card>
       <ion-card-content>
         <h2>Orden de Trabajo ID: {{ quote.workorder_id }}</h2>
+        <p><strong>ID:</strong> {{ quote.id }}</p>
         <p><strong>Usuario ID:</strong> {{ quote.user_id }}</p>
         <p><strong>Estado ID:</strong> {{ quote.status_id }}</p>
         <p><strong>Subtotal:</strong> ${{ quote.subtotal }}</p>
@@ -27,3 +28,11 @@
     </ion-card>
   </div>
 </ion-content>
+
+<ion-footer *ngIf="quote">
+  <ion-toolbar>
+    <ion-button expand="block" (click)="abrirPagina()">
+      Ver respuesta de la API
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

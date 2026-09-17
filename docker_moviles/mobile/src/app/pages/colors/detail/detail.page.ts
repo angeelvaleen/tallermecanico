@@ -62,4 +62,12 @@ export class DetailPage implements OnInit {
       await loading.dismiss();
     }
   }
+
+  abrirPagina(): void {
+    if (!this.color) {
+      return;
+    }
+    const url = `${environment.apiUrl}/colors/${this.color.id}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
 }

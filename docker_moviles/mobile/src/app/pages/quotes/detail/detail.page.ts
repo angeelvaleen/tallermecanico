@@ -61,4 +61,12 @@ export class DetailPage implements OnInit {
       await loading.dismiss();
     }
   }
+
+  abrirPagina(): void {
+    if (!this.quote) {
+      return;
+    }
+    const url = `${environment.apiUrl}/quotes/${this.quote.id}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
 }

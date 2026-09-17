@@ -16,9 +16,21 @@
     <ion-card>
       <ion-card-content>
         <h2>Nombre: {{ fuel.name }}</h2>
-        <p><strong>Estado:</strong> {{ fuel.is_active ? 'Activo' : 'Inactivo' }}</p>
+        <p><strong>ID:</strong> {{ fuel.id }}</p>
+        <p>
+          <ion-badge color="success" *ngIf="fuel.is_active">Activo</ion-badge>
+          <ion-badge color="danger" *ngIf="!fuel.is_active">Inactivo</ion-badge>
+        </p>
         <p><strong>Registro:</strong> {{ fuel.created_at | date:'yyyy-MM-dd' }}</p>
       </ion-card-content>
     </ion-card>
   </div>
 </ion-content>
+
+<ion-footer *ngIf="fuel">
+  <ion-toolbar>
+    <ion-button expand="block" (click)="abrirPagina()">
+      Ver respuesta de la API
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

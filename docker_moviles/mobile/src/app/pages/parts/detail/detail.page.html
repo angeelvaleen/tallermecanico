@@ -16,12 +16,24 @@
     <ion-card>
       <ion-card-content>
         <h2>Nombre: {{ part.name }}</h2>
+        <p><strong>ID:</strong> {{ part.id }}</p>
         <p><strong>Precio:</strong> ${{ part.price }}</p>
         <p><strong>Descripcion:</strong> {{ part.description || 'Sin descripcion' }}</p>
-        <p><strong>Estado:</strong> {{ part.is_active ? 'Activo' : 'Inactivo' }}</p>
+        <p>
+          <ion-badge color="success" *ngIf="part.is_active">Activo</ion-badge>
+          <ion-badge color="danger" *ngIf="!part.is_active">Inactivo</ion-badge>
+        </p>
         <p><strong>Registro:</strong> {{ part.created_at | date:'yyyy-MM-dd' }}</p>
       </ion-card-content>
     </ion-card>
   </div>
 
 </ion-content>
+
+<ion-footer *ngIf="part">
+  <ion-toolbar>
+    <ion-button expand="block" (click)="abrirPagina()">
+      Ver respuesta de la API
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

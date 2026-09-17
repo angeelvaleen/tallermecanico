@@ -12,6 +12,7 @@
     <ion-card>
       <ion-card-content>
         <h2>Fecha: {{ appointment.date }}</h2>
+        <p><strong>ID:</strong> {{ appointment.id }}</p>
         <p><strong>Hora:</strong> {{ appointment.time }}</p>
         <p><strong>Vehiculo ID:</strong> {{ appointment.vehicle_id }}</p>
         <p><strong>Estado ID:</strong> {{ appointment.status_id }}</p>
@@ -24,3 +25,11 @@
     <p>Cargando informacion...</p>
   </div>
 </ion-content>
+
+<ion-footer *ngIf="appointment">
+  <ion-toolbar>
+    <ion-button expand="block" (click)="abrirPagina()">
+      Ver respuesta de la API
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

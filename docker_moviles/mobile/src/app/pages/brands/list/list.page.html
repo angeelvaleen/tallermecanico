@@ -9,8 +9,6 @@
     <ion-item *ngFor="let brand of brands">
       <ion-label class="ion-text-wrap">
         <h2>{{ brand.name }}</h2>
-        <p>Estado: {{ brand.is_active ? 'Activo' : 'Inactivo' }}</p>
-        <p>Registro: {{ brand.created_at | date:'yyyy-MM-dd' }}</p>
       </ion-label>
       <ion-button slot="end" [routerLink]="['/brands/detail', brand.id]">
         <ion-icon name="eye-outline"></ion-icon>

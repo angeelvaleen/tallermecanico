@@ -16,11 +16,29 @@
     <ion-card>
       <ion-card-content>
         <h2>Placa: {{ vehicle.plate }}</h2>
+        <p><strong>ID:</strong> {{ vehicle.id }}</p>
         <p><strong>VIN:</strong> {{ vehicle.vin }}</p>
         <p><strong>Year:</strong> {{ vehicle.year }}</p>
         <p><strong>Kilometraje:</strong> {{ vehicle.mileage }}</p>
-        <p><strong>Estado:</strong> {{ vehicle.is_active ? 'Activo' : 'Inactivo' }}</p>
+        <p><strong>Modelo ID:</strong> {{ vehicle.model_id }}</p>
+        <p><strong>Usuario ID:</strong> {{ vehicle.user_id }}</p>
+        <p><strong>Combustible ID:</strong> {{ vehicle.fuel_id }}</p>
+        <p><strong>Color ID:</strong> {{ vehicle.color_id }}</p>
+        <p>
+          <ion-badge color="success" *ngIf="vehicle.is_active">Activo</ion-badge>
+          <ion-badge color="danger" *ngIf="!vehicle.is_active">Inactivo</ion-badge>
+        </p>
+        <p><strong>Registro:</strong> {{ vehicle.created_at | date:'yyyy-MM-dd' }}</p>
+        <p><strong>Actualizado:</strong> {{ vehicle.updated_at | date:'yyyy-MM-dd' }}</p>
       </ion-card-content>
     </ion-card>
   </div>
 </ion-content>
+
+<ion-footer *ngIf="vehicle">
+  <ion-toolbar>
+    <ion-button expand="block" (click)="abrirPagina()">
+      Ver respuesta de la API
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

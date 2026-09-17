@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { LoadingController } from '@ionic/angular';
+import { LoadingController, ModalController } from '@ionic/angular';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
+import { FormPage } from '../form/form.page';
 
 interface Brand {
   id: number;
@@ -24,6 +25,7 @@ export class DetailPage implements OnInit{
   constructor(
     private route: ActivatedRoute,
     private loading: LoadingController,
+    private modalController: ModalController,
   ) {}
 
   ngOnInit():void{
@@ -61,6 +63,15 @@ export class DetailPage implements OnInit{
       await loading.dismiss();
     }
 
+  }
+
+  async abrirFormModal(): Promise<void> {
+    const modal = await this.modalController.create({
+      component: FormPage,
+      breakpoints: [0, 0.5, 0.95],
+      initialBreakpoint: 0.95
+    });
+    await modal.present();
   }
 
 }
