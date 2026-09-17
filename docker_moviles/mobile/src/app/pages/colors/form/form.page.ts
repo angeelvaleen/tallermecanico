@@ -16,7 +16,6 @@ interface ColorCreate{
 })
 
 
-
 export class FormPage implements OnInit {
 
   colorForm!: FormGroup; 
@@ -75,10 +74,10 @@ export class FormPage implements OnInit {
 
     this.saved = true;
 
-    const valors = this.colorForm.value;
+    const values = this.colorForm.value;
 
     const color: ColorCreate = {
-      name: valors.name.trim(),
+      name: values.name.trim(),
     }
 
     try {

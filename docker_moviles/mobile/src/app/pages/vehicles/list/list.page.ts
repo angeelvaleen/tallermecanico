@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { ModalController } from '@ionic/angular';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
+import { FormPage } from '../form/form.page';
+
 
 interface Vehicle {
   id: number;
@@ -26,7 +29,9 @@ export class ListPage implements OnInit {
 
   vehicles: Vehicle[] = [];
 
-  constructor() { }
+  constructor(
+    private modalController: ModalController,
+  ) { }
 
   ngOnInit() {
     this.chargerVehicles();
@@ -42,5 +47,24 @@ export class ListPage implements OnInit {
       console.log('Error al cargar vehiculos', error);
     }
   }
+
+  async createVehicle(): Promise<void>{
+    const modal = await this.modalController.create({
+      component: FormPage,
+      breakpoints: [0,0.5,0.95],
+      initialBreakpoint: 0.95,
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if(data?.saved){
+      await this.chargerVehicles();
+    }
+
+  }
+
+
 
 }

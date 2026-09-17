@@ -1,32 +1,138 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/vehicles/list"></ion-back-button>
+      <ion-button (click)="closeModal()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
     </ion-buttons>
-    <ion-title>{{ vehicleId ? 'Editar Vehiculo' : 'Nuevo Vehiculo' }}</ion-title>
+
+    <ion-title>Nuevo Vehículo</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
+  <form
+    *ngIf="vehicleForm"
+    [formGroup]="vehicleForm"
+    (ngSubmit)="saveVehicle()"
+  >
 
-  <ion-item>
-    <ion-input label="Placa" labelPlacement="stacked" [(ngModel)]="vehicle.plate" placeholder="Ej: ABC1234"></ion-input>
-  </ion-item>
+    <ion-list>
 
-  <ion-item>
-    <ion-input label="VIN" labelPlacement="stacked" [(ngModel)]="vehicle.vin" placeholder="Número de serie"></ion-input>
-  </ion-item>
+      <!-- Modelo -->
+      <ion-item>
+        <ion-input
+          label="Modelo"
+          labelPlacement="stacked"
+          type="number"
+          formControlName="model_id"
+        ></ion-input>
+      </ion-item>
 
-  <ion-item>
-    <ion-input label="Año" labelPlacement="stacked" [(ngModel)]="vehicle.year" placeholder="2023"></ion-input>
-  </ion-item>
+      <ion-note color="danger" *ngIf="getError('model_id') as error">
+        {{ error }}
+      </ion-note>
 
-  <ion-item>
-    <ion-input label="Kilometraje" labelPlacement="stacked" type="number" [(ngModel)]="vehicle.mileage" placeholder="0"></ion-input>
-  </ion-item>
 
-  <ion-button expand="block" class="ion-margin-top" (click)="guardar()">
-    Guardar
-  </ion-button>
+      <!-- Combustible -->
+      <ion-item>
+        <ion-input
+          label="Combustible"
+          labelPlacement="stacked"
+          type="number"
+          formControlName="fuel_id"
+        ></ion-input>
+      </ion-item>
 
+      <ion-note color="danger" *ngIf="getError('fuel_id') as error">
+        {{ error }}
+      </ion-note>
+
+
+      <!-- Color -->
+      <ion-item>
+        <ion-input
+          label="Color"
+          labelPlacement="stacked"
+          type="number"
+          formControlName="color_id"
+        ></ion-input>
+      </ion-item>
+
+      <ion-note color="danger" *ngIf="getError('color_id') as error">
+        {{ error }}
+      </ion-note>
+
+
+      <!-- Placa -->
+      <ion-item>
+        <ion-input
+          label="Placa"
+          labelPlacement="stacked"
+          type="text"
+          formControlName="plate"
+        ></ion-input>
+      </ion-item>
+
+      <ion-note color="danger" *ngIf="getError('plate') as error">
+        {{ error }}
+      </ion-note>
+
+
+      <!-- VIN -->
+      <ion-item>
+        <ion-input
+          label="VIN"
+          labelPlacement="stacked"
+          type="text"
+          formControlName="vin"
+        ></ion-input>
+      </ion-item>
+
+      <ion-note color="danger" *ngIf="getError('vin') as error">
+        {{ error }}
+      </ion-note>
+
+
+      <!-- Año -->
+      <ion-item>
+        <ion-input
+          label="Año"
+          labelPlacement="stacked"
+          type="number"
+          formControlName="year"
+        ></ion-input>
+      </ion-item>
+
+      <ion-note color="danger" *ngIf="getError('year') as error">
+        {{ error }}
+      </ion-note>
+
+
+      <!-- Kilometraje -->
+      <ion-item>
+        <ion-input
+          label="Kilometraje"
+          labelPlacement="stacked"
+          type="number"
+          formControlName="mileage"
+        ></ion-input>
+      </ion-item>
+
+      <ion-note color="danger" *ngIf="getError('mileage') as error">
+        {{ error }}
+      </ion-note>
+
+    </ion-list>
+
+    <ion-button
+      expand="block"
+      type="submit"
+      class="ion-margin-top"
+      [disabled]="saved"
+    >
+      {{ saved ? 'Guardando...' : 'Guardar' }}
+    </ion-button>
+
+  </form>
 </ion-content>
