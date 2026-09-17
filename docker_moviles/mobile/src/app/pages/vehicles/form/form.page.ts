@@ -4,7 +4,7 @@ import { AlertController, ModalController } from '@ionic/angular';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
 
-interface vehicleCreate{
+interface VehicleCreate{
   user_id: number,
   model_id: number,
   fuel_id: number,
@@ -124,7 +124,7 @@ export class FormPage implements OnInit {
 
     const values = this.vehicleForm.value;
 
-    const vehicle: vehicleCreate = {
+    const vehicle: VehicleCreate = {
       user_id: 1,
       model_id: Number(values.model_id),
       fuel_id: Number(values.fuel_id),
