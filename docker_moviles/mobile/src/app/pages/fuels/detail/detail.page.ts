@@ -57,4 +57,12 @@ export class DetailPage implements OnInit {
       await loading.dismiss();
     }
   }
+
+  abrirPagina(): void {
+    if (!this.fuel) {
+      return;
+    }
+    const url = `${environment.apiUrl}/fuels/${this.fuel.id}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
 }

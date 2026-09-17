@@ -15,6 +15,7 @@
   <ion-card *ngIf="evidence">
     <ion-card-content>
         <h2>Orden de Trabajo ID: {{ evidence.workorder_id }}</h2>
+        <p><strong>ID:</strong> {{ evidence.id }}</p>
         <p><strong>Ruta:</strong> {{ evidence.path }}</p>
         <p><strong>Formato:</strong> {{ evidence.format }}</p>
         <p><strong>Tamaño:</strong> {{ evidence.size }} bytes</p>
@@ -22,3 +23,11 @@
     </ion-card-content>
   </ion-card>
 </ion-content>
+
+<ion-footer *ngIf="evidence">
+  <ion-toolbar>
+    <ion-button expand="block" (click)="abrirPagina()">
+      Ver respuesta de la API
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

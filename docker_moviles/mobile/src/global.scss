@@ -103,8 +103,14 @@ ion-button {
 ion-item {
   --background: #ffffff;
   --border-radius: 8px;
+  border-radius: 12px;
   margin: 6px 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  margin-bottom: 12px;
+  border: 1px solid #E2E8F0;
+  border-left: 5px solid #F97316;
+  --padding-start: 16px;
+  --inner-padding-end: 16px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
 }
 
 

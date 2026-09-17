@@ -7,11 +7,11 @@
 <ion-content>
   <ion-list>
     <ion-item *ngFor="let service of services">
-      <ion-label>
+      <ion-label class="ion-text-wrap">
         <h2>{{ service.name }}</h2>
         <p>Precio: ${{ service.price }}</p>
       </ion-label>
-      <ion-button [routerLink]="['/services/detail',service.id]">
+      <ion-button slot="end" [routerLink]="['/services/detail',service.id]">
           <ion-icon name="eye-outline"></ion-icon>
       </ion-button>
     </ion-item>

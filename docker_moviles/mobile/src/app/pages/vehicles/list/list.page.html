@@ -12,11 +12,11 @@
 <ion-content>
   <ion-list>
     <ion-item *ngFor="let vehicle of vehicles">
-      <ion-label>
+      <ion-label class="ion-text-wrap">
         <h2>Placa: {{ vehicle.plate }}</h2>
         <p>Year: {{ vehicle.year }}</p>
       </ion-label>
-      <ion-button [routerLink]="['/vehicles/detail', vehicle.id]" >
+      <ion-button slot="end" [routerLink]="['/vehicles/detail', vehicle.id]" >
         <ion-icon name="eye-outline" ></ion-icon>
     </ion-button>
     </ion-item>

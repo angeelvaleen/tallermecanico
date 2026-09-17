@@ -7,18 +7,29 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="ion-padding">
   <ion-text color="danger" *ngIf="messageError">
     <p class="ion-padding">{{ messageError }}</p>
   </ion-text>
 
 
-  <!-- Muestra la tarjeta si ya hay datos -->
   <ion-card *ngIf="brand as detail">
     <ion-card-content>
       <h2>{{ detail.name }}</h2>
-      <p><strong>Estado:</strong> {{ detail.is_active ? 'Activo' : 'Inactivo' }}</p>
+      <p><strong>ID:</strong> {{ detail.id }}</p>
+      <p>
+        <ion-badge color="success" *ngIf="detail.is_active">Activo</ion-badge>
+        <ion-badge color="danger" *ngIf="!detail.is_active">Inactivo</ion-badge>
+      </p>
       <p><strong>Registro:</strong> {{ detail.created_at | date:'yyyy-MM-dd' }}</p>
     </ion-card-content>
   </ion-card>
 </ion-content>
+
+<ion-footer *ngIf="brand">
+  <ion-toolbar>
+    <ion-button expand="block" (click)="abrirFormModal()">
+      Abrir formulario
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

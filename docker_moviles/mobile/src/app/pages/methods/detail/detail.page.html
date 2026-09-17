@@ -17,9 +17,21 @@
     <ion-card>
       <ion-card-content>
         <h2>Nombre: {{ method.name }}</h2>
-        <p><strong>Estado:</strong> {{ method.is_active ? 'Activo' : 'Inactivo' }}</p>
+        <p><strong>ID:</strong> {{ method.id }}</p>
+        <p>
+          <ion-badge color="success" *ngIf="method.is_active">Activo</ion-badge>
+          <ion-badge color="danger" *ngIf="!method.is_active">Inactivo</ion-badge>
+        </p>
         <p><strong>Registro:</strong> {{ method.created_at | date:'yyyy-MM-dd' }}</p>
       </ion-card-content>
     </ion-card>
   </div>
 </ion-content>
+
+<ion-footer *ngIf="method">
+  <ion-toolbar>
+    <ion-button expand="block" (click)="abrirPagina()">
+      Ver respuesta de la API
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

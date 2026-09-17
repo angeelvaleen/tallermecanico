@@ -60,4 +60,12 @@ export class DetailPage implements OnInit {
       await loading.dismiss();
     }
   }
+
+  abrirPagina(): void {
+    if (!this.evidence) {
+      return;
+    }
+    const url = `${environment.apiUrl}/evidence/${this.evidence.id}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
 }

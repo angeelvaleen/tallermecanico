@@ -61,4 +61,12 @@ export class DetailPage implements OnInit {
       await loading.dismiss();
     }
   }
+
+  abrirPagina(): void {
+    if (!this.workorder) {
+      return;
+    }
+    const url = `${environment.apiUrl}/workorders/${this.workorder.id}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
 }

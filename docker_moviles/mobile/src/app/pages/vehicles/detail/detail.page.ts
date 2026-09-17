@@ -68,4 +68,12 @@ export class DetailPage implements OnInit {
     }
   }
 
+  abrirPagina(): void {
+    if (!this.vehicle) {
+      return;
+    }
+    const url = `${environment.apiUrl}/vehicles/${this.vehicle.id}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
 }

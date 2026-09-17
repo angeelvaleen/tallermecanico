@@ -7,12 +7,12 @@
 <ion-content>
   <ion-list>
     <ion-item *ngFor="let fuel of fuels">
-      <ion-label>
+      <ion-label class="ion-text-wrap">
         <h2>{{ fuel.name }}</h2>
-        <ion-button [routerLink]="['/fuels/detail', fuel.id]">
-          <ion-icon name="eye-outline"></ion-icon>
-        </ion-button>
       </ion-label>
+      <ion-button slot="end" [routerLink]="['/fuels/detail', fuel.id]">
+        <ion-icon name="eye-outline"></ion-icon>
+      </ion-button>
     </ion-item>
   </ion-list>
 </ion-content>
