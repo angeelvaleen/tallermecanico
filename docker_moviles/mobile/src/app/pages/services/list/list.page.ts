@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { ModalController } from '@ionic/angular';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
+import { FormPage } from '../form/form.page';
 
 interface Service {
   id: number;
@@ -20,7 +22,9 @@ interface Service {
 export class ListPage implements OnInit {
   services: Service[] = [];
 
-  constructor() {}
+  constructor(
+    private modalController: ModalController,
+  ) {}
 
   ngOnInit() {
     this.chargerServices();
@@ -36,4 +40,20 @@ export class ListPage implements OnInit {
       console.log('Error al cargar servicios', error);
     }
   }
+
+  async createService(): Promise<void> {
+      const modal = await this.modalController.create({
+        component: FormPage,
+        breakpoints: [0, 0.5, 0.95],
+        initialBreakpoint: 0.95,
+      });
+  
+      await modal.present();
+  
+      const { data } = await modal.onDidDismiss();
+  
+      if (data?.saved) {
+        await this.chargerServices();
+      }
+    }
 }
