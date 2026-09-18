@@ -7,7 +7,7 @@ import { environment } from "src/environments/environment";
 interface DiagnosisCreate {
   workorder_id: number;
   description: string;
-  result: string;
+  result?: string;
 }
 
 @Component({
@@ -23,6 +23,7 @@ export class FormPage implements OnInit {
   validatorsMessage: Record<string, Record<string, string>> = {
     workorder_id: {
       required: "La order es requerida",
+      pattern:"La orden debe ser un numero entero y positivo"
     },
     description: {
       required: "La descripcion es requerida",
