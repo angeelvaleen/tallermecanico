@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { LoadingController } from '@ionic/angular';
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
+import { Component, OnInit } from "@angular/core";
+import { ModalController } from '@ionic/angular';
+import axios from "axios";
+import { environment } from "src/environments/environment";
+import { FormPage } from "../form/form.page";
 
 interface Diagnosis {
   id: number;
@@ -13,15 +13,17 @@ interface Diagnosis {
 }
 
 @Component({
-  selector: 'app-diagnoses-list',
-  templateUrl: './list.page.html',
-  styleUrls: ['./list.page.scss'],
+  selector: "app-diagnoses-list",
+  templateUrl: "./list.page.html",
+  styleUrls: ["./list.page.scss"],
   standalone: false,
 })
 export class ListPage implements OnInit {
   diagnoses: Diagnosis[] = [];
 
-  constructor() {}
+  constructor(
+    private modalController: ModalController,
+  ) {}
 
   ngOnInit() {
     this.chargerDiagnoses();
@@ -30,11 +32,27 @@ export class ListPage implements OnInit {
   async chargerDiagnoses(): Promise<void> {
     try {
       const response = await axios.get<{ data: Diagnosis[] }>(
-        `${environment.apiUrl}/diagnoses`
+        `${environment.apiUrl}/diagnoses`,
       );
       this.diagnoses = response.data.data;
     } catch (error) {
-      console.log('Error al cargar diagnósticos', error);
+      console.log("Error al cargar diagnósticos", error);
+    }
+  }
+
+  async createDiagnosis(): Promise<void> {
+    const modal = await this.modalController.create({
+      component: FormPage,
+      breakpoints: [0, 0.5, 0.95],
+      initialBreakpoint: 0.95,
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if (data?.saved) {
+      await this.chargerDiagnoses();
     }
   }
 }
