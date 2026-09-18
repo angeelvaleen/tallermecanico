@@ -1,13 +1,78 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>form</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="closeModal()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title>Nueva Orden de Trabajo</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">form</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+  <form
+    *ngIf="workorderForm"
+    [formGroup]="workorderForm"
+    (ngSubmit)="saveWorkorder()"
+  >
+
+    <ion-list>
+
+      <!-- Vehículo -->
+      <ion-item>
+        <ion-input
+          label="Vehículo"
+          labelPlacement="stacked"
+          type="number"
+          formControlName="vehicle_id"
+        ></ion-input>
+      </ion-item>
+
+      <ion-note color="danger" *ngIf="getError('vehicle_id') as error">
+        {{ error }}
+      </ion-note>
+
+
+      <!-- Mecánico -->
+      <ion-item>
+        <ion-input
+          label="Mecánico"
+          labelPlacement="stacked"
+          type="number"
+          formControlName="mechanic_id"
+        ></ion-input>
+      </ion-item>
+
+      <ion-note color="danger" *ngIf="getError('mechanic_id') as error">
+        {{ error }}
+      </ion-note>
+
+
+      <!-- Kilometraje -->
+      <ion-item>
+        <ion-input
+          label="Kilometraje"
+          labelPlacement="stacked"
+          type="number"
+          formControlName="mileage"
+        ></ion-input>
+      </ion-item>
+
+      <ion-note color="danger" *ngIf="getError('mileage') as error">
+        {{ error }}
+      </ion-note>
+
+    </ion-list>
+
+    <ion-button
+      expand="block"
+      type="submit"
+      class="ion-margin-top"
+      [disabled]="saved"
+    >
+      {{ saved ? 'Guardando...' : 'Guardar' }}
+    </ion-button>
+
+  </form>
 </ion-content>
