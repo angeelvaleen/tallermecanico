@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { ModalController } from '@ionic/angular';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
+import { FormPage } from '../form/form.page';
 
 interface Part {
   id: number;
@@ -19,7 +21,9 @@ interface Part {
 export class ListPage implements OnInit {
   parts: Part[] = [];
 
-  constructor() {}
+  constructor(
+    private modalController: ModalController,
+  ) {}
 
   ngOnInit() {
     this.chargerParts();
@@ -35,4 +39,22 @@ export class ListPage implements OnInit {
       console.log('Error al cargar partes', error);
     }
   }
+
+  async createPart(): Promise<void>{
+      const modal = await this.modalController.create({
+        component: FormPage,
+        breakpoints: [0,0.5,0.95],
+        initialBreakpoint: 0.95,
+      });
+  
+      await modal.present();
+  
+      const { data } = await modal.onDidDismiss();
+  
+      if(data?.saved){
+        await this.chargerParts();
+      }
+  
+  }
+  
 }
