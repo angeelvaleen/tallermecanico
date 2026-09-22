@@ -5,9 +5,9 @@
 </ion-header>
 
 <ion-fab slot="fixed" vertical="bottom" horizontal="center">
-    <ion-fab-button (click)="createColor()">
-        <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
+  <ion-fab-button (click)="createColor()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
 </ion-fab>
 
 <ion-content>
@@ -15,8 +15,11 @@
     <ion-item *ngFor="let color of colors">
       <ion-label>
         <h2>{{ color.name }}</h2>
-        <ion-button slot="end" [routerLink]="['/colors/detail', color.id]">
+        <ion-button [routerLink]="['/colors/detail', color.id]">
           <ion-icon name="eye-outline"></ion-icon>
+        </ion-button>
+        <ion-button  color="warning" (click)="editColor(color.id)">
+          <ion-icon  name="pencil"></ion-icon>
         </ion-button>
       </ion-label>
     </ion-item>
