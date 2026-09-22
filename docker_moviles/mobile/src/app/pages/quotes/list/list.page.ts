@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { ModalController } from '@ionic/angular';
 import axios from 'axios';
 import { environment } from '../../../../environments/environment';
+import { FormPage } from '../form/form.page';
 
 interface Quote {
   id: number;
@@ -23,7 +25,9 @@ interface Quote {
 export class ListPage implements OnInit {
   quotes: Quote[] = [];
 
-  constructor() {}
+  constructor(
+    private modalController:ModalController,
+  ) {}
 
   ngOnInit() {
     this.chargerQuotes();
@@ -39,4 +43,21 @@ export class ListPage implements OnInit {
       console.log('Error al cargar cotizaciones', error);
     }
   }
+
+  async createQuote(): Promise<void>{
+        const modal = await this.modalController.create({
+          component: FormPage,
+          breakpoints: [0,0.5,0.95],
+          initialBreakpoint: 0.95,
+        });
+    
+        await modal.present();
+    
+        const { data } = await modal.onDidDismiss();
+    
+        if(data?.saved){
+          await this.chargerQuotes();
+        }
+    
+    }
 }
