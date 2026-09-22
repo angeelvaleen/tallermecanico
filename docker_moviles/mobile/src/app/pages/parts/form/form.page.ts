@@ -22,15 +22,12 @@ export class FormPage implements OnInit {
 
   validatorsMessage: Record<string, Record<string, string>> = {
     name: {
-      required: "La order es requerida",
+      required: "El nombre es requerido",
     },
     price: {
       required: "Precio es requerido",
       min: "El precio debe ser mayor o igual que cero",
       pattern: "El precio es invalido",
-    },
-    description: {
-      required: "La descripcion es requerida",
     },
   };
 
@@ -55,10 +52,7 @@ export class FormPage implements OnInit {
         [(Validators.required, Validators.min(0), Validators.pattern("^[0-9]+(\\.[0-9]{1,2})?$"))],
       ],
       description: [
-        "",
-        [
-          (Validators.required),
-        ],
+        ""
       ],
     });
   }
@@ -84,7 +78,7 @@ export class FormPage implements OnInit {
     });
   }
 
-  async saveWorkorder(): Promise<void> {
+  async savePart(): Promise<void> {
     if (this.partForm.invalid) {
       this.partForm.markAllAsTouched();
       return;
