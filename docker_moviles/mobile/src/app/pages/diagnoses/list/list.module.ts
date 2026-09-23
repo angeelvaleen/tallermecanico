@@ -15,7 +15,8 @@ import { FormPageModule } from '../form/form.module';
     CommonModule,
     FormsModule,
     IonicModule,
-    ListPageRoutingModule
+    ListPageRoutingModule,
+    FormPageModule
   ],
   declarations: [ListPage]
 })

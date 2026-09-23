@@ -54,4 +54,21 @@ export class ListPage implements OnInit {
       await this.chargerWorkorders();
     }
   }
+
+  async abrirEditarModal(id: number): Promise<void> {
+    const modal = await this.modalController.create({
+      component: FormPage,
+      componentProps: { id },
+      breakpoints: [0, 0.5, 0.95],
+      initialBreakpoint: 0.95,
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if (data?.saved) {
+      await this.chargerWorkorders();
+    }
+  }
 }

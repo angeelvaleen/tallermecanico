@@ -1,13 +1,33 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>form</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="closeModal()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Nuevo Historial</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">form</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+  <form *ngIf="historyForm" [formGroup]="historyForm" (ngSubmit)="saveHistory()">
+    <ion-list>
+      <ion-item>
+        <ion-input label="Vehiculo ID" labelPlacement="stacked" type="number" formControlName="vehicle_id"></ion-input>
+      </ion-item>
+      <ion-note color="danger" *ngIf="getError('vehicle_id') as error">
+        {{ error }}
+      </ion-note>
+      <ion-item>
+        <ion-input label="Orden ID" labelPlacement="stacked" type="number" formControlName="workorder_id"></ion-input>
+      </ion-item>
+      <ion-note color="danger" *ngIf="getError('workorder_id') as error">
+        {{ error }}
+      </ion-note>
+    </ion-list>
+
+    <ion-button expand="block" type="submit" class="ion-margin-top" [disabled]="saved">
+      {{ saved ? 'Guardando...' : 'Guardar' }}
+    </ion-button>
+  </form>
 </ion-content>

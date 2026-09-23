@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { AlertController, ModalController } from "@ionic/angular";
 import axios from "axios";
@@ -17,8 +17,11 @@ interface DiagnosisCreate {
   standalone: false,
 })
 export class FormPage implements OnInit {
+  @Input() id?: number;
+
   diagnosisForm!: FormGroup;
   saved: boolean = false;
+  charging: boolean = false;
 
   validatorsMessage: Record<string, Record<string, string>> = {
     workorder_id: {
@@ -36,8 +39,16 @@ export class FormPage implements OnInit {
     private modalController: ModalController,
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.createForm();
+
+    if (this.isEdition) {
+      await this.chargerDiagnosis();
+    }
+  }
+
+  get isEdition(): boolean {
+    return this.id !== undefined;
   }
 
   private createForm() {
@@ -90,15 +101,25 @@ export class FormPage implements OnInit {
     };
 
     try {
-      await axios.post(`${environment.apiUrl}/diagnoses`, diagnosis, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      if (this.isEdition && this.id !== undefined) {
+        await axios.patch(`${environment.apiUrl}/diagnoses/${this.id}`, diagnosis, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      } else {
+        await axios.post(`${environment.apiUrl}/diagnoses`, diagnosis, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      }
 
       const alert = await this.alertController.create({
-        header: "Diagnostico guardado",
-        message: "El diagnostico fue guardada exitosamente",
+        header: this.isEdition ? "Diagnostico actualizado" : "Diagnostico guardado",
+        message: this.isEdition
+          ? "El diagnostico fue actualizado correctamente"
+          : "El diagnostico fue guardada exitosamente",
         buttons: ["Aceptar"],
       });
 
@@ -109,18 +130,57 @@ export class FormPage implements OnInit {
         saved: true,
       });
     } catch (error) {
-      console.log("Error al guardar el diagnostico", error);
+      console.log(
+        this.isEdition ? "Error al actualizar el diagnostico" : "Error al guardar el diagnostico",
+        error,
+      );
 
       const alert = await this.alertController.create({
         header: "Error",
-        message:
-          "No fue posible guardar el diagnostico, Revisar los datos, la conexion o los permisos de directus",
+        message: this.isEdition
+          ? "No fue posible actualizar el diagnostico, Revisar los datos, la conexion o los permisos de directus"
+          : "No fue posible guardar el diagnostico, Revisar los datos, la conexion o los permisos de directus",
         buttons: ["Aceptar"],
       });
 
       await alert.present();
     } finally {
       this.saved = false;
+    }
+  }
+
+  async chargerDiagnosis(): Promise<void> {
+    if (this.id === undefined) {
+      return;
+    }
+
+    this.charging = true;
+
+    try {
+      const response = await axios.get<{ data: { id: number; workorder_id: number; description: string; result: string } }>(
+        `${environment.apiUrl}/diagnoses/${this.id}`,
+      );
+
+      const diagnosis = response.data.data;
+
+      this.diagnosisForm.patchValue({
+        workorder_id: diagnosis.workorder_id,
+        description: diagnosis.description,
+        result: diagnosis.result,
+      });
+    } catch (error) {
+      console.log("Error al cargar el diagnostico", error);
+
+      const alert = await this.alertController.create({
+        header: "Error",
+        message:
+          "No fue posible cargar los datos del diagnostico, Revisar la conexion o los permisos de directus",
+        buttons: ["Aceptar"],
+      });
+
+      await alert.present();
+    } finally {
+      this.charging = false;
     }
   }
 }

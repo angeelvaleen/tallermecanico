@@ -4,15 +4,24 @@
   </ion-toolbar>
 </ion-header>
 
+<ion-fab slot="fixed" vertical="bottom" horizontal="center">
+  <ion-fab-button (click)="createPayment()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+
 <ion-content>
   <ion-list>
     <ion-item *ngFor="let payment of payments">
-      <ion-label>
+      <ion-label class="ion-text-wrap">
         <h2>Monto: ${{ payment.amount }}</h2>
         <p>Referencia: {{ payment.reference || 'N/A' }}</p>
       </ion-label>
-      <ion-button [routerLink]="['/payment/detail',payment.id]" >
+      <ion-button slot="end" [routerLink]="['/payment/detail',payment.id]" >
         <ion-icon name="eye-outline" ></ion-icon>
+      </ion-button>
+      <ion-button slot="end" color="warning" (click)="abrirEditarModal(payment.id)">
+        <ion-icon name="pencil-outline"></ion-icon>
       </ion-button>
     </ion-item>
   </ion-list>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { AlertController, ModalController } from "@ionic/angular";
 import axios from "axios";
@@ -19,8 +19,11 @@ interface WorkorderCreate {
   standalone: false,
 })
 export class FormPage implements OnInit {
+  @Input() id?: number;
+
   workorderForm!: FormGroup;
   saved: boolean = false;
+  charging: boolean = false;
 
   validatorsMessage: Record<string, Record<string, string>> = {
     vehicle_id: {
@@ -44,8 +47,16 @@ export class FormPage implements OnInit {
     private modalController: ModalController,
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.createForm();
+
+    if (this.isEdition) {
+      await this.chargerWorkorder();
+    }
+  }
+
+  get isEdition(): boolean {
+    return this.id !== undefined;
   }
 
   private createForm() {
@@ -102,15 +113,29 @@ export class FormPage implements OnInit {
     };
 
     try {
-      await axios.post(`${environment.apiUrl}/workorders`, workorder, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      if (this.isEdition && this.id !== undefined) {
+        await axios.patch(`${environment.apiUrl}/workorders/${this.id}`, {
+          vehicle_id: workorder.vehicle_id,
+          mechanic_id: workorder.mechanic_id,
+          mileage: workorder.mileage,
+        }, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      } else {
+        await axios.post(`${environment.apiUrl}/workorders`, workorder, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      }
 
       const alert = await this.alertController.create({
-        header: "Orden guardado",
-        message: "La orden fue guardada exitosamente",
+        header: this.isEdition ? "Orden actualizada" : "Orden guardado",
+        message: this.isEdition
+          ? "La orden fue actualizada correctamente"
+          : "La orden fue guardada exitosamente",
         buttons: ["Aceptar"],
       });
 
@@ -121,18 +146,57 @@ export class FormPage implements OnInit {
         saved: true,
       });
     } catch (error) {
-      console.log("Error al guardar la orden", error);
+      console.log(
+        this.isEdition ? "Error al actualizar la orden" : "Error al guardar la orden",
+        error,
+      );
 
       const alert = await this.alertController.create({
         header: "Error",
-        message:
-          "No fue posible guardar la orden, Revisar los datos, la conexion o los permisos de directus",
+        message: this.isEdition
+          ? "No fue posible actualizar la orden, Revisar los datos, la conexion o los permisos de directus"
+          : "No fue posible guardar la orden, Revisar los datos, la conexion o los permisos de directus",
         buttons: ["Aceptar"],
       });
 
       await alert.present();
     } finally {
       this.saved = false;
+    }
+  }
+
+  async chargerWorkorder(): Promise<void> {
+    if (this.id === undefined) {
+      return;
+    }
+
+    this.charging = true;
+
+    try {
+      const response = await axios.get<{ data: { id: number; vehicle_id: number; mechanic_id: number; mileage: number } }>(
+        `${environment.apiUrl}/workorders/${this.id}`,
+      );
+
+      const workorder = response.data.data;
+
+      this.workorderForm.patchValue({
+        vehicle_id: workorder.vehicle_id,
+        mechanic_id: workorder.mechanic_id,
+        mileage: workorder.mileage,
+      });
+    } catch (error) {
+      console.log("Error al cargar la orden", error);
+
+      const alert = await this.alertController.create({
+        header: "Error",
+        message:
+          "No fue posible cargar los datos de la orden, Revisar la conexion o los permisos de directus",
+        buttons: ["Aceptar"],
+      });
+
+      await alert.present();
+    } finally {
+      this.charging = false;
     }
   }
 }

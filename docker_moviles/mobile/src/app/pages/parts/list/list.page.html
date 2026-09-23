@@ -13,12 +13,15 @@
 <ion-content>
   <ion-list>
     <ion-item *ngFor="let part of parts">
-      <ion-label>
+      <ion-label class="ion-text-wrap">
         <h2>{{ part.name }}</h2>
         <p>Precio: ${{ part.price }}</p>
       </ion-label>
-      <ion-button [routerLink]="['/parts/detail',part.id]">
+      <ion-button slot="end" [routerLink]="['/parts/detail',part.id]">
           <ion-icon name="eye-outline"></ion-icon>
+      </ion-button>
+      <ion-button slot="end" color="warning" (click)="abrirEditarModal(part.id)">
+        <ion-icon name="pencil-outline"></ion-icon>
       </ion-button>
     </ion-item>
   </ion-list>

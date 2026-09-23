@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { AlertController, ModalController } from "@ionic/angular";
 import axios from "axios";
@@ -17,8 +17,11 @@ interface PartCreate {
   standalone: false,
 })
 export class FormPage implements OnInit {
+  @Input() id?: number;
+
   partForm!: FormGroup;
   saved: boolean = false;
+  charging: boolean = false;
 
   validatorsMessage: Record<string, Record<string, string>> = {
     name: {
@@ -37,8 +40,16 @@ export class FormPage implements OnInit {
     private modalController: ModalController,
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.createForm();
+
+    if (this.isEdition) {
+      await this.chargerPart();
+    }
+  }
+
+  get isEdition(): boolean {
+    return this.id !== undefined;
   }
 
   private createForm() {
@@ -95,15 +106,25 @@ export class FormPage implements OnInit {
     };
 
     try {
-      await axios.post(`${environment.apiUrl}/parts`, part, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      if (this.isEdition && this.id !== undefined) {
+        await axios.patch(`${environment.apiUrl}/parts/${this.id}`, part, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      } else {
+        await axios.post(`${environment.apiUrl}/parts`, part, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      }
 
       const alert = await this.alertController.create({
-        header: "Refaccion guardado",
-        message: "La refaccion fue guardada exitosamente",
+        header: this.isEdition ? "Refaccion actualizada" : "Refaccion guardado",
+        message: this.isEdition
+          ? "La refaccion fue actualizada correctamente"
+          : "La refaccion fue guardada exitosamente",
         buttons: ["Aceptar"],
       });
 
@@ -114,18 +135,57 @@ export class FormPage implements OnInit {
         saved: true,
       });
     } catch (error) {
-      console.log("Error al guardar la refaccion", error);
+      console.log(
+        this.isEdition ? "Error al actualizar la refaccion" : "Error al guardar la refaccion",
+        error,
+      );
 
       const alert = await this.alertController.create({
         header: "Error",
-        message:
-          "No fue posible guardar la refaccion, Revisar los datos, la conexion o los permisos de directus",
+        message: this.isEdition
+          ? "No fue posible actualizar la refaccion, Revisar los datos, la conexion o los permisos de directus"
+          : "No fue posible guardar la refaccion, Revisar los datos, la conexion o los permisos de directus",
         buttons: ["Aceptar"],
       });
 
       await alert.present();
     } finally {
       this.saved = false;
+    }
+  }
+
+  async chargerPart(): Promise<void> {
+    if (this.id === undefined) {
+      return;
+    }
+
+    this.charging = true;
+
+    try {
+      const response = await axios.get<{ data: { id: number; name: string; price: number; description: string } }>(
+        `${environment.apiUrl}/parts/${this.id}`,
+      );
+
+      const part = response.data.data;
+
+      this.partForm.patchValue({
+        name: part.name,
+        price: part.price,
+        description: part.description,
+      });
+    } catch (error) {
+      console.log("Error al cargar la refaccion", error);
+
+      const alert = await this.alertController.create({
+        header: "Error",
+        message:
+          "No fue posible cargar los datos de la refaccion, Revisar la conexion o los permisos de directus",
+        buttons: ["Aceptar"],
+      });
+
+      await alert.present();
+    } finally {
+      this.charging = false;
     }
   }
 }

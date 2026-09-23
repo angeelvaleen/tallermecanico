@@ -4,16 +4,25 @@
   </ion-toolbar>
 </ion-header>
 
+<ion-fab slot="fixed" vertical="bottom" horizontal="center">
+  <ion-fab-button (click)="createEvidence()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+
 <ion-content>
   <ion-list>
     <ion-item *ngFor="let evidence of evidences">
-      <ion-label>
+      <ion-label class="ion-text-wrap">
         <h2>Formato: {{ evidence.format }}</h2>
         <p>{{ evidence.path }}</p>
-        <ion-button [routerLink]="['/evidences/detail', evidence.id]">
-          <ion-icon name="eye-outline"></ion-icon>
-        </ion-button>
       </ion-label>
+      <ion-button slot="end" [routerLink]="['/evidences/detail', evidence.id]">
+        <ion-icon name="eye-outline"></ion-icon>
+      </ion-button>
+      <ion-button slot="end" color="warning" (click)="abrirEditarModal(evidence.id)">
+        <ion-icon name="pencil-outline"></ion-icon>
+      </ion-button>
     </ion-item>
   </ion-list>
 </ion-content>

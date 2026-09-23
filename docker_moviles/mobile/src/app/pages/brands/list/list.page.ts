@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { ModalController } from '@ionic/angular';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
+import { FormPage } from '../form/form.page';
 
 interface Brand {
   id: number;
@@ -18,7 +20,7 @@ interface Brand {
 export class ListPage implements OnInit {
 
   brands: Brand[] = [];
-  constructor() {}
+  constructor(private modalController: ModalController) {}
 
   ngOnInit() {
     this.chargerBrands();
@@ -34,6 +36,39 @@ export class ListPage implements OnInit {
       this.brands = response.data.data;
     } catch (error) {
       console.error('Error al cargar marcas:', error);
+    }
+  }
+
+  async abrirEditarModal(id: number): Promise<void> {
+    const modal = await this.modalController.create({
+      component: FormPage,
+      componentProps: { id },
+      breakpoints: [0, 0.5, 0.95],
+      initialBreakpoint: 0.95
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if (data?.saved) {
+      await this.chargerBrands();
+    }
+  }
+
+  async createBrand(): Promise<void> {
+    const modal = await this.modalController.create({
+      component: FormPage,
+      breakpoints: [0, 0.5, 0.95],
+      initialBreakpoint: 0.95
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if (data?.saved) {
+      await this.chargerBrands();
     }
   }
 
