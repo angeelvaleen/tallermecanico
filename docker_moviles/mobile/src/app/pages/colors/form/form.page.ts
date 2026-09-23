@@ -95,15 +95,25 @@ export class FormPage implements OnInit {
     };
 
     try {
-      await axios.post(`${environment.apiUrl}/colors`, color, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      if (this.isEdition && this.id !== undefined) {
+        await axios.patch(`${environment.apiUrl}/colors/${this.id}`, color, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      } else {
+        await axios.post(`${environment.apiUrl}/colors`, color, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      }
 
       const alert = await this.alertController.create({
-        header: "Color agregado",
-        message: "El color fue registrado correctamente",
+        header: this.isEdition ? "Producto actualizado" : "Producto guardado",
+        message: this.isEdition
+          ? "El color fue actualizado correctamente."
+          : "El color fue registrado correctamente.",
         buttons: ["Aceptar"],
       });
 
@@ -114,12 +124,19 @@ export class FormPage implements OnInit {
         saved: true,
       });
     } catch (error) {
-      console.log("Error al guardar color", error);
+      console.error(
+        this.isEdition
+          ? "Error al actualizar el color:"
+          : "Error al guardar el color:",
+        error,
+      );
 
       const alert = await this.alertController.create({
         header: "Error",
-        message:
-          "No fue posible guardar color,Revisa los datos,la conexion y los permisos de creacion en directus",
+        message: this.isEdition
+          ? "No fue posible actualizar el color. Revisa los datos, la conexión y los permisos de actualización en Directus."
+          : "No fue posible guardar el color. Revisa los datos, la conexión y los permisos de creación en Directus.",
+        buttons: ["Aceptar"],
       });
 
       await alert.dismiss();
@@ -151,7 +168,7 @@ export class FormPage implements OnInit {
       const alerta = await this.alertController.create({
         header: "Error",
         message:
-          "No fue posible cargar los datos del producto. Revisa la conexión, el identificador y los permisos de lectura en Directus.",
+          "No fue posible cargar los datos del color. Revisa la conexión, el identificador y los permisos de lectura en Directus.",
         buttons: ["Aceptar"],
       });
 
