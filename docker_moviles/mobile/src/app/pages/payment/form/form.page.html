@@ -1,13 +1,45 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>form</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="closeModal()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Nuevo Pago</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">form</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+  <form *ngIf="paymentForm" [formGroup]="paymentForm" (ngSubmit)="savePayment()">
+    <ion-list>
+      <ion-item>
+        <ion-input label="Cotizacion ID" labelPlacement="stacked" type="number" formControlName="quote_id"></ion-input>
+      </ion-item>
+      <ion-note color="danger" *ngIf="getError('quote_id') as error">
+        {{ error }}
+      </ion-note>
+      <ion-item>
+        <ion-input label="Metodo ID" labelPlacement="stacked" type="number" formControlName="method_id"></ion-input>
+      </ion-item>
+      <ion-note color="danger" *ngIf="getError('method_id') as error">
+        {{ error }}
+      </ion-note>
+      <ion-item>
+        <ion-input label="Monto" labelPlacement="stacked" type="number" formControlName="amount" min="0"></ion-input>
+      </ion-item>
+      <ion-note color="danger" *ngIf="getError('amount') as error">
+        {{ error }}
+      </ion-note>
+      <ion-item>
+        <ion-input label="Referencia" labelPlacement="stacked" type="text" formControlName="reference"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input label="Fecha de pago" labelPlacement="stacked" type="datetime-local" formControlName="paid_at"></ion-input>
+      </ion-item>
+    </ion-list>
+
+    <ion-button expand="block" type="submit" class="ion-margin-top" [disabled]="saved">
+      {{ saved ? 'Guardando...' : 'Guardar' }}
+    </ion-button>
+  </form>
 </ion-content>

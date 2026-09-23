@@ -20,6 +20,9 @@
       <ion-button slot="end" [routerLink]="['/appointments/detail', item.id]">
         <ion-icon  name="eye-outline"></ion-icon>
       </ion-button>
+      <ion-button slot="end" color="warning" (click)="abrirEditarModal(item.id)">
+        <ion-icon name="pencil-outline"></ion-icon>
+      </ion-button>
     </ion-item>
   </ion-list>
 </ion-content>

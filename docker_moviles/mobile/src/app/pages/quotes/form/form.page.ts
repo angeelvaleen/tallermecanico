@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import {
   AbstractControl,
   FormArray,
@@ -62,9 +62,13 @@ interface QuotePartCreate {
   standalone: false,
 })
 export class FormPage implements OnInit {
+  @Input() id?: number;
+
   quoteForm!: FormGroup;
 
   saved: boolean = false;
+
+  charging: boolean = false;
 
   workorders: Workorder[] = [];
   services: Service[] = [];
@@ -95,6 +99,14 @@ export class FormPage implements OnInit {
   ngOnInit() {
     this.createForm();
     this.loadData();
+
+    if (this.isEdition) {
+      this.chargerQuote();
+    }
+  }
+
+  get isEdition(): boolean {
+    return this.id !== undefined;
   }
 
   private createForm(): void {
@@ -531,6 +543,11 @@ export class FormPage implements OnInit {
   }
 
   async saveQuote(): Promise<void> {
+    if (this.isEdition) {
+      await this.updateQuote();
+      return;
+    }
+
     if (this.quoteForm.invalid) {
       this.quoteForm.markAllAsTouched();
 
@@ -675,6 +692,115 @@ export class FormPage implements OnInit {
 
     } finally {
       this.saved = false;
+    }
+  }
+
+  async updateQuote(): Promise<void> {
+    const headerValid =
+      this.quoteForm.get("workorder_id")?.valid &&
+      this.quoteForm.get("validity")?.valid;
+
+    if (!headerValid) {
+      this.quoteForm.get("workorder_id")?.markAsTouched();
+      this.quoteForm.get("validity")?.markAsTouched();
+      return;
+    }
+
+    if (this.id === undefined) {
+      return;
+    }
+
+    this.saved = true;
+
+    try {
+      await axios.patch(
+        `${environment.apiUrl}/quotes/${this.id}`,
+        {
+          validity: this.quoteForm.get("validity")?.value,
+        },
+        {
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+        },
+      );
+
+      const alert =
+        await this.alertController.create({
+          header: "Cotización actualizada",
+          message:
+            "La vigencia fue actualizada correctamente",
+          buttons: ["Aceptar"],
+        });
+
+      await alert.present();
+      await alert.onDidDismiss();
+
+      await this.modalController.dismiss({
+        saved: true,
+      });
+    } catch (error) {
+      console.log(
+        "Error al actualizar la cotización",
+        error,
+      );
+
+      const alert =
+        await this.alertController.create({
+          header: "Error",
+          message:
+            "No fue posible actualizar la cotización. Revisar los datos, la conexión o los permisos de Directus.",
+          buttons: ["Aceptar"],
+        });
+
+      await alert.present();
+    } finally {
+      this.saved = false;
+    }
+  }
+
+  async chargerQuote(): Promise<void> {
+    if (this.id === undefined) {
+      return;
+    }
+
+    this.charging = true;
+
+    try {
+      const response = await axios.get<{
+        data: {
+          id: number;
+          workorder_id: number;
+          validity: string;
+        };
+      }>(
+        `${environment.apiUrl}/quotes/${this.id}`,
+      );
+
+      const quote = response.data.data;
+
+      this.quoteForm.patchValue({
+        workorder_id: quote.workorder_id,
+        validity: quote.validity,
+      });
+    } catch (error) {
+      console.log(
+        "Error al cargar la cotización",
+        error,
+      );
+
+      const alert =
+        await this.alertController.create({
+          header: "Error",
+          message:
+            "No fue posible cargar los datos de la cotización.",
+          buttons: ["Aceptar"],
+        });
+
+      await alert.present();
+    } finally {
+      this.charging = false;
     }
   }
 }

@@ -13,12 +13,15 @@
 <ion-content>
   <ion-list>
     <ion-item *ngFor="let quote of quotes">
-      <ion-label>
+      <ion-label class="ion-text-wrap">
         <h2>Cotizacion #{{ quote.id }}</h2>
         <p>Total: ${{ quote.total }}</p>
       </ion-label>
-      <ion-button [routerLink]="['/quotes/detail',quote.id]">
+      <ion-button slot="end" [routerLink]="['/quotes/detail',quote.id]">
         <ion-icon name="eye-outline" ></ion-icon>
+      </ion-button>
+      <ion-button slot="end" color="warning" (click)="abrirEditarModal(quote.id)">
+        <ion-icon name="pencil-outline"></ion-icon>
       </ion-button>
     </ion-item>
   </ion-list>

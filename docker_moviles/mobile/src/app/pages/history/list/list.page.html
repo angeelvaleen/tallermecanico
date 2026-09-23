@@ -4,15 +4,24 @@
   </ion-toolbar>
 </ion-header>
 
+<ion-fab slot="fixed" vertical="bottom" horizontal="center">
+  <ion-fab-button (click)="createHistory()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+
 <ion-content>
   <ion-list>
     <ion-item *ngFor="let h of history">
-      <ion-label>
+      <ion-label class="ion-text-wrap">
         <h2>Vehiculo ID: {{ h.vehicle_id }}</h2>
         <p>Orden ID: {{ h.workorder_id }}</p>
       </ion-label>
-      <ion-button [routerLink]="['/history/detail', h.id]">
+      <ion-button slot="end" [routerLink]="['/history/detail', h.id]">
         <ion-icon name="eye-outline" ></ion-icon>
+      </ion-button>
+      <ion-button slot="end" color="warning" (click)="abrirEditarModal(h.id)">
+        <ion-icon name="pencil-outline"></ion-icon>
       </ion-button>
     </ion-item>
   </ion-list>

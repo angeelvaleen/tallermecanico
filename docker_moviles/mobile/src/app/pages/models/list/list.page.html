@@ -4,15 +4,24 @@
   </ion-toolbar>
 </ion-header>
 
+<ion-fab slot="fixed" vertical="bottom" horizontal="center">
+  <ion-fab-button (click)="createModel()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+
 <ion-content>
   <ion-list>
     <ion-item *ngFor="let model of models">
-      <ion-label>
+      <ion-label class="ion-text-wrap">
         <h2>{{ model.name }}</h2>
         <p>Marca ID: {{ model.brand_id }}</p>
       </ion-label>
-      <ion-button [routerLink]="['/models/detail', model.id]">
-          <ion-icon name="eye-outline" ></ion-icon>
+      <ion-button slot="end" [routerLink]="['/models/detail', model.id]">
+        <ion-icon name="eye-outline" ></ion-icon>
+      </ion-button>
+      <ion-button slot="end" color="warning" (click)="abrirEditarModal(model.id)">
+        <ion-icon name="pencil-outline"></ion-icon>
       </ion-button>
     </ion-item>
   </ion-list>

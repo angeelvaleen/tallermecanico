@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Nueva cotización</ion-title>
+    <ion-title>{{ isEdition ? 'Editar cotización' : 'Nueva cotización' }}</ion-title>
 
     <ion-buttons slot="end">
       <ion-button (click)="closeModal()">
@@ -73,7 +73,7 @@
 
 
     <!-- SERVICIOS -->
-    <ion-card>
+    <ion-card *ngIf="!isEdition">
       <ion-card-header>
         <div class="section-header">
           <ion-card-title>Servicios</ion-card-title>
@@ -210,7 +210,7 @@
 
 
     <!-- REFACCIONES -->
-    <ion-card>
+    <ion-card *ngIf="!isEdition">
       <ion-card-header>
 
         <div class="section-header">
@@ -368,7 +368,7 @@
 
 
     <!-- TOTALES -->
-    <ion-card>
+    <ion-card *ngIf="!isEdition">
       <ion-card-header>
         <ion-card-title>Totales</ion-card-title>
       </ion-card-header>
@@ -432,7 +432,7 @@
           name="save-outline"
         ></ion-icon>
 
-        Guardar cotización
+        Guardar {{ isEdition ? 'cambios' : 'cotización' }}
       </ion-button>
 
     </div>

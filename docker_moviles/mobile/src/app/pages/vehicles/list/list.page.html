@@ -13,13 +13,16 @@
 <ion-content>
   <ion-list>
     <ion-item *ngFor="let vehicle of vehicles">
-      <ion-label>
+      <ion-label class="ion-text-wrap">
         <h2>Placa: {{ vehicle.plate }}</h2>
         <p>Year: {{ vehicle.year }}</p>
       </ion-label>
-      <ion-button [routerLink]="['/vehicles/detail', vehicle.id]" >
+      <ion-button slot="end" [routerLink]="['/vehicles/detail', vehicle.id]" >
         <ion-icon name="eye-outline" ></ion-icon>
     </ion-button>
+      <ion-button slot="end" color="warning" (click)="abrirEditarModal(vehicle.id)">
+        <ion-icon name="pencil-outline"></ion-icon>
+      </ion-button>
     </ion-item>
   </ion-list>
 </ion-content>

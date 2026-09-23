@@ -4,15 +4,24 @@
   </ion-toolbar>
 </ion-header>
 
+<ion-fab slot="fixed" vertical="bottom" horizontal="center">
+  <ion-fab-button (click)="createMethod()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+
 <ion-content>
   <ion-list>
     <ion-item *ngFor="let method of methods">
-      <ion-label>
+      <ion-label class="ion-text-wrap">
         <h2>{{ method.name }}</h2>
-        <ion-button [routerLink]="['/methods/detail',method.id]">
-          <ion-icon name="eye-outline" ></ion-icon>
-        </ion-button>
       </ion-label>
+      <ion-button slot="end" [routerLink]="['/methods/detail',method.id]">
+        <ion-icon name="eye-outline" ></ion-icon>
+      </ion-button>
+      <ion-button slot="end" color="warning" (click)="abrirEditarModal(method.id)">
+        <ion-icon name="pencil-outline"></ion-icon>
+      </ion-button>
     </ion-item>
   </ion-list>
 </ion-content>

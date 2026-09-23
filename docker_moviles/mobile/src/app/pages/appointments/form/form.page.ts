@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AlertController, ModalController } from '@ionic/angular';
 import axios from 'axios';
@@ -19,8 +19,11 @@ interface AppointmentCreate {
   standalone: false,
 })
 export class FormPage implements OnInit {
+  @Input() id?: number;
+
   appointmentForm!: FormGroup;
   saved: boolean = false;
+  charging: boolean = false;
 
   validatorsMessage: Record<string, Record<string, string>> = {
     vehicle_id: {
@@ -43,8 +46,16 @@ export class FormPage implements OnInit {
     private modalController: ModalController,
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.createForm();
+
+    if (this.isEdition) {
+      await this.chargerAppointment();
+    }
+  }
+
+  get isEdition(): boolean {
+    return this.id !== undefined;
   }
 
   private createForm() {
@@ -99,15 +110,30 @@ export class FormPage implements OnInit {
     };
 
     try {
-      await axios.post(`${environment.apiUrl}/appointments`,appointment , {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      if (this.isEdition && this.id !== undefined) {
+        await axios.patch(`${environment.apiUrl}/appointments/${this.id}`, {
+          vehicle_id: appointment.vehicle_id,
+          date: appointment.date,
+          time: appointment.time,
+          reason: appointment.reason,
+        }, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      } else {
+        await axios.post(`${environment.apiUrl}/appointments`,appointment , {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      }
 
       const alert = await this.alertController.create({
-        header: "Cita guardado",
-        message: "La cita fue guardada exitosamente",
+        header: this.isEdition ? "Cita actualizada" : "Cita guardado",
+        message: this.isEdition
+          ? "La cita fue actualizada correctamente"
+          : "La cita fue guardada exitosamente",
         buttons: ["Aceptar"],
       });
 
@@ -118,18 +144,58 @@ export class FormPage implements OnInit {
         saved: true,
       });
     } catch (error) {
-      console.log("Error al guardar cita", error);
+      console.log(
+        this.isEdition ? "Error al actualizar cita" : "Error al guardar cita",
+        error,
+      );
 
       const alert = await this.alertController.create({
         header: "Error",
-        message:
-          "No fue posible guardar la cita, Revisar los datos, la conexion o los permisos de directus",
+        message: this.isEdition
+          ? "No fue posible actualizar la cita, Revisar los datos, la conexion o los permisos de directus"
+          : "No fue posible guardar la cita, Revisar los datos, la conexion o los permisos de directus",
         buttons: ["Aceptar"],
       });
 
       await alert.present();
     } finally {
       this.saved = false;
+    }
+  }
+
+  async chargerAppointment(): Promise<void> {
+    if (this.id === undefined) {
+      return;
+    }
+
+    this.charging = true;
+
+    try {
+      const response = await axios.get<{ data: { id: number; vehicle_id: number; date: string; time: string; reason: string } }>(
+        `${environment.apiUrl}/appointments/${this.id}`,
+      );
+
+      const appointment = response.data.data;
+
+      this.appointmentForm.patchValue({
+        vehicle_id: appointment.vehicle_id,
+        date: appointment.date,
+        time: appointment.time,
+        reason: appointment.reason,
+      });
+    } catch (error) {
+      console.log("Error al cargar la cita", error);
+
+      const alert = await this.alertController.create({
+        header: "Error",
+        message:
+          "No fue posible cargar los datos de la cita, Revisar la conexion o los permisos de directus",
+        buttons: ["Aceptar"],
+      });
+
+      await alert.present();
+    } finally {
+      this.charging = false;
     }
   }
 }
