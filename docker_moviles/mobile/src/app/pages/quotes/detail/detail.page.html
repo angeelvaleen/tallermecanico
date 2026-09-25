@@ -1,29 +1,233 @@
 <ion-header>
   <ion-toolbar>
+
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/quotes/list"></ion-back-button>
+      <ion-back-button
+        defaultHref="/quotes/list">
+      </ion-back-button>
     </ion-buttons>
-    <ion-title>Detalle de Cotizacion</ion-title>
+
+    <ion-title>
+      Detalle de Cotización
+    </ion-title>
+
   </ion-toolbar>
 </ion-header>
 
+
 <ion-content class="ion-padding">
-  <ion-text color="danger" *ngIf="messageError" >
-    <p class="ion-padding">{{ messageError }}</p>
+
+  <ion-text
+    color="danger"
+    *ngIf="messageError">
+
+    <p class="ion-padding">
+      {{ messageError }}
+    </p>
+
   </ion-text>
 
+
   <div *ngIf="quote">
+
+    <!-- DATOS GENERALES -->
+
     <ion-card>
+
+      <ion-card-header>
+
+        <ion-card-title>
+          Cotización #{{ quote.id }}
+        </ion-card-title>
+
+      </ion-card-header>
+
+
       <ion-card-content>
-        <h2>Orden de Trabajo ID: {{ quote.workorder_id }}</h2>
-        <p><strong>Usuario ID:</strong> {{ quote.user_id }}</p>
-        <p><strong>Estado ID:</strong> {{ quote.status_id }}</p>
-        <p><strong>Subtotal:</strong> ${{ quote.subtotal }}</p>
-        <p><strong>Impuesto:</strong> ${{ quote.tax }}</p>
-        <p><strong>Total:</strong> ${{ quote.total }}</p>
-        <p><strong>Validez:</strong> {{ quote.validity || 'Sin definir' }}</p>
-        <p><strong>Registro:</strong> {{ quote.created_at | date:'yyyy-MM-dd' }}</p>
+
+        <p>
+          <strong>Orden de trabajo:</strong>
+          #{{ quote.workorder_id.id }}
+        </p>
+
+        <p>
+          <strong>Estado:</strong>
+          {{ quote.status_id.name }}
+        </p>
+
+        <p>
+          <strong>Vigencia:</strong>
+          {{ quote.validity || 'Sin definir' }}
+        </p>
+
+        <p>
+          <strong>Fecha de registro:</strong>
+          {{ quote.created_at | date:'yyyy-MM-dd' }}
+        </p>
+
       </ion-card-content>
+
     </ion-card>
+
+
+    <!-- SERVICIOS -->
+
+    <ion-card>
+
+      <ion-card-header>
+
+        <ion-card-title>
+          Servicios
+        </ion-card-title>
+
+      </ion-card-header>
+
+
+      <ion-card-content>
+
+        <ion-text
+          color="medium"
+          *ngIf="quote.quoteitems.length === 0">
+
+          <p>
+            No hay servicios en esta cotización.
+          </p>
+
+        </ion-text>
+
+
+        <ion-list>
+
+          <ion-item
+            *ngFor="let item of quote.quoteitems">
+
+            <ion-label>
+
+              <h2>
+                {{ item.service_id.name }}
+              </h2>
+
+              <p>
+                Precio: ${{ item.price }}
+              </p>
+
+              <p>
+                Descuento: {{ item.discount }}%
+              </p>
+
+              <p>
+                Importe: ${{ item.amount }}
+              </p>
+
+            </ion-label>
+
+          </ion-item>
+
+        </ion-list>
+
+      </ion-card-content>
+
+    </ion-card>
+
+
+    <!-- REFACCIONES -->
+
+    <ion-card>
+
+      <ion-card-header>
+
+        <ion-card-title>
+          Refacciones
+        </ion-card-title>
+
+      </ion-card-header>
+
+
+      <ion-card-content>
+
+        <ion-text
+          color="medium"
+          *ngIf="quote.quoteparts.length === 0">
+
+          <p>
+            No hay refacciones en esta cotización.
+          </p>
+
+        </ion-text>
+
+
+        <ion-list>
+
+          <ion-item
+            *ngFor="let part of quote.quoteparts">
+
+            <ion-label>
+
+              <h2>
+                {{ part.part_id.name }}
+              </h2>
+
+              <p>
+                Cantidad: {{ part.quantity }}
+              </p>
+
+              <p>
+                Precio: ${{ part.price }}
+              </p>
+
+              <p>
+                Descuento: {{ part.discount }}%
+              </p>
+
+              <p>
+                Importe: ${{ part.amount }}
+              </p>
+
+            </ion-label>
+
+          </ion-item>
+
+        </ion-list>
+
+      </ion-card-content>
+
+    </ion-card>
+
+
+    <!-- TOTALES -->
+
+    <ion-card>
+
+      <ion-card-header>
+
+        <ion-card-title>
+          Totales
+        </ion-card-title>
+
+      </ion-card-header>
+
+
+      <ion-card-content>
+
+        <p>
+          <strong>Subtotal:</strong>
+          ${{ quote.subtotal }}
+        </p>
+
+        <p>
+          <strong>Impuesto:</strong>
+          ${{ quote.tax }}
+        </p>
+
+        <h2>
+          <strong>Total:</strong>
+          ${{ quote.total }}
+        </h2>
+
+      </ion-card-content>
+
+    </ion-card>
+
   </div>
+
 </ion-content>
