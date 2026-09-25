@@ -1,0 +1,33 @@
+ion-card {
+  margin: 12px 0;
+}
+
+.section-header,
+.item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.item-card {
+  margin: 16px 0;
+}
+
+.error-message {
+  margin: 4px 16px 8px;
+  font-size: 13px;
+}
+
+.empty-message {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.buttons-container {
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.buttons-container ion-button {
+  margin-top: 10px;
+}
