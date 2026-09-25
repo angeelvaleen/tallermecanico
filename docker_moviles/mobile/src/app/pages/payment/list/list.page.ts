@@ -5,7 +5,7 @@ import { environment } from 'src/environments/environment';
 interface Payment {
   id: number;
   quote_id: number;
-  status_id: number;
+  user_id: number;
   method_id:number;
   amount: number;
   reference: string;

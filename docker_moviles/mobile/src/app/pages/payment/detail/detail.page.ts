@@ -8,7 +8,7 @@ interface Payment {
   id: number;
   quote_id: number;
   method_id: number;
-  status_id: number;
+  user_id: number;
   amount: number;
   reference: string;
   paid_at: string;
