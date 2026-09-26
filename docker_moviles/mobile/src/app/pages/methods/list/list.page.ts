@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
+import { ModalController } from '@ionic/angular';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
+import { FormPage } from '../form/form.page';
 
 interface Method {
   id: number;
   name: string;
   is_active: boolean;
-  created_at:string;
+  created_at: string;
 }
 
 @Component({
@@ -18,20 +20,58 @@ interface Method {
 export class ListPage implements OnInit {
   methods: Method[] = [];
 
-  constructor() {}
+  constructor(
+    private modalController: ModalController,
+  ) {}
 
-  ngOnInit() {
-    this.chargerMethods();
+  ngOnInit(): void {
+    this.loadMethods();
   }
 
-  async chargerMethods(): Promise<void> {
+  async loadMethods(): Promise<void> {
     try {
       const response = await axios.get<{ data: Method[] }>(
-        `${environment.apiUrl}/methods`
+        `${environment.apiUrl}/methods`,
       );
+
       this.methods = response.data.data;
     } catch (error) {
-      console.log('Error al cargar metodos', error);
+      console.error('Error al cargar métodos:', error);
+    }
+  }
+
+  async createMethod(): Promise<void> {
+    const modal = await this.modalController.create({
+      component: FormPage,
+      breakpoints: [0, 0.5, 0.95],
+      initialBreakpoint: 0.95,
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if (data?.saved) {
+      await this.loadMethods();
+    }
+  }
+
+  async editMethod(id: number): Promise<void> {
+    const modal = await this.modalController.create({
+      component: FormPage,
+      componentProps: {
+        id,
+      },
+      breakpoints: [0, 0.5, 0.95],
+      initialBreakpoint: 0.95,
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if (data?.saved) {
+      await this.loadMethods();
     }
   }
 }

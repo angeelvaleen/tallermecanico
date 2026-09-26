@@ -4,15 +4,52 @@
   </ion-toolbar>
 </ion-header>
 
+<ion-fab
+  slot="fixed"
+  vertical="bottom"
+  horizontal="center"
+>
+  <ion-fab-button (click)="createModel()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+
 <ion-content>
   <ion-list>
     <ion-item *ngFor="let model of models">
-      <ion-label>
+      <ion-label class="ion-text-wrap">
         <h2>{{ model.name }}</h2>
-        <p>Marca ID: {{ model.brand_id }}</p>
+
+        <p>
+          Marca:
+          {{ getBrandName(model.brand_id) }}
+        </p>
+
+        <p>
+          Estado:
+          {{ model.is_active ? 'Activo' : 'Inactivo' }}
+        </p>
+
+        <p>
+          Registro:
+          {{ model.created_at | date:'yyyy-MM-dd' }}
+        </p>
       </ion-label>
-      <ion-button [routerLink]="['/models/detail', model.id]">
-          <ion-icon name="eye-outline" ></ion-icon>
+
+      <!--<ion-button
+        slot="end"
+        [routerLink]="['/models/detail', model.id]"
+      >
+        <ion-icon name="eye-outline"></ion-icon>
+      </ion-button>
+      --->
+      
+      <ion-button
+        slot="end"
+        color="warning"
+        (click)="editModel(model.id)"
+      >
+        <ion-icon name="pencil"></ion-icon>
       </ion-button>
     </ion-item>
   </ion-list>

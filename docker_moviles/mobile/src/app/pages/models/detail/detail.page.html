@@ -1,26 +1,51 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/models/list"></ion-back-button>
+      <ion-back-button
+        defaultHref="/models/list"
+      ></ion-back-button>
     </ion-buttons>
+
     <ion-title>Detalle de Modelo</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-text color="danger" *ngIf="messageError">
-    <p class="ion-padding">{{ messageError }}</p>
-  </ion-text>
 
+  <ion-text
+    color="danger"
+    *ngIf="messageError"
+  >
+    <p class="ion-padding">
+      {{ messageError }}
+    </p>
+  </ion-text>
 
   <div *ngIf="model">
     <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          {{ model.name }}
+        </ion-card-title>
+      </ion-card-header>
+
       <ion-card-content>
-        <h2>Nombre: {{ model.name }}</h2>
-        <p><strong>Marca ID:</strong> {{ model.brand_id }}</p>
-        <p><strong>Estado:</strong> {{ model.is_active ? 'Activo' : 'Inactivo' }}</p>
-        <p><strong>Registro:</strong> {{ model.created_at | date:'yyyy-MM-dd' }}</p>
+        <p>
+          <strong>Marca:</strong>
+          {{ brand?.name ?? 'No disponible' }}
+        </p>
+
+        <p>
+          <strong>Estado:</strong>
+          {{ model.is_active ? 'Activo' : 'Inactivo' }}
+        </p>
+
+        <p>
+          <strong>Registro:</strong>
+          {{ model.created_at | date:'yyyy-MM-dd' }}
+        </p>
       </ion-card-content>
     </ion-card>
   </div>
+
 </ion-content>

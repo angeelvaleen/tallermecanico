@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { ModalController } from '@ionic/angular';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
+import { FormPage } from '../form/form.page';
 
 interface Fuel {
   id: number;
@@ -18,21 +20,58 @@ interface Fuel {
 export class ListPage implements OnInit {
   fuels: Fuel[] = [];
 
-  constructor() {}
+  constructor(
+    private modalController: ModalController,
+  ) {}
 
-  ngOnInit() {
-    this.chargerFuels();
+  ngOnInit(): void {
+    this.loadFuels();
   }
 
-  async chargerFuels(): Promise<void> {
+  async loadFuels(): Promise<void> {
     try {
       const response = await axios.get<{ data: Fuel[] }>(
-        `${environment.apiUrl}/fuels`
+        `${environment.apiUrl}/fuels`,
       );
-      
+
       this.fuels = response.data.data;
     } catch (error) {
-      console.log('Error al cargar combustibles', error);
+      console.error('Error al cargar combustibles:', error);
+    }
+  }
+
+  async createFuel(): Promise<void> {
+    const modal = await this.modalController.create({
+      component: FormPage,
+      breakpoints: [0, 0.5, 0.95],
+      initialBreakpoint: 0.95,
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if (data?.saved) {
+      await this.loadFuels();
+    }
+  }
+
+  async editFuel(id: number): Promise<void> {
+    const modal = await this.modalController.create({
+      component: FormPage,
+      componentProps: {
+        id,
+      },
+      breakpoints: [0, 0.5, 0.95],
+      initialBreakpoint: 0.95,
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if (data?.saved) {
+      await this.loadFuels();
     }
   }
 }
