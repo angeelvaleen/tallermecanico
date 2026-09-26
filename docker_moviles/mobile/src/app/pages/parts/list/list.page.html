@@ -4,22 +4,45 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-fab slot="fixed" vertical="bottom" horizontal="center">
-    <ion-fab-button (click)="createPart()">
-        <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
+<ion-fab
+  slot="fixed"
+  vertical="bottom"
+  horizontal="center"
+>
+  <ion-fab-button (click)="createPart()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
 </ion-fab>
 
 <ion-content>
+
   <ion-list>
+
     <ion-item *ngFor="let part of parts">
+
       <ion-label>
         <h2>{{ part.name }}</h2>
-        <p>Precio: ${{ part.price }}</p>
       </ion-label>
-      <ion-button [routerLink]="['/parts/detail',part.id]">
-          <ion-icon name="eye-outline"></ion-icon>
+
+      <!-- Detalle -->
+      <ion-button
+        slot="end"
+        [routerLink]="['/parts/detail', part.id]"
+      >
+        <ion-icon name="eye-outline"></ion-icon>
       </ion-button>
+
+      <!-- Editar -->
+      <ion-button
+        slot="end"
+        color="warning"
+        (click)="editPart(part.id)"
+      >
+        <ion-icon name="pencil"></ion-icon>
+      </ion-button>
+
     </ion-item>
+
   </ion-list>
+
 </ion-content>

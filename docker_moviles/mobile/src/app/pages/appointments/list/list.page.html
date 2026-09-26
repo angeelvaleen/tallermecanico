@@ -5,21 +5,45 @@
 </ion-header>
 
 <ion-fab slot="fixed" vertical="bottom" horizontal="center">
-    <ion-fab-button (click)="createAppointment()">
-        <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
+  <ion-fab-button (click)="createAppointment()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
 </ion-fab>
 
 <ion-content>
   <ion-list>
+
     <ion-item *ngFor="let item of appointments">
+
       <ion-label class="ion-text-wrap">
-        <h2>Fecha: {{ item.date }} - {{ item.time }}</h2>
-        <p>Vehiculo ID: {{ item.vehicle_id }}</p>
+        <h2>
+          {{ item.date }} - {{ item.time }}
+        </h2>
+
+        <p>
+          Estado: {{ getStatusName(item.status_id) }}
+        </p>
       </ion-label>
-      <ion-button slot="end" [routerLink]="['/appointments/detail', item.id]">
-        <ion-icon  name="eye-outline"></ion-icon>
+
+      <!-- Detalle -->
+      <ion-button
+        slot="end"
+        [routerLink]="['/appointments/detail', item.id]"
+      >
+        <ion-icon name="eye-outline"></ion-icon>
       </ion-button>
+
+      <!-- Editar solamente si está pendiente -->
+      <ion-button
+        *ngIf="canEditAppointment(item)"
+        slot="end"
+        color="warning"
+        (click)="editAppointment(item.id)"
+      >
+        <ion-icon name="pencil"></ion-icon>
+      </ion-button>
+
     </ion-item>
+
   </ion-list>
 </ion-content>

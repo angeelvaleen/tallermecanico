@@ -21,42 +21,47 @@ interface Service {
 })
 export class DetailPage implements OnInit {
   service: Service | null = null;
-  messageError:string = '';
+  messageError: string = '';
 
   constructor(
     private route: ActivatedRoute,
     private loading: LoadingController,
   ) {}
 
-  ngOnInit() {
-    this.chargerService();
+  async ngOnInit(): Promise<void> {
+    await this.loadService();
   }
 
-  async chargerService(): Promise<void> {
-
+  async loadService(): Promise<void> {
     const id = this.route.snapshot.paramMap.get('id');
-    
+
+    this.service = null;
+    this.messageError = '';
+
     if (!id) {
-      this.messageError='No se proporciono ID';
+      this.messageError = 'No se proporcionó ID.';
       return;
     }
 
     const loading = await this.loading.create({
-      message:"Cargando servicio...",
-      spinner:"crescent",
-    })
+      message: 'Cargando servicio...',
+      spinner: 'crescent',
+    });
 
     await loading.present();
 
     try {
       const response = await axios.get<{ data: Service }>(
-        `${environment.apiUrl}/services/${encodeURIComponent(id)}`
+        `${environment.apiUrl}/services/${encodeURIComponent(id)}`,
       );
+
       this.service = response.data.data;
     } catch (error) {
-      this.messageError='Revisar id, conexion a base de datos o permisos';
-      console.log('Error al cargar detalle de servicio', error);
-    }finally{
+      console.error('Error al cargar el detalle del servicio:', error);
+
+      this.messageError =
+        'No se pudo cargar el servicio. Revisa el ID, la conexión y los permisos de Directus.';
+    } finally {
       await loading.dismiss();
     }
   }

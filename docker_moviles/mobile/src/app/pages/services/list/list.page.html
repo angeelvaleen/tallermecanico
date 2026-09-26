@@ -4,23 +4,39 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-fab slot="fixed" vertical="bottom" horizontal="center">
-    <ion-fab-button (click)="createService()">
-        <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
+<ion-fab
+  slot="fixed"
+  vertical="bottom"
+  horizontal="center"
+>
+  <ion-fab-button (click)="createService()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
 </ion-fab>
-
 
 <ion-content>
   <ion-list>
     <ion-item *ngFor="let service of services">
-      <ion-label>
+
+      <ion-label class="ion-text-wrap">
         <h2>{{ service.name }}</h2>
-        <p>Precio: ${{ service.price }}</p>
       </ion-label>
-      <ion-button [routerLink]="['/services/detail',service.id]">
-          <ion-icon name="eye-outline"></ion-icon>
+
+      <ion-button
+        slot="end"
+        [routerLink]="['/services/detail', service.id]"
+      >
+        <ion-icon name="eye-outline"></ion-icon>
       </ion-button>
+
+      <ion-button
+        slot="end"
+        color="warning"
+        (click)="editService(service.id)"
+      >
+        <ion-icon name="pencil"></ion-icon>
+      </ion-button>
+
     </ion-item>
   </ion-list>
 </ion-content>

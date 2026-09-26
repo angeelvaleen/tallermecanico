@@ -6,7 +6,9 @@
       </ion-button>
     </ion-buttons>
 
-    <ion-title>Nueva Cita</ion-title>
+    <ion-title>
+      {{ isEdition ? 'Editar Cita' : 'Nueva Cita' }}
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -16,17 +18,23 @@
     [formGroup]="appointmentForm"
     (ngSubmit)="saveAppointment()"
   >
-
     <ion-list>
 
       <!-- Vehículo -->
       <ion-item>
-        <ion-input
+        <ion-select
           label="Vehículo"
           labelPlacement="stacked"
-          type="number"
+          placeholder="Selecciona un vehículo"
           formControlName="vehicle_id"
-        ></ion-input>
+        >
+          <ion-select-option
+            *ngFor="let vehicle of vehicles"
+            [value]="vehicle.id"
+          >
+            {{ vehicle.plate }}
+          </ion-select-option>
+        </ion-select>
       </ion-item>
 
       <ion-note color="danger" *ngIf="getError('vehicle_id') as error">
@@ -64,10 +72,10 @@
       </ion-note>
 
 
-      <!-- Razón -->
+      <!-- Motivo -->
       <ion-item>
         <ion-input
-          label="Razón"
+          label="Motivo"
           labelPlacement="stacked"
           type="text"
           formControlName="reason"
@@ -86,7 +94,7 @@
       class="ion-margin-top"
       [disabled]="saved"
     >
-      {{ saved ? 'Guardando...' : 'Guardar' }}
+      {{ saved ? 'Guardando...' : (isEdition ? 'Actualizar' : 'Guardar') }}
     </ion-button>
 
   </form>

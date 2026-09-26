@@ -1,8 +1,8 @@
-import { Component, OnInit } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { AlertController, ModalController } from "@ionic/angular";
-import axios from "axios";
-import { environment } from "src/environments/environment";
+import { Component, Input, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AlertController, ModalController } from '@ionic/angular';
+import axios from 'axios';
+import { environment } from 'src/environments/environment';
 
 interface PartCreate {
   name: string;
@@ -10,24 +10,38 @@ interface PartCreate {
   description: string;
 }
 
+interface PartDetail {
+  id: number;
+  name: string;
+  price: number;
+  description: string;
+  is_active: boolean;
+  created_at: string;
+}
+
 @Component({
-  selector: "app-parts-form",
-  templateUrl: "./form.page.html",
-  styleUrls: ["./form.page.scss"],
+  selector: 'app-parts-form',
+  templateUrl: './form.page.html',
+  styleUrls: ['./form.page.scss'],
   standalone: false,
 })
 export class FormPage implements OnInit {
+
+  @Input() id?: number;
+
   partForm!: FormGroup;
   saved: boolean = false;
+  isEdition: boolean = false;
 
   validatorsMessage: Record<string, Record<string, string>> = {
     name: {
-      required: "El nombre es requerido",
+      required: 'El nombre es requerido',
+      maxlength: 'El nombre no puede tener más de 100 caracteres',
     },
     price: {
-      required: "Precio es requerido",
-      min: "El precio debe ser mayor o igual que cero",
-      pattern: "El precio es invalido",
+      required: 'El precio es requerido',
+      min: 'El precio debe ser mayor o igual que cero',
+      pattern: 'El precio no es válido',
     },
   };
 
@@ -37,38 +51,78 @@ export class FormPage implements OnInit {
     private modalController: ModalController,
   ) {}
 
-  ngOnInit() {
+  async ngOnInit(): Promise<void> {
     this.createForm();
+
+    if (this.id) {
+      this.isEdition = true;
+      await this.loadPart();
+    }
   }
 
-  private createForm() {
+  private createForm(): void {
     this.partForm = this.formBuilder.group({
       name: [
-        "",
-        [(Validators.required)],
+        '',
+        [
+          Validators.required,
+          Validators.maxLength(100),
+        ],
       ],
+
       price: [
-        "",
-        [(Validators.required, Validators.min(0), Validators.pattern("^[0-9]+(\\.[0-9]{1,2})?$"))],
+        '',
+        [
+          Validators.required,
+          Validators.min(0),
+          Validators.pattern('^[0-9]+(\\.[0-9]{1,2})?$'),
+        ],
       ],
-      description: [
-        ""
-      ],
+
+      description: [''],
     });
+  }
+
+  private async loadPart(): Promise<void> {
+    try {
+      const response = await axios.get<{ data: PartDetail }>(
+        `${environment.apiUrl}/parts/${this.id}`
+      );
+
+      const part = response.data.data;
+
+      this.partForm.patchValue({
+        name: part.name,
+        price: part.price,
+        description: part.description,
+      });
+
+    } catch (error) {
+      console.log('Error al cargar la refacción', error);
+
+      await this.showAlert(
+        'Error',
+        'No fue posible cargar la información de la refacción'
+      );
+    }
   }
 
   getError(controlName: string): string {
     const control = this.partForm.get(controlName);
 
-    if (!control || !control.errors || !(control.touched || control.dirty)) {
-      return "";
+    if (
+      !control ||
+      !control.errors ||
+      !(control.touched || control.dirty)
+    ) {
+      return '';
     }
 
     const typeError = Object.keys(control.errors)[0];
 
     return (
       this.validatorsMessage[controlName]?.[typeError] ??
-      "El valor ingresado no es valido"
+      'El valor ingresado no es válido'
     );
   }
 
@@ -91,41 +145,74 @@ export class FormPage implements OnInit {
     const part: PartCreate = {
       name: values.name.trim(),
       price: Number(values.price),
-      description: values.description.trim(),
+      description: values.description?.trim() ?? '',
     };
 
     try {
-      await axios.post(`${environment.apiUrl}/parts`, part, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      if (this.isEdition && this.id) {
 
-      const alert = await this.alertController.create({
-        header: "Refaccion guardado",
-        message: "La refaccion fue guardada exitosamente",
-        buttons: ["Aceptar"],
-      });
+        await axios.patch(
+          `${environment.apiUrl}/parts/${this.id}`,
+          part,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
 
-      await alert.present();
-      await alert.onDidDismiss();
+        await this.showAlert(
+          'Refacción actualizada',
+          'La refacción fue actualizada exitosamente'
+        );
+
+      } else {
+
+        await axios.post(
+          `${environment.apiUrl}/parts`,
+          part,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        await this.showAlert(
+          'Refacción guardada',
+          'La refacción fue guardada exitosamente'
+        );
+      }
 
       await this.modalController.dismiss({
         saved: true,
       });
+
     } catch (error) {
-      console.log("Error al guardar la refaccion", error);
+      console.log('Error al guardar la refacción', error);
 
-      const alert = await this.alertController.create({
-        header: "Error",
-        message:
-          "No fue posible guardar la refaccion, Revisar los datos, la conexion o los permisos de directus",
-        buttons: ["Aceptar"],
-      });
+      await this.showAlert(
+        'Error',
+        'No fue posible guardar la refacción. Revisar los datos, la conexión o los permisos de Directus'
+      );
 
-      await alert.present();
     } finally {
       this.saved = false;
     }
+  }
+
+  private async showAlert(
+    header: string,
+    message: string
+  ): Promise<void> {
+
+    const alert = await this.alertController.create({
+      header,
+      message,
+      buttons: ['Aceptar'],
+    });
+
+    await alert.present();
+    await alert.onDidDismiss();
   }
 }

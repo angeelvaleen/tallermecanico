@@ -4,7 +4,6 @@ import axios from 'axios';
 import { environment } from 'src/environments/environment';
 import { FormPage } from '../form/form.page';
 
-
 interface Vehicle {
   id: number;
   model_id: number;
@@ -13,12 +12,13 @@ interface Vehicle {
   color_id: number;
   plate: string;
   vin: string;
-  year: string;
+  year: number;
   mileage: number;
   is_active: boolean;
   created_at: string;
   updated_at: string;
 }
+
 @Component({
   selector: 'app-vehicles-list',
   templateUrl: './list.page.html',
@@ -31,27 +31,36 @@ export class ListPage implements OnInit {
 
   constructor(
     private modalController: ModalController,
-  ) { }
+  ) {}
 
-  ngOnInit() {
-    this.chargerVehicles();
+  ngOnInit(): void {
+    this.loadVehicles();
   }
 
-  async chargerVehicles(): Promise<void> {
+  async loadVehicles(): Promise<void> {
+
     try {
+
       const response = await axios.get<{ data: Vehicle[] }>(
         `${environment.apiUrl}/vehicles`
       );
+
       this.vehicles = response.data.data;
+
     } catch (error) {
-      console.log('Error al cargar vehiculos', error);
+
+      console.log(
+        'Error al cargar vehículos',
+        error
+      );
     }
   }
 
-  async createVehicle(): Promise<void>{
+  async createVehicle(): Promise<void> {
+
     const modal = await this.modalController.create({
       component: FormPage,
-      breakpoints: [0,0.5,0.95],
+      breakpoints: [0, 0.5, 0.95],
       initialBreakpoint: 0.95,
     });
 
@@ -59,12 +68,28 @@ export class ListPage implements OnInit {
 
     const { data } = await modal.onDidDismiss();
 
-    if(data?.saved){
-      await this.chargerVehicles();
+    if (data?.saved) {
+      await this.loadVehicles();
     }
-
   }
 
+  async editVehicle(id: number): Promise<void> {
 
+    const modal = await this.modalController.create({
+      component: FormPage,
+      componentProps: {
+        id,
+      },
+      breakpoints: [0, 0.5, 0.95],
+      initialBreakpoint: 0.95,
+    });
 
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if (data?.saved) {
+      await this.loadVehicles();
+    }
+  }
 }

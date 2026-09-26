@@ -1,27 +1,62 @@
 <ion-header>
   <ion-toolbar>
+
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/parts/list"></ion-back-button>
+      <ion-back-button
+        defaultHref="/parts/list"
+      ></ion-back-button>
     </ion-buttons>
-    <ion-title>Detalle de Refaccion</ion-title>
+
+    <ion-title>Detalle de Refacción</ion-title>
+
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-text color="danger" *ngIf="messageError">
-    <p class="ion-padding">{{ messageError }}</p>
+
+  <ion-text
+    color="danger"
+    *ngIf="messageError"
+  >
+    <p class="ion-padding">
+      {{ messageError }}
+    </p>
   </ion-text>
 
   <div *ngIf="part">
+
     <ion-card>
+
       <ion-card-content>
-        <h2>Nombre: {{ part.name }}</h2>
-        <p><strong>Precio:</strong> ${{ part.price }}</p>
-        <p><strong>Descripcion:</strong> {{ part.description || 'Sin descripcion' }}</p>
-        <p><strong>Estado:</strong> {{ part.is_active ? 'Activo' : 'Inactivo' }}</p>
-        <p><strong>Registro:</strong> {{ part.created_at | date:'yyyy-MM-dd' }}</p>
+
+        <h2>
+          Nombre: {{ part.name }}
+        </h2>
+
+        <p>
+          <strong>Precio:</strong>
+          ${{ part.price }}
+        </p>
+
+        <p>
+          <strong>Descripción:</strong>
+          {{ part.description || 'Sin descripción' }}
+        </p>
+
+        <p>
+          <strong>Estado:</strong>
+          {{ part.is_active ? 'Activo' : 'Inactivo' }}
+        </p>
+
+        <p>
+          <strong>Registro:</strong>
+          {{ part.created_at | date:'yyyy-MM-dd' }}
+        </p>
+
       </ion-card-content>
+
     </ion-card>
+
   </div>
 
 </ion-content>

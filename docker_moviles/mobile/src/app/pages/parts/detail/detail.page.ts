@@ -20,42 +20,54 @@ interface Part {
   standalone: false,
 })
 export class DetailPage implements OnInit {
+
   part: Part | null = null;
-  messageError:string = '';
+  messageError: string = '';
 
   constructor(
     private route: ActivatedRoute,
     private loading: LoadingController,
   ) {}
 
-  ngOnInit() {
-    this.chargerPart();
+  ngOnInit(): void {
+    this.loadPart();
   }
 
-  async chargerPart(): Promise<void> {
+  async loadPart(): Promise<void> {
+
     const id = this.route.snapshot.paramMap.get('id');
-    
+
     if (!id) {
-      this.messageError='No se proporciono ID';
+      this.messageError = 'No se proporcionó ID';
       return;
     }
-    
+
     const loading = await this.loading.create({
-      message:"Cargando refaccion...",
-      spinner:"bubbles",
+      message: 'Cargando refacción...',
+      spinner: 'bubbles',
     });
 
     await loading.present();
 
     try {
+
       const response = await axios.get<{ data: Part }>(
         `${environment.apiUrl}/parts/${encodeURIComponent(id)}`
       );
+
       this.part = response.data.data;
+
     } catch (error) {
-      this.messageError="Revisar id, conexion a base de datos o permisos";
-      console.log('Error al cargar detalle de refaccion', error);
-    }finally{
+
+      this.messageError =
+        'Revisar ID, conexión a base de datos o permisos';
+
+      console.log(
+        'Error al cargar detalle de refacción',
+        error
+      );
+
+    } finally {
       await loading.dismiss();
     }
   }

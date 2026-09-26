@@ -1,16 +1,21 @@
 <ion-header>
   <ion-toolbar>
+
     <ion-buttons slot="start">
       <ion-button (click)="closeModal()">
         <ion-icon name="close-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
 
-    <ion-title>Nuevo Vehículo</ion-title>
+    <ion-title>
+      {{ isEdition ? 'Editar Vehículo' : 'Nuevo Vehículo' }}
+    </ion-title>
+
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
+
   <form
     *ngIf="vehicleForm"
     [formGroup]="vehicleForm"
@@ -19,47 +24,111 @@
 
     <ion-list>
 
-      <!-- Modelo -->
+      <!-- Marca -->
       <ion-item>
-        <ion-input
-          label="Modelo"
+        <ion-select
+          label="Marca"
           labelPlacement="stacked"
-          type="number"
-          formControlName="model_id"
-        ></ion-input>
+          formControlName="brand_id"
+          (ionChange)="onBrandChange()"
+          interface="popover"
+        >
+
+          <ion-select-option
+            *ngFor="let brand of brands"
+            [value]="brand.id"
+          >
+            {{ brand.name }}
+          </ion-select-option>
+
+        </ion-select>
       </ion-item>
 
-      <ion-note color="danger" *ngIf="getError('model_id') as error">
+      <ion-note
+        color="danger"
+        *ngIf="getError('brand_id') as error"
+      >
+        {{ error }}
+      </ion-note>
+
+
+      <!-- Modelo -->
+      <ion-item>
+        <ion-select
+          label="Modelo"
+          labelPlacement="stacked"
+          formControlName="model_id"
+          interface="popover"
+        >
+
+          <ion-select-option
+            *ngFor="let model of filteredModels"
+            [value]="model.id"
+          >
+            {{ model.name }}
+          </ion-select-option>
+
+        </ion-select>
+      </ion-item>
+
+      <ion-note
+        color="danger"
+        *ngIf="getError('model_id') as error"
+      >
         {{ error }}
       </ion-note>
 
 
       <!-- Combustible -->
       <ion-item>
-        <ion-input
+        <ion-select
           label="Combustible"
           labelPlacement="stacked"
-          type="number"
           formControlName="fuel_id"
-        ></ion-input>
+          interface="popover"
+        >
+
+          <ion-select-option
+            *ngFor="let fuel of fuels"
+            [value]="fuel.id"
+          >
+            {{ fuel.name }}
+          </ion-select-option>
+
+        </ion-select>
       </ion-item>
 
-      <ion-note color="danger" *ngIf="getError('fuel_id') as error">
+      <ion-note
+        color="danger"
+        *ngIf="getError('fuel_id') as error"
+      >
         {{ error }}
       </ion-note>
 
 
       <!-- Color -->
       <ion-item>
-        <ion-input
+        <ion-select
           label="Color"
           labelPlacement="stacked"
-          type="number"
           formControlName="color_id"
-        ></ion-input>
+          interface="popover"
+        >
+
+          <ion-select-option
+            *ngFor="let color of colors"
+            [value]="color.id"
+          >
+            {{ color.name }}
+          </ion-select-option>
+
+        </ion-select>
       </ion-item>
 
-      <ion-note color="danger" *ngIf="getError('color_id') as error">
+      <ion-note
+        color="danger"
+        *ngIf="getError('color_id') as error"
+      >
         {{ error }}
       </ion-note>
 
@@ -71,10 +140,14 @@
           labelPlacement="stacked"
           type="text"
           formControlName="plate"
+          maxlength="10"
         ></ion-input>
       </ion-item>
 
-      <ion-note color="danger" *ngIf="getError('plate') as error">
+      <ion-note
+        color="danger"
+        *ngIf="getError('plate') as error"
+      >
         {{ error }}
       </ion-note>
 
@@ -86,10 +159,14 @@
           labelPlacement="stacked"
           type="text"
           formControlName="vin"
+          maxlength="17"
         ></ion-input>
       </ion-item>
 
-      <ion-note color="danger" *ngIf="getError('vin') as error">
+      <ion-note
+        color="danger"
+        *ngIf="getError('vin') as error"
+      >
         {{ error }}
       </ion-note>
 
@@ -104,7 +181,10 @@
         ></ion-input>
       </ion-item>
 
-      <ion-note color="danger" *ngIf="getError('year') as error">
+      <ion-note
+        color="danger"
+        *ngIf="getError('year') as error"
+      >
         {{ error }}
       </ion-note>
 
@@ -119,7 +199,10 @@
         ></ion-input>
       </ion-item>
 
-      <ion-note color="danger" *ngIf="getError('mileage') as error">
+      <ion-note
+        color="danger"
+        *ngIf="getError('mileage') as error"
+      >
         {{ error }}
       </ion-note>
 
@@ -131,8 +214,12 @@
       class="ion-margin-top"
       [disabled]="saved"
     >
-      {{ saved ? 'Guardando...' : 'Guardar' }}
+      {{ saved
+        ? (isEdition ? 'Actualizando...' : 'Guardando...')
+        : (isEdition ? 'Actualizar' : 'Guardar')
+      }}
     </ion-button>
 
   </form>
+
 </ion-content>

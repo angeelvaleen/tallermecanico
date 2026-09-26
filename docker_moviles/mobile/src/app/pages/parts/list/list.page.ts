@@ -9,7 +9,8 @@ interface Part {
   name: string;
   price: number;
   description: string;
-  created_at:string;
+  is_active: boolean;
+  created_at: string;
 }
 
 @Component({
@@ -19,42 +20,62 @@ interface Part {
   standalone: false,
 })
 export class ListPage implements OnInit {
+
   parts: Part[] = [];
 
   constructor(
     private modalController: ModalController,
   ) {}
 
-  ngOnInit() {
-    this.chargerParts();
+  ngOnInit(): void {
+    this.loadParts();
   }
 
-  async chargerParts(): Promise<void> {
+  async loadParts(): Promise<void> {
     try {
       const response = await axios.get<{ data: Part[] }>(
         `${environment.apiUrl}/parts`
       );
+
       this.parts = response.data.data;
+
     } catch (error) {
-      console.log('Error al cargar partes', error);
+      console.log('Error al cargar refacciones', error);
     }
   }
 
-  async createPart(): Promise<void>{
-      const modal = await this.modalController.create({
-        component: FormPage,
-        breakpoints: [0,0.5,0.95],
-        initialBreakpoint: 0.95,
-      });
-  
-      await modal.present();
-  
-      const { data } = await modal.onDidDismiss();
-  
-      if(data?.saved){
-        await this.chargerParts();
-      }
-  
+  async createPart(): Promise<void> {
+    const modal = await this.modalController.create({
+      component: FormPage,
+      breakpoints: [0, 0.5, 0.95],
+      initialBreakpoint: 0.95,
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if (data?.saved) {
+      await this.loadParts();
+    }
   }
-  
+
+  async editPart(id: number): Promise<void> {
+    const modal = await this.modalController.create({
+      component: FormPage,
+      componentProps: {
+        id,
+      },
+      breakpoints: [0, 0.5, 0.95],
+      initialBreakpoint: 0.95,
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if (data?.saved) {
+      await this.loadParts();
+    }
+  }
 }
