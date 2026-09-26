@@ -1,88 +1,122 @@
 <ion-header>
   <ion-toolbar>
+
     <ion-buttons slot="start">
-      <ion-button (click)="closeModal()">
-        <ion-icon name="close-outline"></ion-icon>
+      <ion-button
+        (click)="closeModal()"
+      >
+        <ion-icon
+          name="close-outline"
+        ></ion-icon>
       </ion-button>
     </ion-buttons>
 
     <ion-title>
-      {{ isEdition ? 'Editar Cita' : 'Nueva Cita' }}
+      {{
+        isEdition
+          ? "Editar Cita"
+          : "Nueva Cita"
+      }}
     </ion-title>
+
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
+
   <form
     *ngIf="appointmentForm"
     [formGroup]="appointmentForm"
     (ngSubmit)="saveAppointment()"
   >
+
     <ion-list>
 
       <!-- Vehículo -->
       <ion-item>
+
         <ion-select
           label="Vehículo"
           labelPlacement="stacked"
           placeholder="Selecciona un vehículo"
           formControlName="vehicle_id"
         >
+
           <ion-select-option
             *ngFor="let vehicle of vehicles"
             [value]="vehicle.id"
           >
             {{ vehicle.plate }}
           </ion-select-option>
+
         </ion-select>
+
       </ion-item>
 
-      <ion-note color="danger" *ngIf="getError('vehicle_id') as error">
+      <ion-note
+        color="danger"
+        *ngIf="getError('vehicle_id') as error"
+      >
         {{ error }}
       </ion-note>
 
 
       <!-- Fecha -->
       <ion-item>
+
         <ion-input
           label="Fecha"
           labelPlacement="stacked"
           type="date"
           formControlName="date"
         ></ion-input>
+
       </ion-item>
 
-      <ion-note color="danger" *ngIf="getError('date') as error">
+      <ion-note
+        color="danger"
+        *ngIf="getError('date') as error"
+      >
         {{ error }}
       </ion-note>
 
 
       <!-- Hora -->
       <ion-item>
+
         <ion-input
           label="Hora"
           labelPlacement="stacked"
           type="time"
           formControlName="time"
         ></ion-input>
+
       </ion-item>
 
-      <ion-note color="danger" *ngIf="getError('time') as error">
+      <ion-note
+        color="danger"
+        *ngIf="getError('time') as error"
+      >
         {{ error }}
       </ion-note>
 
 
       <!-- Motivo -->
       <ion-item>
+
         <ion-input
           label="Motivo"
           labelPlacement="stacked"
           type="text"
           formControlName="reason"
         ></ion-input>
+
       </ion-item>
 
-      <ion-note color="danger" *ngIf="getError('reason') as error">
+      <ion-note
+        color="danger"
+        *ngIf="getError('reason') as error"
+      >
         {{ error }}
       </ion-note>
 
@@ -94,8 +128,17 @@
       class="ion-margin-top"
       [disabled]="saved"
     >
-      {{ saved ? 'Guardando...' : (isEdition ? 'Actualizar' : 'Guardar') }}
+      {{
+        saved
+          ? "Guardando..."
+          : (
+              isEdition
+                ? "Actualizar"
+                : "Guardar"
+            )
+      }}
     </ion-button>
 
   </form>
+
 </ion-content>

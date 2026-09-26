@@ -1,9 +1,15 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
-import { LoadingController, ModalController } from "@ionic/angular";
+import {
+  AlertController,
+  LoadingController,
+  ModalController,
+} from "@ionic/angular";
 import axios from "axios";
 import { environment } from "src/environments/environment";
+
 import { FormPage } from "../form/form.page";
+import { ConfirmPage } from "../confirm/confirm.page";
 
 interface Appointment {
   id: number;
@@ -23,12 +29,14 @@ interface Appointment {
 })
 export class DetailPage implements OnInit {
   appointment: Appointment | null = null;
+
   messageError: string = "";
 
   constructor(
     private route: ActivatedRoute,
     private loading: LoadingController,
     private modalController: ModalController,
+    private alertController: AlertController
   ) {}
 
   ngOnInit(): void {
@@ -52,10 +60,11 @@ export class DetailPage implements OnInit {
 
     try {
       const response = await axios.get<{ data: Appointment }>(
-        `${environment.apiUrl}/appointments/${encodeURIComponent(id)}`,
+        `${environment.apiUrl}/appointments/${encodeURIComponent(id)}`
       );
 
       this.appointment = response.data.data;
+      this.messageError = "";
     } catch (error) {
       console.error("Error al cargar la cita:", error);
 
@@ -70,16 +79,27 @@ export class DetailPage implements OnInit {
     switch (statusId) {
       case 1:
         return "Pendiente";
+
       case 2:
         return "Confirmada";
+
       case 3:
         return "Cancelada";
+
       default:
         return "Desconocido";
     }
   }
 
   canEditAppointment(): boolean {
+    return this.appointment?.status_id === 1;
+  }
+
+  canConfirmAppointment(): boolean {
+    return this.appointment?.status_id === 1;
+  }
+
+  canCancelAppointment(): boolean {
     return this.appointment?.status_id === 1;
   }
 
@@ -103,6 +123,90 @@ export class DetailPage implements OnInit {
 
     if (data?.saved) {
       await this.loadAppointment();
+    }
+  }
+
+  async confirmAppointment(): Promise<void> {
+    if (!this.appointment || !this.canConfirmAppointment()) {
+      return;
+    }
+
+    const modal = await this.modalController.create({
+      component: ConfirmPage,
+      componentProps: {
+        appointmentId: this.appointment.id,
+      },
+      breakpoints: [0, 0.7, 0.95],
+      initialBreakpoint: 0.95,
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if (data?.saved) {
+      await this.loadAppointment();
+    }
+  }
+
+  async cancelAppointment(): Promise<void> {
+    if (!this.appointment || !this.canCancelAppointment()) {
+      return;
+    }
+
+    const alert = await this.alertController.create({
+      header: "Cancelar cita",
+      message: "¿Está seguro de que desea cancelar esta cita?",
+      buttons: [
+        {
+          text: "No",
+          role: "cancel",
+        },
+        {
+          text: "Sí, cancelar",
+          role: "confirm",
+          handler: async () => {
+            await this.executeCancelAppointment();
+          },
+        },
+      ],
+    });
+
+    await alert.present();
+  }
+
+  private async executeCancelAppointment(): Promise<void> {
+    if (!this.appointment) {
+      return;
+    }
+
+    try {
+      await axios.patch(
+        `${environment.apiUrl}/appointments/${this.appointment.id}`,
+        {
+          status_id: 3,
+        }
+      );
+
+      const alert = await this.alertController.create({
+        header: "Cita cancelada",
+        message: "La cita fue cancelada correctamente.",
+        buttons: ["Aceptar"],
+      });
+
+      await alert.present();
+
+      await this.loadAppointment();
+    } catch (error) {
+      console.error("Error al cancelar cita:", error);
+
+      const alert = await this.alertController.create({
+        header: "Error",
+        message: "No se pudo cancelar la cita.",
+        buttons: ["Aceptar"],
+      });
+
+      await alert.present();
     }
   }
 }
