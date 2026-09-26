@@ -1,16 +1,30 @@
 <ion-header>
   <ion-toolbar>
+
     <ion-buttons slot="start">
-      <ion-button (click)="closeModal()">
-        <ion-icon name="close-outline"></ion-icon>
+      <ion-button
+        (click)="closeModal()"
+      >
+        <ion-icon
+          name="close-outline"
+        ></ion-icon>
       </ion-button>
     </ion-buttons>
 
-    <ion-title>Nueva Orden de Trabajo</ion-title>
+    <ion-title>
+      {{
+        isEdition
+          ? "Editar Orden de Trabajo"
+          : "Nueva Orden de Trabajo"
+      }}
+    </ion-title>
+
   </ion-toolbar>
 </ion-header>
 
+
 <ion-content class="ion-padding">
+
   <form
     *ngIf="workorderForm"
     [formGroup]="workorderForm"
@@ -21,49 +35,144 @@
 
       <!-- Vehículo -->
       <ion-item>
-        <ion-input
+
+        <ion-select
           label="Vehículo"
           labelPlacement="stacked"
-          type="number"
+          placeholder="Selecciona un vehículo"
           formControlName="vehicle_id"
-        ></ion-input>
+        >
+
+          <ion-select-option
+            *ngFor="let vehicle of vehicles"
+            [value]="vehicle.id"
+          >
+            {{ vehicle.plate }}
+          </ion-select-option>
+
+        </ion-select>
+
       </ion-item>
 
-      <ion-note color="danger" *ngIf="getError('vehicle_id') as error">
+      <ion-note
+        color="danger"
+        *ngIf="getError('vehicle_id') as error"
+      >
         {{ error }}
       </ion-note>
 
 
       <!-- Mecánico -->
       <ion-item>
-        <ion-input
+
+        <ion-select
           label="Mecánico"
           labelPlacement="stacked"
-          type="number"
+          placeholder="Selecciona un mecánico"
+          interface="popover"
           formControlName="mechanic_id"
-        ></ion-input>
+        >
+
+          <ion-select-option
+            *ngFor="let mechanic of mechanics"
+            [value]="mechanic.id"
+          >
+            {{ getMechanicName(mechanic) }}
+          </ion-select-option>
+
+        </ion-select>
+
       </ion-item>
 
-      <ion-note color="danger" *ngIf="getError('mechanic_id') as error">
+      <ion-note
+        color="danger"
+        *ngIf="getError('mechanic_id') as error"
+      >
         {{ error }}
       </ion-note>
 
 
       <!-- Kilometraje -->
       <ion-item>
+
         <ion-input
           label="Kilometraje"
           labelPlacement="stacked"
           type="number"
           formControlName="mileage"
+          placeholder="Ingrese el kilometraje"
         ></ion-input>
+
       </ion-item>
 
-      <ion-note color="danger" *ngIf="getError('mileage') as error">
+      <ion-note
+        color="danger"
+        *ngIf="getError('mileage') as error"
+      >
         {{ error }}
       </ion-note>
 
+
+      <!-- Estado -->
+      <ion-item *ngIf="isEdition">
+
+        <ion-select
+          label="Estado"
+          labelPlacement="stacked"
+          placeholder="Selecciona un estado"
+          interface="popover"
+          formControlName="status_id"
+        >
+
+          <ion-select-option
+            [value]="4"
+          >
+            Recibida
+          </ion-select-option>
+
+          <ion-select-option
+            [value]="5"
+          >
+            Diagnóstico
+          </ion-select-option>
+
+          <ion-select-option
+            [value]="6"
+          >
+            Reparación
+          </ion-select-option>
+
+          <ion-select-option
+            [value]="7"
+          >
+            Lista
+          </ion-select-option>
+
+          <ion-select-option
+            [value]="8"
+          >
+            Entregada
+          </ion-select-option>
+
+        </ion-select>
+
+      </ion-item>
+
+
+      <!-- Entrega -->
+      <ion-item *ngIf="isEdition">
+
+        <ion-input
+          label="Fecha de entrega"
+          labelPlacement="stacked"
+          type="date"
+          formControlName="delivery"
+        ></ion-input>
+
+      </ion-item>
+
     </ion-list>
+
 
     <ion-button
       expand="block"
@@ -71,8 +180,17 @@
       class="ion-margin-top"
       [disabled]="saved"
     >
-      {{ saved ? 'Guardando...' : 'Guardar' }}
+      {{
+        saved
+          ? "Guardando..."
+          : (
+              isEdition
+                ? "Actualizar"
+                : "Guardar"
+            )
+      }}
     </ion-button>
 
   </form>
+
 </ion-content>

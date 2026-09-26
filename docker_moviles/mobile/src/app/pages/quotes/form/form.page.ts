@@ -1,13 +1,23 @@
-import { Component, OnInit } from "@angular/core";
 import {
-  AbstractControl,
+  Component,
+  Input,
+  OnInit,
+} from "@angular/core";
+
+import {
   FormArray,
   FormBuilder,
   FormGroup,
   Validators,
 } from "@angular/forms";
-import { AlertController, ModalController } from "@ionic/angular";
+
+import {
+  AlertController,
+  ModalController,
+} from "@ionic/angular";
+
 import axios from "axios";
+
 import { environment } from "src/environments/environment";
 
 interface Workorder {
@@ -62,94 +72,134 @@ interface QuotePartCreate {
   standalone: false,
 })
 export class FormPage implements OnInit {
+
+  @Input() workorderId?: number;
+
   quoteForm!: FormGroup;
 
   saved: boolean = false;
 
   workorders: Workorder[] = [];
+
   services: Service[] = [];
+
   parts: Part[] = [];
 
-  /*
-   * Cambiar por el porcentaje de IVA que utilice el proyecto.
-   * Ejemplo:
-   * 0.16 = 16%
-   */
   private readonly TAX_RATE = 0.16;
 
-  validatorsMessage: Record<string, Record<string, string>> = {
+  validatorsMessage: Record<
+    string,
+    Record<string, string>
+  > = {
+
     workorder_id: {
-      required: "La orden de trabajo es requerida",
+      required:
+        "La orden de trabajo es requerida",
     },
+
     validity: {
-      required: "La vigencia es requerida",
+      required:
+        "La vigencia es requerida",
     },
   };
 
   constructor(
     private formBuilder: FormBuilder,
+
     private alertController: AlertController,
+
     private modalController: ModalController,
   ) {}
 
   ngOnInit() {
+
     this.createForm();
+
     this.loadData();
   }
 
   private createForm(): void {
-    this.quoteForm = this.formBuilder.group({
-      workorder_id: [
-        "",
-        [
-          Validators.required,
+
+    this.quoteForm =
+      this.formBuilder.group({
+
+        workorder_id: [
+          "",
+          [
+            Validators.required,
+          ],
         ],
-      ],
 
-      validity: [
-        "",
-        [
-          Validators.required,
+        validity: [
+          "",
+          [
+            Validators.required,
+          ],
         ],
-      ],
 
-      items: this.formBuilder.array([]),
+        items:
+          this.formBuilder.array([]),
 
-      parts: this.formBuilder.array([]),
+        parts:
+          this.formBuilder.array([]),
 
-      subtotal: [
-        {
-          value: 0,
-          disabled: true,
-        },
-      ],
+        subtotal: [
+          {
+            value: 0,
+            disabled: true,
+          },
+        ],
 
-      tax: [
-        {
-          value: 0,
-          disabled: true,
-        },
-      ],
+        tax: [
+          {
+            value: 0,
+            disabled: true,
+          },
+        ],
 
-      total: [
-        {
-          value: 0,
-          disabled: true,
-        },
-      ],
-    });
+        total: [
+          {
+            value: 0,
+            disabled: true,
+          },
+        ],
+      });
+
+    if (
+      this.workorderId !== undefined
+    ) {
+
+      const control =
+        this.quoteForm.get(
+          "workorder_id",
+        );
+
+      control?.setValue(
+        this.workorderId,
+      );
+
+      control?.disable();
+    }
   }
 
   get items(): FormArray {
-    return this.quoteForm.get("items") as FormArray;
+
+    return this.quoteForm.get(
+      "items",
+    ) as FormArray;
   }
 
   get partsArray(): FormArray {
-    return this.quoteForm.get("parts") as FormArray;
+
+    return this.quoteForm.get(
+      "parts",
+    ) as FormArray;
   }
 
   private createItem(): FormGroup {
+
     return this.formBuilder.group({
+
       service_id: [
         "",
         [
@@ -170,7 +220,9 @@ export class FormPage implements OnInit {
           Validators.required,
           Validators.min(0),
           Validators.max(100),
-          Validators.pattern("^[0-9]+(\\.[0-9]{1,2})?$"),
+          Validators.pattern(
+            "^[0-9]+(\\.[0-9]{1,2})?$",
+          ),
         ],
       ],
 
@@ -184,7 +236,9 @@ export class FormPage implements OnInit {
   }
 
   private createPart(): FormGroup {
+
     return this.formBuilder.group({
+
       part_id: [
         "",
         [
@@ -197,7 +251,9 @@ export class FormPage implements OnInit {
         [
           Validators.required,
           Validators.min(1),
-          Validators.pattern("^[1-9][0-9]*$"),
+          Validators.pattern(
+            "^[1-9][0-9]*$",
+          ),
         ],
       ],
 
@@ -214,7 +270,9 @@ export class FormPage implements OnInit {
           Validators.required,
           Validators.min(0),
           Validators.max(100),
-          Validators.pattern("^[0-9]+(\\.[0-9]{1,2})?$"),
+          Validators.pattern(
+            "^[0-9]+(\\.[0-9]{1,2})?$",
+          ),
         ],
       ],
 
@@ -228,43 +286,72 @@ export class FormPage implements OnInit {
   }
 
   addService(): void {
-    this.items.push(this.createItem());
+
+    this.items.push(
+      this.createItem(),
+    );
+
     this.calculateTotals();
   }
 
-  removeService(index: number): void {
+  removeService(
+    index: number,
+  ): void {
+
     this.items.removeAt(index);
+
     this.calculateTotals();
   }
 
   addPart(): void {
-    this.partsArray.push(this.createPart());
+
+    this.partsArray.push(
+      this.createPart(),
+    );
+
     this.calculateTotals();
   }
 
-  removePart(index: number): void {
+  removePart(
+    index: number,
+  ): void {
+
     this.partsArray.removeAt(index);
+
     this.calculateTotals();
   }
 
-  onServiceChange(index: number): void {
-    const item = this.items.at(index) as FormGroup;
+  onServiceChange(
+    index: number,
+  ): void {
 
-    const serviceId = Number(
-      item.get("service_id")?.value,
-    );
+    const item =
+      this.items.at(
+        index,
+      ) as FormGroup;
 
-    const service = this.services.find(
-      (service) => service.id === serviceId,
-    );
+    const serviceId =
+      Number(
+        item.get(
+          "service_id",
+        )?.value,
+      );
+
+    const service =
+      this.services.find(
+        (service) =>
+          service.id === serviceId,
+      );
 
     if (!service) {
+
       item.patchValue({
         price: 0,
         amount: 0,
       });
 
       this.calculateTotals();
+
       return;
     }
 
@@ -272,27 +359,42 @@ export class FormPage implements OnInit {
       price: service.price,
     });
 
-    this.calculateItemAmount(index);
+    this.calculateItemAmount(
+      index,
+    );
   }
 
-  onPartChange(index: number): void {
-    const item = this.partsArray.at(index) as FormGroup;
+  onPartChange(
+    index: number,
+  ): void {
 
-    const partId = Number(
-      item.get("part_id")?.value,
-    );
+    const item =
+      this.partsArray.at(
+        index,
+      ) as FormGroup;
 
-    const part = this.parts.find(
-      (part) => part.id === partId,
-    );
+    const partId =
+      Number(
+        item.get(
+          "part_id",
+        )?.value,
+      );
+
+    const part =
+      this.parts.find(
+        (part) =>
+          part.id === partId,
+      );
 
     if (!part) {
+
       item.patchValue({
         price: 0,
         amount: 0,
       });
 
       this.calculateTotals();
+
       return;
     }
 
@@ -300,28 +402,46 @@ export class FormPage implements OnInit {
       price: part.price,
     });
 
-    this.calculatePartAmount(index);
+    this.calculatePartAmount(
+      index,
+    );
   }
 
-  calculateItemAmount(index: number): void {
-    const item = this.items.at(index) as FormGroup;
+  calculateItemAmount(
+    index: number,
+  ): void {
 
-    const price = Number(
-      item.get("price")?.value ?? 0,
-    );
+    const item =
+      this.items.at(
+        index,
+      ) as FormGroup;
 
-    const discount = Number(
-      item.get("discount")?.value ?? 0,
-    );
+    const price =
+      Number(
+        item.get(
+          "price",
+        )?.value ?? 0,
+      );
 
-    const amount = this.calculateDiscount(
-      price,
-      discount,
-    );
+    const discount =
+      Number(
+        item.get(
+          "discount",
+        )?.value ?? 0,
+      );
+
+    const amount =
+      this.calculateDiscount(
+        price,
+        discount,
+      );
 
     item.patchValue(
       {
-        amount: Number(amount.toFixed(2)),
+        amount:
+          Number(
+            amount.toFixed(2),
+          ),
       },
       {
         emitEvent: false,
@@ -331,31 +451,51 @@ export class FormPage implements OnInit {
     this.calculateTotals();
   }
 
-  calculatePartAmount(index: number): void {
-    const item = this.partsArray.at(index) as FormGroup;
+  calculatePartAmount(
+    index: number,
+  ): void {
 
-    const quantity = Number(
-      item.get("quantity")?.value ?? 1,
-    );
+    const item =
+      this.partsArray.at(
+        index,
+      ) as FormGroup;
 
-    const price = Number(
-      item.get("price")?.value ?? 0,
-    );
+    const quantity =
+      Number(
+        item.get(
+          "quantity",
+        )?.value ?? 1,
+      );
 
-    const discount = Number(
-      item.get("discount")?.value ?? 0,
-    );
+    const price =
+      Number(
+        item.get(
+          "price",
+        )?.value ?? 0,
+      );
 
-    const subtotal = price * quantity;
+    const discount =
+      Number(
+        item.get(
+          "discount",
+        )?.value ?? 0,
+      );
 
-    const amount = this.calculateDiscount(
-      subtotal,
-      discount,
-    );
+    const subtotal =
+      price * quantity;
+
+    const amount =
+      this.calculateDiscount(
+        subtotal,
+        discount,
+      );
 
     item.patchValue(
       {
-        amount: Number(amount.toFixed(2)),
+        amount:
+          Number(
+            amount.toFixed(2),
+          ),
       },
       {
         emitEvent: false,
@@ -369,32 +509,63 @@ export class FormPage implements OnInit {
     amount: number,
     discount: number,
   ): number {
-    return amount - amount * (discount / 100);
+
+    return (
+      amount -
+      amount * (discount / 100)
+    );
   }
 
   calculateTotals(): void {
+
     let subtotal = 0;
 
-    for (const item of this.items.controls) {
+    for (
+      const item of
+      this.items.controls
+    ) {
+
       subtotal += Number(
-        item.get("amount")?.value ?? 0,
+        item.get(
+          "amount",
+        )?.value ?? 0,
       );
     }
 
-    for (const item of this.partsArray.controls) {
+    for (
+      const item of
+      this.partsArray.controls
+    ) {
+
       subtotal += Number(
-        item.get("amount")?.value ?? 0,
+        item.get(
+          "amount",
+        )?.value ?? 0,
       );
     }
 
-    const tax = subtotal * this.TAX_RATE;
-    const total = subtotal + tax;
+    const tax =
+      subtotal * this.TAX_RATE;
+
+    const total =
+      subtotal + tax;
 
     this.quoteForm.patchValue(
       {
-        subtotal: Number(subtotal.toFixed(2)),
-        tax: Number(tax.toFixed(2)),
-        total: Number(total.toFixed(2)),
+        subtotal:
+          Number(
+            subtotal.toFixed(2),
+          ),
+
+        tax:
+          Number(
+            tax.toFixed(2),
+          ),
+
+        total:
+          Number(
+            total.toFixed(2),
+          ),
       },
       {
         emitEvent: false,
@@ -402,22 +573,36 @@ export class FormPage implements OnInit {
     );
   }
 
-  getError(controlName: string): string {
-    const control = this.quoteForm.get(controlName);
+  getError(
+    controlName: string,
+  ): string {
+
+    const control =
+      this.quoteForm.get(
+        controlName,
+      );
 
     if (
       !control ||
       !control.errors ||
-      !(control.touched || control.dirty)
+      !(
+        control.touched ||
+        control.dirty
+      )
     ) {
       return "";
     }
 
-    const typeError = Object.keys(control.errors)[0];
+    const typeError =
+      Object.keys(
+        control.errors,
+      )[0];
 
     return (
-      this.validatorsMessage[controlName]?.[typeError] ??
-      "El valor ingresado no es valido"
+      this.validatorsMessage[
+        controlName
+      ]?.[typeError] ??
+      "El valor ingresado no es válido"
     );
   }
 
@@ -425,88 +610,170 @@ export class FormPage implements OnInit {
     index: number,
     controlName: string,
   ): string {
-    const control = this.items
-      .at(index)
-      ?.get(controlName);
+
+    const control =
+      this.items
+        .at(index)
+        ?.get(controlName);
 
     if (
       !control ||
       !control.errors ||
-      !(control.touched || control.dirty)
+      !(
+        control.touched ||
+        control.dirty
+      )
     ) {
       return "";
     }
 
-    const typeError = Object.keys(control.errors)[0];
+    const typeError =
+      Object.keys(
+        control.errors,
+      )[0];
 
-    const messages: Record<string, string> = {
-      required: "Este campo es requerido",
-      min: "El valor debe ser mayor",
-      max: "El descuento no puede superar 100%",
-      pattern: "El valor ingresado no es valido",
+    const messages: Record<
+      string,
+      string
+    > = {
+
+      required:
+        "Este campo es requerido",
+
+      min:
+        "El valor debe ser mayor",
+
+      max:
+        "El descuento no puede superar 100%",
+
+      pattern:
+        "El valor ingresado no es válido",
     };
 
-    return messages[typeError] ?? "El valor ingresado no es valido";
+    return (
+      messages[typeError] ??
+      "El valor ingresado no es válido"
+    );
   }
 
   getPartError(
     index: number,
     controlName: string,
   ): string {
-    const control = this.partsArray
-      .at(index)
-      ?.get(controlName);
+
+    const control =
+      this.partsArray
+        .at(index)
+        ?.get(controlName);
 
     if (
       !control ||
       !control.errors ||
-      !(control.touched || control.dirty)
+      !(
+        control.touched ||
+        control.dirty
+      )
     ) {
       return "";
     }
 
-    const typeError = Object.keys(control.errors)[0];
+    const typeError =
+      Object.keys(
+        control.errors,
+      )[0];
 
-    const messages: Record<string, string> = {
-      required: "Este campo es requerido",
-      min: "El valor debe ser mayor",
-      max: "El descuento no puede superar 100%",
-      pattern: "El valor ingresado no es valido",
+    const messages: Record<
+      string,
+      string
+    > = {
+
+      required:
+        "Este campo es requerido",
+
+      min:
+        "El valor debe ser mayor",
+
+      max:
+        "El descuento no puede superar 100%",
+
+      pattern:
+        "El valor ingresado no es válido",
     };
 
-    return messages[typeError] ?? "El valor ingresado no es valido";
+    return (
+      messages[typeError] ??
+      "El valor ingresado no es válido"
+    );
   }
 
   private async loadData(): Promise<void> {
-    try {
-      const [
-        workordersResponse,
-        servicesResponse,
-        partsResponse,
-      ] = await Promise.all([
-        axios.get<{ data: Workorder[] }>(
-          `${environment.apiUrl}/workorders`,
-        ),
 
-        axios.get<{ data: Service[] }>(
+    try {
+
+      const requests: Promise<any>[] = [];
+
+      if (
+        this.workorderId === undefined
+      ) {
+
+        requests.push(
+          axios.get<{
+            data: Workorder[];
+          }>(
+            `${environment.apiUrl}/workorders`,
+          ),
+        );
+      }
+
+      requests.push(
+        axios.get<{
+          data: Service[];
+        }>(
           `${environment.apiUrl}/services`,
         ),
+      );
 
-        axios.get<{ data: Part[] }>(
+      requests.push(
+        axios.get<{
+          data: Part[];
+        }>(
           `${environment.apiUrl}/parts`,
         ),
-      ]);
+      );
 
-      this.workorders =
-        workordersResponse.data.data;
+      const responses =
+        await Promise.all(
+          requests,
+        );
+
+      let index = 0;
+
+      if (
+        this.workorderId === undefined
+      ) {
+
+        this.workorders =
+          responses[
+            index
+          ].data.data;
+
+        index++;
+      }
 
       this.services =
-        servicesResponse.data.data;
+        responses[
+          index
+        ].data.data;
+
+      index++;
 
       this.parts =
-        partsResponse.data.data;
+        responses[
+          index
+        ].data.data;
 
     } catch (error) {
+
       console.log(
         "Error al cargar datos de la cotización",
         error,
@@ -514,10 +781,15 @@ export class FormPage implements OnInit {
 
       const alert =
         await this.alertController.create({
+
           header: "Error",
+
           message:
             "No fue posible cargar las órdenes, servicios o refacciones.",
-          buttons: ["Aceptar"],
+
+          buttons: [
+            "Aceptar",
+          ],
         });
 
       await alert.present();
@@ -525,20 +797,32 @@ export class FormPage implements OnInit {
   }
 
   async closeModal(): Promise<void> {
+
     await this.modalController.dismiss({
       saved: false,
     });
   }
 
   async saveQuote(): Promise<void> {
-    if (this.quoteForm.invalid) {
-      this.quoteForm.markAllAsTouched();
 
-      for (const item of this.items.controls) {
+    if (
+      this.quoteForm.invalid
+    ) {
+
+      this.quoteForm
+        .markAllAsTouched();
+
+      for (
+        const item of
+        this.items.controls
+      ) {
         item.markAllAsTouched();
       }
 
-      for (const part of this.partsArray.controls) {
+      for (
+        const part of
+        this.partsArray.controls
+      ) {
         part.markAllAsTouched();
       }
 
@@ -549,62 +833,94 @@ export class FormPage implements OnInit {
 
     this.calculateTotals();
 
-    const values = this.quoteForm.getRawValue();
+    const values =
+      this.quoteForm
+        .getRawValue();
 
-    /*
-     * Estos valores deberían venir del usuario
-     * autenticado y del estado Pending.
-     *
-     * Por ahora se dejan como los valores de tu
-     * esquema actual hasta conectar autenticación.
-     */
-    const quote: QuoteCreate = {
-      workorder_id: Number(
-        values.workorder_id,
-      ),
+    const quote:
+      QuoteCreate = {
+
+      workorder_id:
+        Number(
+          values.workorder_id,
+        ),
 
       user_id: 1,
 
       status_id: 9,
 
-      subtotal: Number(values.subtotal),
+      subtotal:
+        Number(
+          values.subtotal,
+        ),
 
-      tax: Number(values.tax),
+      tax:
+        Number(
+          values.tax,
+        ),
 
-      total: Number(values.total),
+      total:
+        Number(
+          values.total,
+        ),
 
-      validity: values.validity,
+      validity:
+        values.validity,
     };
 
     try {
-      const quoteResponse = await axios.post<{
-        data: {
-          id: number;
-        };
-      }>(
-        `${environment.apiUrl}/quotes`,
-        quote,
-        {
-          headers: {
-            "Content-Type":
-              "application/json",
+
+      const quoteResponse =
+        await axios.post<{
+          data: {
+            id: number;
+          };
+        }>(
+          `${environment.apiUrl}/quotes`,
+          quote,
+          {
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
           },
-        },
-      );
+        );
 
       const quoteId =
         quoteResponse.data.data.id;
 
-      for (const item of values.items) {
-        const quoteItem: QuoteItemCreate = {
-          quote_id: quoteId,
-          service_id: Number(
-            item.service_id,
-          ),
-          price: Number(item.price),
-          discount: Number(item.discount),
-          amount: Number(item.amount),
-          is_approved: false,
+      for (
+        const item of values.items
+      ) {
+
+        const quoteItem:
+          QuoteItemCreate = {
+
+          quote_id:
+            quoteId,
+
+          service_id:
+            Number(
+              item.service_id,
+            ),
+
+          price:
+            Number(
+              item.price,
+            ),
+
+          discount:
+            Number(
+              item.discount,
+            ),
+
+          amount:
+            Number(
+              item.amount,
+            ),
+
+          is_approved:
+            false,
         };
 
         await axios.post(
@@ -619,15 +935,43 @@ export class FormPage implements OnInit {
         );
       }
 
-      for (const part of values.parts) {
-        const quotePart: QuotePartCreate = {
-          quote_id: quoteId,
-          part_id: Number(part.part_id),
-          quantity: Number(part.quantity),
-          price: Number(part.price),
-          discount: Number(part.discount),
-          amount: Number(part.amount),
-          is_approved: false,
+      for (
+        const part of values.parts
+      ) {
+
+        const quotePart:
+          QuotePartCreate = {
+
+          quote_id:
+            quoteId,
+
+          part_id:
+            Number(
+              part.part_id,
+            ),
+
+          quantity:
+            Number(
+              part.quantity,
+            ),
+
+          price:
+            Number(
+              part.price,
+            ),
+
+          discount:
+            Number(
+              part.discount,
+            ),
+
+          amount:
+            Number(
+              part.amount,
+            ),
+
+          is_approved:
+            false,
         };
 
         await axios.post(
@@ -644,13 +988,20 @@ export class FormPage implements OnInit {
 
       const alert =
         await this.alertController.create({
-          header: "Cotización guardada",
+
+          header:
+            "Cotización guardada",
+
           message:
-            "La cotización fue guardada exitosamente",
-          buttons: ["Aceptar"],
+            "La cotización fue guardada exitosamente.",
+
+          buttons: [
+            "Aceptar",
+          ],
         });
 
       await alert.present();
+
       await alert.onDidDismiss();
 
       await this.modalController.dismiss({
@@ -658,6 +1009,7 @@ export class FormPage implements OnInit {
       });
 
     } catch (error) {
+
       console.log(
         "Error al guardar la cotización",
         error,
@@ -665,15 +1017,21 @@ export class FormPage implements OnInit {
 
       const alert =
         await this.alertController.create({
+
           header: "Error",
+
           message:
             "No fue posible guardar la cotización. Revisar los datos, la conexión o los permisos de Directus.",
-          buttons: ["Aceptar"],
+
+          buttons: [
+            "Aceptar",
+          ],
         });
 
       await alert.present();
 
     } finally {
+
       this.saved = false;
     }
   }

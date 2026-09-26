@@ -1,12 +1,15 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import {
+  FormsModule,
+  ReactiveFormsModule,
+} from "@angular/forms";
 
-import { IonicModule } from '@ionic/angular';
+import { IonicModule } from "@ionic/angular";
 
-import { FormPageRoutingModule } from './form-routing.module';
+import { FormPageRoutingModule } from "./form-routing.module";
 
-import { FormPage } from './form.page';
+import { FormPage } from "./form.page";
 
 @NgModule({
   imports: [
@@ -14,8 +17,11 @@ import { FormPage } from './form.page';
     FormsModule,
     ReactiveFormsModule,
     IonicModule,
-    FormPageRoutingModule
+    FormPageRoutingModule,
   ],
-  declarations: [FormPage]
+
+  declarations: [
+    FormPage,
+  ],
 })
 export class FormPageModule {}

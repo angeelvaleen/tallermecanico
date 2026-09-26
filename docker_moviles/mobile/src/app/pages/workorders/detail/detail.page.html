@@ -1,27 +1,398 @@
 <ion-header>
   <ion-toolbar>
+
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/workorders/list"></ion-back-button>
+      <ion-back-button
+        defaultHref="/workorders/list"
+      ></ion-back-button>
     </ion-buttons>
-    <ion-title>Detalle de Orden</ion-title>
+
+    <ion-title>
+      Detalle de Orden
+    </ion-title>
+
   </ion-toolbar>
 </ion-header>
 
+
 <ion-content class="ion-padding">
-  <ion-text color="danger" *ngIf="messageError" >
-    <p class="ion-padding" >{{ messageError }}</p>
+
+  <!-- ERROR -->
+  <ion-text
+    color="danger"
+    *ngIf="messageError"
+  >
+    <p class="ion-padding">
+      {{ messageError }}
+    </p>
   </ion-text>
 
+
   <div *ngIf="workorder">
+
+    <!-- INFORMACIÓN GENERAL -->
     <ion-card>
+
+      <ion-card-header>
+
+        <ion-card-title>
+          Orden #{{ workorder.id }}
+        </ion-card-title>
+
+      </ion-card-header>
+
+
       <ion-card-content>
-        <h2>Vehiculo ID: {{ workorder.vehicle_id }}</h2>
-        <p><strong>Mecanico ID:</strong> {{ workorder.mechanic_id }}</p>
-        <p><strong>Estado ID:</strong> {{ workorder.status_id }}</p>
-        <p><strong>Kilometraje:</strong> {{ workorder.mileage }}</p>
-        <p><strong>Entrega:</strong> {{ workorder.delivery || 'Sin fecha de entrega' }}</p>
-        <p><strong>Registro:</strong> {{ workorder.created_at | date:'yyyy-MM-dd' }}</p>
+
+        <p>
+          <strong>Vehículo ID:</strong>
+          {{ workorder.vehicle_id }}
+        </p>
+
+        <p>
+          <strong>Mecánico ID:</strong>
+          {{ workorder.mechanic_id }}
+        </p>
+
+        <p>
+          <strong>Estado ID:</strong>
+          {{ workorder.status_id }}
+        </p>
+
+        <p>
+          <strong>Kilometraje:</strong>
+          {{ workorder.mileage }}
+        </p>
+
+        <p>
+          <strong>Entrega:</strong>
+          {{ workorder.delivery || 'Sin fecha de entrega' }}
+        </p>
+
+        <p>
+          <strong>Registro:</strong>
+          {{ workorder.created_at | date:'yyyy-MM-dd' }}
+        </p>
+
       </ion-card-content>
+
     </ion-card>
+
+
+    <!-- DIAGNÓSTICOS -->
+    <ion-card>
+
+      <ion-card-header>
+
+        <div class="section-header">
+
+          <ion-card-title>
+            Diagnósticos
+          </ion-card-title>
+
+          <ion-button
+            size="small"
+            (click)="addDiagnosis()"
+          >
+
+            <ion-icon
+              slot="start"
+              name="add-outline"
+            ></ion-icon>
+
+            Agregar
+
+          </ion-button>
+
+        </div>
+
+      </ion-card-header>
+
+
+      <ion-card-content>
+
+        <ion-list
+          *ngIf="diagnoses.length > 0"
+        >
+
+          <ion-item
+            *ngFor="let diagnosis of diagnoses"
+          >
+
+            <ion-label>
+
+              <h2>
+                Diagnóstico #{{ diagnosis.id }}
+              </h2>
+
+              <p>
+                <strong>Descripción:</strong>
+                {{ diagnosis.description }}
+              </p>
+
+              <p
+                *ngIf="diagnosis.result"
+              >
+                <strong>Resultado:</strong>
+                {{ diagnosis.result }}
+              </p>
+
+              <p>
+                <strong>Fecha:</strong>
+                {{ diagnosis.created_at | date:'yyyy-MM-dd' }}
+              </p>
+
+            </ion-label>
+
+
+            <ion-button
+              fill="clear"
+              (click)="editDiagnosis(diagnosis)"
+            >
+
+              <ion-icon
+                slot="icon-only"
+                name="create-outline"
+              ></ion-icon>
+
+            </ion-button>
+
+          </ion-item>
+
+        </ion-list>
+
+
+        <ion-text
+          color="medium"
+          *ngIf="diagnoses.length === 0"
+        >
+
+          <p class="empty-message">
+            Esta orden todavía no tiene diagnósticos.
+          </p>
+
+        </ion-text>
+
+      </ion-card-content>
+
+    </ion-card>
+
+
+    <!-- EVIDENCIAS -->
+    <ion-card>
+
+      <ion-card-header>
+
+        <div class="section-header">
+
+          <ion-card-title>
+            Evidencias
+          </ion-card-title>
+
+          <ion-button
+            size="small"
+            (click)="addEvidence()"
+          >
+
+            <ion-icon
+              slot="start"
+              name="camera-outline"
+            ></ion-icon>
+
+            Agregar
+
+          </ion-button>
+
+        </div>
+
+      </ion-card-header>
+
+
+      <ion-card-content>
+
+        <ion-list
+          *ngIf="evidences.length > 0"
+        >
+
+          <ion-item
+            *ngFor="let evidence of evidences"
+          >
+
+            <ion-icon
+              slot="start"
+              name="image-outline"
+            ></ion-icon>
+
+            <ion-label>
+
+              <h2>
+                Evidencia #{{ evidence.id }}
+              </h2>
+
+              <p>
+                {{ evidence.path }}
+              </p>
+
+              <p>
+                {{ evidence.created_at | date:'yyyy-MM-dd' }}
+              </p>
+
+            </ion-label>
+
+          </ion-item>
+
+        </ion-list>
+
+
+        <ion-text
+          color="medium"
+          *ngIf="evidences.length === 0"
+        >
+
+          <p class="empty-message">
+            Esta orden todavía no tiene evidencias.
+          </p>
+
+        </ion-text>
+
+      </ion-card-content>
+
+    </ion-card>
+
+
+    <!-- COTIZACIONES -->
+    <ion-card>
+
+      <ion-card-header>
+
+        <div class="section-header">
+
+          <ion-card-title>
+            Cotizaciones
+          </ion-card-title>
+
+          <ion-button
+            size="small"
+            (click)="createQuote()"
+            *ngIf="canCreateQuote()"
+          >
+
+            <ion-icon
+              slot="start"
+              name="add-outline"
+            ></ion-icon>
+
+            Nueva
+
+          </ion-button>
+
+        </div>
+
+      </ion-card-header>
+
+
+      <ion-card-content>
+
+        <!-- COTIZACIONES EXISTENTES -->
+        <ion-list
+          *ngIf="quotes.length > 0"
+        >
+
+          <ion-item
+            *ngFor="let quote of quotes"
+          >
+
+            <ion-label>
+
+              <h2>
+                Cotización #{{ quote.id }}
+              </h2>
+
+              <p>
+                <strong>Fecha:</strong>
+                {{ quote.created_at | date:'yyyy-MM-dd' }}
+              </p>
+
+              <p>
+                <strong>Vigencia:</strong>
+                {{ quote.validity }}
+              </p>
+
+              <p>
+                <strong>Subtotal:</strong>
+                {{ quote.subtotal | number:'1.2-2' }}
+              </p>
+
+              <p>
+                <strong>Impuesto:</strong>
+                {{ quote.tax | number:'1.2-2' }}
+              </p>
+
+              <p>
+                <strong>Total:</strong>
+                {{ quote.total | number:'1.2-2' }}
+              </p>
+
+              <ion-badge
+                [color]="getQuoteStatusColor(quote)"
+              >
+                {{ getQuoteStatusName(quote) }}
+              </ion-badge>
+
+            </ion-label>
+
+
+            <ion-button
+              fill="clear"
+              [routerLink]="[
+                '/quotes/detail',
+                quote.id
+              ]"
+            >
+
+              <ion-icon
+                slot="icon-only"
+                name="eye-outline"
+              ></ion-icon>
+
+            </ion-button>
+
+          </ion-item>
+
+        </ion-list>
+
+
+        <!-- SIN COTIZACIONES -->
+        <ion-text
+          color="medium"
+          *ngIf="quotes.length === 0"
+        >
+
+          <p class="empty-message">
+            Esta orden todavía no tiene cotizaciones.
+          </p>
+
+        </ion-text>
+
+
+        <!-- EXISTE COTIZACIÓN PENDIENTE -->
+        <ion-text
+          color="warning"
+          *ngIf="!canCreateQuote()"
+        >
+
+          <p class="quote-message">
+            Existe una cotización pendiente de respuesta.
+            Cuando sea aprobada o rechazada podrás crear
+            otra cotización.
+          </p>
+
+        </ion-text>
+
+      </ion-card-content>
+
+    </ion-card>
+
   </div>
+
 </ion-content>
