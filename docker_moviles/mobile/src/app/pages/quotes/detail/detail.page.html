@@ -3,7 +3,8 @@
 
     <ion-buttons slot="start">
       <ion-back-button
-        defaultHref="/quotes/list">
+        defaultHref="/quotes/list"
+      >
       </ion-back-button>
     </ion-buttons>
 
@@ -19,7 +20,8 @@
 
   <ion-text
     color="danger"
-    *ngIf="messageError">
+    *ngIf="messageError"
+  >
 
     <p class="ion-padding">
       {{ messageError }}
@@ -62,7 +64,7 @@
 
         <p>
           <strong>Fecha de registro:</strong>
-          {{ quote.created_at | date:'yyyy-MM-dd' }}
+          {{ quote.created_at|date: 'yyyy-MM-dd' }}
         </p>
 
       </ion-card-content>
@@ -87,7 +89,8 @@
 
         <ion-text
           color="medium"
-          *ngIf="quote.quoteitems.length === 0">
+          *ngIf="quote.quoteitems.length === 0"
+        >
 
           <p>
             No hay servicios en esta cotización.
@@ -99,7 +102,8 @@
         <ion-list>
 
           <ion-item
-            *ngFor="let item of quote.quoteitems">
+            *ngFor="let item of quote.quoteitems"
+          >
 
             <ion-label>
 
@@ -120,6 +124,13 @@
               </p>
 
             </ion-label>
+
+            <ion-toggle
+              slot="end"
+              [checked]="item.is_approved === 1"
+              [disabled]="quote.status_id.id !== 9"
+              (ionChange)="toggleService(item)"
+            ></ion-toggle>
 
           </ion-item>
 
@@ -147,7 +158,8 @@
 
         <ion-text
           color="medium"
-          *ngIf="quote.quoteparts.length === 0">
+          *ngIf="quote.quoteparts.length === 0"
+        >
 
           <p>
             No hay refacciones en esta cotización.
@@ -159,7 +171,8 @@
         <ion-list>
 
           <ion-item
-            *ngFor="let part of quote.quoteparts">
+            *ngFor="let part of quote.quoteparts"
+          >
 
             <ion-label>
 
@@ -184,6 +197,13 @@
               </p>
 
             </ion-label>
+
+            <ion-toggle
+              slot="end"
+              [checked]="part.is_approved === 1"
+              [disabled]="quote.status_id.id !== 9"
+              (ionChange)="togglePart(part)"
+            ></ion-toggle>
 
           </ion-item>
 
@@ -227,6 +247,43 @@
       </ion-card-content>
 
     </ion-card>
+
+    <!-- ACCIONES -->
+
+    <div
+      class="buttons-container"
+      *ngIf="quote && quote.status_id.id === 9"
+    >
+
+      <ion-button
+        expand="block"
+        color="success"
+        (click)="approveQuote()"
+      >
+        <ion-icon
+          slot="start"
+          name="checkmark-circle-outline"
+        ></ion-icon>
+
+        Aprobar cotización
+      </ion-button>
+
+
+      <ion-button
+        expand="block"
+        color="danger"
+        fill="outline"
+        (click)="rejectQuote()"
+      >
+        <ion-icon
+          slot="start"
+          name="close-circle-outline"
+        ></ion-icon>
+
+        Rechazar cotización
+      </ion-button>
+
+    </div>
 
   </div>
 

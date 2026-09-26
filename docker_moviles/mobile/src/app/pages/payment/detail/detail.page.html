@@ -1,27 +1,130 @@
 <ion-header>
   <ion-toolbar>
+
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/payment/list"></ion-back-button>
     </ion-buttons>
-    <ion-title>Detalle de Pago</ion-title>
+
+    <ion-title>Detalle del pago</ion-title>
+
   </ion-toolbar>
 </ion-header>
 
+
 <ion-content class="ion-padding">
+
+  <!-- Error -->
   <ion-text color="danger" *ngIf="messageError">
-    <p class="ion-padding">{{ messageError }}</p>
+    <p>{{ messageError }}</p>
   </ion-text>
 
+
   <div *ngIf="payment">
+
+    <!-- Información del pago -->
     <ion-card>
+
+      <ion-card-header>
+        <ion-card-title>
+          Pago #{{ payment.id }}
+        </ion-card-title>
+      </ion-card-header>
+
       <ion-card-content>
-        <h2>Cotizacion ID: {{ payment.quote_id }}</h2>
-        <p><strong>Metodo ID:</strong> {{ payment.method_id }}</p>
-        <p><strong>Usuario ID:</strong> {{ payment.user_id }}</p>
-        <p><strong>Monto:</strong> ${{ payment.amount }}</p>
-        <p><strong>Referencia:</strong> {{ payment.reference || 'Sin referencia' }}</p>
-        <p><strong>Fecha de Pago:</strong> {{ payment.paid_at || 'Pendiente' }}</p>
+
+        <p>
+          <strong>Monto:</strong>
+          ${{ payment.amount }}
+        </p>
+
+        <p>
+          <strong>Método de pago:</strong>
+          {{ payment.method_id.name }}
+        </p>
+
+        <p>
+          <strong>Referencia:</strong>
+          {{ payment.reference || 'Sin referencia' }}
+        </p>
+
+        <p>
+          <strong>Fecha de pago:</strong>
+          {{ payment.paid_at
+            ? (payment.paid_at | date:'dd/MM/yyyy HH:mm')
+            : 'Sin registrar' }}
+        </p>
+
+        <p>
+          <strong>Registrado por:</strong>
+          {{ payment.user_id.name }}
+        </p>
+
       </ion-card-content>
+
     </ion-card>
+
+
+    <!-- Cotización relacionada -->
+    <ion-card>
+
+      <ion-card-header>
+        <ion-card-title>
+          Cotización relacionada
+        </ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+
+        <p>
+          <strong>Cotización:</strong>
+          #{{ payment.quote_id.id }}
+        </p>
+
+        <p>
+          <strong>Orden de trabajo:</strong>
+          #{{ payment.quote_id.workorder_id }}
+        </p>
+
+        <p>
+          <strong>Vigencia:</strong>
+          {{ payment.quote_id.validity || 'Sin definir' }}
+        </p>
+
+      </ion-card-content>
+
+    </ion-card>
+
+
+    <!-- Totales de la cotización -->
+    <ion-card>
+
+      <ion-card-header>
+        <ion-card-title>
+          Totales de la cotización
+        </ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+
+        <p>
+          <strong>Subtotal:</strong>
+          ${{ payment.quote_id.subtotal }}
+        </p>
+
+        <p>
+          <strong>Impuesto:</strong>
+          ${{ payment.quote_id.tax }}
+        </p>
+
+        <p>
+          <strong>Total:</strong>
+          ${{ payment.quote_id.total }}
+        </p>
+
+      </ion-card-content>
+
+    </ion-card>
+
   </div>
+
 </ion-content>

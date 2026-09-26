@@ -1,28 +1,48 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { LoadingController } from '@ionic/angular';
-import axios from 'axios';
-import { environment } from '../../../../environments/environment';
+import { Component, OnInit } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
+import { LoadingController } from "@ionic/angular";
+import axios from "axios";
+import { environment } from "../../../../environments/environment";
 
-interface Payment {
+interface PaymentRelation {
   id: number;
-  quote_id: number;
-  method_id: number;
+  name: string;
+}
+
+interface QuoteDetail {
+  id: number;
+  workorder_id: number;
   user_id: number;
-  amount: number;
-  reference: string;
-  paid_at: string;
+  status_id: number;
+  subtotal: string;
+  tax: string;
+  total: string;
+  validity: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface PaymentDetail {
+  id: number;
+  amount: string;
+  reference: string | null;
+  paid_at: string | null;
+
+  quote_id: QuoteDetail;
+
+  method_id: PaymentRelation;
+  user_id: PaymentRelation;
 }
 
 @Component({
-  selector: 'app-payment-detail',
-  templateUrl: './detail.page.html',
-  styleUrls: ['./detail.page.scss'],
+  selector: "app-payment-detail",
+  templateUrl: "./detail.page.html",
+  styleUrls: ["./detail.page.scss"],
   standalone: false,
 })
 export class DetailPage implements OnInit {
-  payment: Payment | null = null;
-  messageError:string="";
+  payment: PaymentDetail | null = null;
+  messageError: string = "";
 
   constructor(
     private route: ActivatedRoute,
@@ -34,29 +54,30 @@ export class DetailPage implements OnInit {
   }
 
   async chargerPayment(): Promise<void> {
-     const id = this.route.snapshot.paramMap.get('id');
-    
-     if(!id) {
-      this.messageError="No se proporciono ID";
+    const id = this.route.snapshot.paramMap.get("id");
+
+    if (!id) {
+      this.messageError = "No se proporciono ID";
       return;
     }
 
     const loading = await this.loading.create({
-      message:"Cargando pago...",
-      spinner:"crescent",
+      message: "Cargando pago...",
+      spinner: "crescent",
     });
 
     await loading.present();
 
     try {
-      const response = await axios.get<{ data: Payment }>(
-        `${environment.apiUrl}/payment/${encodeURIComponent(id)}`
-      );
+      const response = await axios.get<{ data: PaymentDetail }>(
+        `${environment.apiUrl}/payment/${encodeURIComponent(id)}?fields=*,quote_id.*,method_id.*,user_id.id,user_id.name`);
       this.payment = response.data.data;
+      console.log('Pago:', this.payment);
+      console.log('Cotización:', this.payment?.quote_id);
     } catch (error) {
-      this.messageError="Revisar id, conexion a base de datos o permisos";
-      console.log('Error al cargar detalle de pago', error);
-    }finally{
+      this.messageError = "Revisar id, conexion a base de datos o permisos";
+      console.log("Error al cargar detalle de pago", error);
+    } finally {
       await loading.dismiss();
     }
   }
