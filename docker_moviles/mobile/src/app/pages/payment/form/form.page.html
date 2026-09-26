@@ -1,13 +1,137 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>form</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button
+        defaultHref="/quotes/list"
+      ></ion-back-button>
+    </ion-buttons>
+
+    <ion-title>Registrar pago</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">form</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+
+  <div *ngIf="quote">
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          Información de la cotización
+        </ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+
+        <ion-item>
+          <ion-label>
+            <p>Cotización</p>
+            <h2>#{{ quote.id }}</h2>
+          </ion-label>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>
+            <p>Subtotal</p>
+            <h2>${{ formattedSubtotal }}</h2>
+          </ion-label>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>
+            <p>Impuesto</p>
+            <h2>${{ formattedTax }}</h2>
+          </ion-label>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>
+            <p>Total a pagar</p>
+            <h1>${{ formattedTotal }}</h1>
+          </ion-label>
+        </ion-item>
+
+      </ion-card-content>
+    </ion-card>
+
+
+    <form
+      [formGroup]="paymentForm"
+      (ngSubmit)="registerPayment()"
+    >
+
+      <ion-card>
+
+        <ion-card-header>
+          <ion-card-title>
+            Datos del pago
+          </ion-card-title>
+        </ion-card-header>
+
+        <ion-card-content>
+
+          <ion-item>
+            <ion-select
+              label="Método de pago"
+              labelPlacement="stacked"
+              placeholder="Seleccione un método"
+              formControlName="method_id"
+            >
+
+              <ion-select-option
+                *ngFor="
+                  let method of paymentMethods
+                "
+                [value]="method.id"
+              >
+                {{ method.name }}
+              </ion-select-option>
+
+            </ion-select>
+          </ion-item>
+
+          <ion-note
+            color="danger"
+            *ngIf="
+              getError('method_id') as error
+            "
+          >
+            {{ error }}
+          </ion-note>
+
+
+          <ion-item>
+            <ion-input
+              label="Referencia"
+              labelPlacement="stacked"
+              placeholder="Referencia del comprobante"
+              formControlName="reference"
+            ></ion-input>
+          </ion-item>
+
+          <ion-note>
+            La referencia es opcional. Puede ingresar
+            el folio o número de operación del comprobante
+            de pago.
+          </ion-note>
+
+        </ion-card-content>
+
+      </ion-card>
+
+
+      <ion-button
+        expand="block"
+        type="submit"
+        [disabled]="
+          paymentForm.invalid || saving
+        "
+      >
+        Registrar pago
+      </ion-button>
+
+    </form>
+
+  </div>
+
 </ion-content>
