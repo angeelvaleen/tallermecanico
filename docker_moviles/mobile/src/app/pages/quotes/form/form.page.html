@@ -1,97 +1,167 @@
 <ion-header>
+
   <ion-toolbar>
-    <ion-title>Nueva cotización</ion-title>
+
+    <ion-title>
+      Nueva cotización
+    </ion-title>
 
     <ion-buttons slot="end">
-      <ion-button (click)="closeModal()">
-        <ion-icon name="close-outline"></ion-icon>
+
+      <ion-button
+        (click)="closeModal()"
+      >
+
+        <ion-icon
+          name="close-outline"
+        ></ion-icon>
+
       </ion-button>
+
     </ion-buttons>
+
   </ion-toolbar>
+
 </ion-header>
+
 
 <ion-content class="ion-padding">
 
-  <form [formGroup]="quoteForm" (ngSubmit)="saveQuote()">
+  <form
+    [formGroup]="quoteForm"
+    (ngSubmit)="saveQuote()"
+  >
 
     <!-- DATOS DE LA COTIZACIÓN -->
     <ion-card>
+
       <ion-card-header>
-        <ion-card-title>Datos de la cotización</ion-card-title>
+
+        <ion-card-title>
+          Datos de la cotización
+        </ion-card-title>
+
       </ion-card-header>
+
 
       <ion-card-content>
 
-        <!-- ORDEN DE TRABAJO -->
-        <ion-item>
+        <!-- ORDEN DESDE WORKORDER -->
+        <ion-item
+          *ngIf="workorderId !== undefined"
+        >
+
+          <ion-input
+            label="Orden de trabajo"
+            labelPlacement="floating"
+            [value]="'Orden #' + workorderId"
+            readonly
+          ></ion-input>
+
+        </ion-item>
+
+
+        <!-- ORDEN DESDE LISTADO DE COTIZACIONES -->
+        <ion-item
+          *ngIf="workorderId === undefined"
+        >
+
           <ion-select
             label="Orden de trabajo"
             labelPlacement="floating"
             formControlName="workorder_id"
             interface="action-sheet"
           >
+
             <ion-select-option
               *ngFor="let workorder of workorders"
               [value]="workorder.id"
             >
               Orden #{{ workorder.id }}
             </ion-select-option>
+
           </ion-select>
+
         </ion-item>
+
 
         <ion-text
           color="danger"
-          *ngIf="quoteForm.get('workorder_id')?.touched && quoteForm.get('workorder_id')?.invalid"
+          *ngIf="
+            quoteForm.get('workorder_id')?.touched &&
+            quoteForm.get('workorder_id')?.invalid
+          "
         >
+
           <p class="error-message">
             {{ getError('workorder_id') }}
           </p>
+
         </ion-text>
 
 
         <!-- VIGENCIA -->
         <ion-item>
+
           <ion-input
             type="date"
             label="Vigencia"
             labelPlacement="floating"
             formControlName="validity"
           ></ion-input>
+
         </ion-item>
+
 
         <ion-text
           color="danger"
-          *ngIf="quoteForm.get('validity')?.touched && quoteForm.get('validity')?.invalid"
+          *ngIf="
+            quoteForm.get('validity')?.touched &&
+            quoteForm.get('validity')?.invalid
+          "
         >
+
           <p class="error-message">
             {{ getError('validity') }}
           </p>
+
         </ion-text>
 
       </ion-card-content>
+
     </ion-card>
 
 
     <!-- SERVICIOS -->
     <ion-card>
+
       <ion-card-header>
+
         <div class="section-header">
-          <ion-card-title>Servicios</ion-card-title>
+
+          <ion-card-title>
+            Servicios
+          </ion-card-title>
 
           <ion-button
             type="button"
             size="small"
             (click)="addService()"
           >
+
             <ion-icon
               slot="start"
               name="add-outline"
             ></ion-icon>
 
             Agregar
+
           </ion-button>
+
         </div>
+
       </ion-card-header>
+
 
       <ion-card-content>
 
@@ -99,11 +169,15 @@
 
           <ion-card
             class="item-card"
-            *ngFor="let item of items.controls; let i = index"
+            *ngFor="
+              let item of items.controls;
+              let i = index
+            "
             [formGroupName]="i"
           >
 
             <ion-card-header>
+
               <div class="item-header">
 
                 <ion-card-title>
@@ -116,16 +190,22 @@
                   color="danger"
                   (click)="removeService(i)"
                 >
-                  <ion-icon name="trash-outline"></ion-icon>
+
+                  <ion-icon
+                    name="trash-outline"
+                  ></ion-icon>
+
                 </ion-button>
 
               </div>
+
             </ion-card-header>
+
 
             <ion-card-content>
 
-              <!-- SERVICIO -->
               <ion-item>
+
                 <ion-select
                   label="Servicio"
                   labelPlacement="floating"
@@ -133,27 +213,38 @@
                   interface="action-sheet"
                   (ionChange)="onServiceChange(i)"
                 >
+
                   <ion-select-option
-                    *ngFor="let service of services"
+                    *ngFor="
+                      let service of services
+                    "
                     [value]="service.id"
                   >
                     {{ service.name }}
                   </ion-select-option>
+
                 </ion-select>
+
               </ion-item>
+
 
               <ion-text
                 color="danger"
-                *ngIf="item.get('service_id')?.touched && item.get('service_id')?.invalid"
+                *ngIf="
+                  item.get('service_id')?.touched &&
+                  item.get('service_id')?.invalid
+                "
               >
+
                 <p class="error-message">
                   {{ getItemError(i, 'service_id') }}
                 </p>
+
               </ion-text>
 
 
-              <!-- PRECIO -->
               <ion-item>
+
                 <ion-input
                   type="number"
                   label="Precio"
@@ -161,11 +252,12 @@
                   formControlName="price"
                   readonly
                 ></ion-input>
+
               </ion-item>
 
 
-              <!-- DESCUENTO -->
               <ion-item>
+
                 <ion-input
                   type="number"
                   label="Descuento"
@@ -174,11 +266,12 @@
                   min="0"
                   (ionInput)="calculateItemAmount(i)"
                 ></ion-input>
+
               </ion-item>
 
 
-              <!-- IMPORTE -->
               <ion-item>
+
                 <ion-input
                   type="number"
                   label="Importe"
@@ -186,6 +279,7 @@
                   formControlName="amount"
                   readonly
                 ></ion-input>
+
               </ion-item>
 
             </ion-card-content>
@@ -195,22 +289,25 @@
         </div>
 
 
-        <!-- SIN SERVICIOS -->
         <ion-text
           color="medium"
           *ngIf="items.length === 0"
         >
+
           <p class="empty-message">
             No hay servicios agregados.
           </p>
+
         </ion-text>
 
       </ion-card-content>
+
     </ion-card>
 
 
     <!-- REFACCIONES -->
     <ion-card>
+
       <ion-card-header>
 
         <div class="section-header">
@@ -224,17 +321,20 @@
             size="small"
             (click)="addPart()"
           >
+
             <ion-icon
               slot="start"
               name="add-outline"
             ></ion-icon>
 
             Agregar
+
           </ion-button>
 
         </div>
 
       </ion-card-header>
+
 
       <ion-card-content>
 
@@ -242,7 +342,10 @@
 
           <ion-card
             class="item-card"
-            *ngFor="let part of partsArray.controls; let i = index"
+            *ngFor="
+              let part of partsArray.controls;
+              let i = index
+            "
             [formGroupName]="i"
           >
 
@@ -260,17 +363,22 @@
                   color="danger"
                   (click)="removePart(i)"
                 >
-                  <ion-icon name="trash-outline"></ion-icon>
+
+                  <ion-icon
+                    name="trash-outline"
+                  ></ion-icon>
+
                 </ion-button>
 
               </div>
 
             </ion-card-header>
 
+
             <ion-card-content>
 
-              <!-- REFACCIÓN -->
               <ion-item>
+
                 <ion-select
                   label="Refacción"
                   labelPlacement="floating"
@@ -278,27 +386,36 @@
                   interface="action-sheet"
                   (ionChange)="onPartChange(i)"
                 >
+
                   <ion-select-option
                     *ngFor="let part of parts"
                     [value]="part.id"
                   >
                     {{ part.name }}
                   </ion-select-option>
+
                 </ion-select>
+
               </ion-item>
+
 
               <ion-text
                 color="danger"
-                *ngIf="part.get('part_id')?.touched && part.get('part_id')?.invalid"
+                *ngIf="
+                  part.get('part_id')?.touched &&
+                  part.get('part_id')?.invalid
+                "
               >
+
                 <p class="error-message">
                   {{ getPartError(i, 'part_id') }}
                 </p>
+
               </ion-text>
 
 
-              <!-- CANTIDAD -->
               <ion-item>
+
                 <ion-input
                   type="number"
                   label="Cantidad"
@@ -307,11 +424,12 @@
                   min="1"
                   (ionInput)="calculatePartAmount(i)"
                 ></ion-input>
+
               </ion-item>
 
 
-              <!-- PRECIO -->
               <ion-item>
+
                 <ion-input
                   type="number"
                   label="Precio"
@@ -319,11 +437,12 @@
                   formControlName="price"
                   readonly
                 ></ion-input>
+
               </ion-item>
 
 
-              <!-- DESCUENTO -->
               <ion-item>
+
                 <ion-input
                   type="number"
                   label="Descuento"
@@ -332,11 +451,12 @@
                   min="0"
                   (ionInput)="calculatePartAmount(i)"
                 ></ion-input>
+
               </ion-item>
 
 
-              <!-- IMPORTE -->
               <ion-item>
+
                 <ion-input
                   type="number"
                   label="Importe"
@@ -344,6 +464,7 @@
                   formControlName="amount"
                   readonly
                 ></ion-input>
+
               </ion-item>
 
             </ion-card-content>
@@ -353,29 +474,38 @@
         </div>
 
 
-        <!-- SIN REFACCIONES -->
         <ion-text
           color="medium"
           *ngIf="partsArray.length === 0"
         >
+
           <p class="empty-message">
             No hay refacciones agregadas.
           </p>
+
         </ion-text>
 
       </ion-card-content>
+
     </ion-card>
 
 
     <!-- TOTALES -->
     <ion-card>
+
       <ion-card-header>
-        <ion-card-title>Totales</ion-card-title>
+
+        <ion-card-title>
+          Totales
+        </ion-card-title>
+
       </ion-card-header>
+
 
       <ion-card-content>
 
         <ion-item>
+
           <ion-input
             type="number"
             label="Subtotal"
@@ -383,9 +513,12 @@
             formControlName="subtotal"
             readonly
           ></ion-input>
+
         </ion-item>
 
+
         <ion-item>
+
           <ion-input
             type="number"
             label="Impuesto"
@@ -393,9 +526,12 @@
             formControlName="tax"
             readonly
           ></ion-input>
+
         </ion-item>
 
+
         <ion-item>
+
           <ion-input
             type="number"
             label="Total"
@@ -403,9 +539,11 @@
             formControlName="total"
             readonly
           ></ion-input>
+
         </ion-item>
 
       </ion-card-content>
+
     </ion-card>
 
 
@@ -422,17 +560,20 @@
         Cancelar
       </ion-button>
 
+
       <ion-button
         type="submit"
         expand="block"
         [disabled]="saved"
       >
+
         <ion-icon
           slot="start"
           name="save-outline"
         ></ion-icon>
 
         Guardar cotización
+
       </ion-button>
 
     </div>

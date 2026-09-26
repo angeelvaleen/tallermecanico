@@ -1,70 +1,186 @@
 <ion-header>
+
   <ion-toolbar>
+
     <ion-buttons slot="start">
-      <ion-button (click)="closeModal()">
-        <ion-icon name="close-outline"></ion-icon>
+
+      <ion-button
+        (click)="closeModal()"
+      >
+
+        <ion-icon
+          name="close-outline"
+        ></ion-icon>
+
       </ion-button>
+
     </ion-buttons>
 
-    <ion-title>Nuevo Diagnóstico</ion-title>
+
+    <ion-title>
+
+      {{
+        isEdition
+          ? 'Editar Diagnóstico'
+          : 'Nuevo Diagnóstico'
+      }}
+
+    </ion-title>
+
   </ion-toolbar>
+
 </ion-header>
 
+
 <ion-content class="ion-padding">
+
   <form
     *ngIf="diagnosisForm"
     [formGroup]="diagnosisForm"
     (ngSubmit)="saveDiagnosis()"
   >
 
-    <ion-list>
+    <ion-card>
 
-      <!-- Orden de trabajo -->
-      <ion-item>
-        <ion-input
-          label="Orden de trabajo"
-          labelPlacement="stacked"
-          type="number"
-          formControlName="workorder_id"
-        ></ion-input>
-      </ion-item>
+      <ion-card-header>
 
-      <ion-note color="danger" *ngIf="getError('workorder_id') as error">
-        {{ error }}
-      </ion-note>
+        <ion-card-title>
+          Información del diagnóstico
+        </ion-card-title>
+
+      </ion-card-header>
 
 
-      <!-- Descripción -->
-      <ion-item>
-        <ion-textarea
-          label="Descripción"
-          labelPlacement="stacked"
-          formControlName="description"
-        ></ion-textarea>
-      </ion-item>
+      <ion-card-content>
 
-      <ion-note color="danger" *ngIf="getError('description') as error">
-        {{ error }}
-      </ion-note>
+        <!-- ORDEN -->
+        <ion-item
+          *ngIf="workorderId === undefined"
+        >
+
+          <ion-input
+            label="Orden de trabajo"
+            labelPlacement="floating"
+            type="number"
+            formControlName="workorder_id"
+          ></ion-input>
+
+        </ion-item>
 
 
-      <!-- Resultado -->
-      <ion-textarea
-        label="Resultado"
-        labelPlacement="stacked"
-        formControlName="result"
-      ></ion-textarea>
+        <ion-item
+          *ngIf="workorderId !== undefined"
+        >
 
-    </ion-list>
+          <ion-input
+            label="Orden de trabajo"
+            labelPlacement="floating"
+            [value]="'Orden #' + workorderId"
+            readonly
+          ></ion-input>
 
-    <ion-button
-      expand="block"
-      type="submit"
-      class="ion-margin-top"
-      [disabled]="saved"
-    >
-      {{ saved ? 'Guardando...' : 'Guardar' }}
-    </ion-button>
+        </ion-item>
+
+
+        <ion-text
+          color="danger"
+          *ngIf="
+            diagnosisForm.get('workorder_id')?.touched &&
+            diagnosisForm.get('workorder_id')?.invalid
+          "
+        >
+
+          <p class="error-message">
+            {{ getError('workorder_id') }}
+          </p>
+
+        </ion-text>
+
+
+        <!-- DESCRIPCIÓN -->
+        <ion-item>
+
+          <ion-textarea
+            label="Descripción"
+            labelPlacement="floating"
+            formControlName="description"
+            rows="5"
+          ></ion-textarea>
+
+        </ion-item>
+
+
+        <ion-text
+          color="danger"
+          *ngIf="
+            diagnosisForm.get('description')?.touched &&
+            diagnosisForm.get('description')?.invalid
+          "
+        >
+
+          <p class="error-message">
+            {{ getError('description') }}
+          </p>
+
+        </ion-text>
+
+
+        <!-- RESULTADO -->
+        <ion-item>
+
+          <ion-textarea
+            label="Resultado"
+            labelPlacement="floating"
+            formControlName="result"
+            rows="5"
+          ></ion-textarea>
+
+        </ion-item>
+
+      </ion-card-content>
+
+    </ion-card>
+
+
+    <!-- BOTONES -->
+    <div class="buttons-container">
+
+      <ion-button
+        type="button"
+        expand="block"
+        fill="outline"
+        color="medium"
+        (click)="closeModal()"
+      >
+        Cancelar
+      </ion-button>
+
+
+      <ion-button
+        type="submit"
+        expand="block"
+        [disabled]="saved"
+      >
+
+        <ion-icon
+          slot="start"
+          name="save-outline"
+        ></ion-icon>
+
+        {{
+          saved
+            ? 'Guardando...'
+            : (
+                isEdition
+                  ? 'Actualizar'
+                  : 'Guardar'
+              )
+        }}
+
+      </ion-button>
+
+    </div>
 
   </form>
+
 </ion-content>

@@ -1,9 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { LoadingController } from '@ionic/angular';
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
-2
+import { Component, OnInit } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
+import {
+  AlertController,
+  LoadingController,
+  ModalController,
+} from "@ionic/angular";
+import axios from "axios";
+import { environment } from "src/environments/environment";
+import { FormPage } from "../form/form.page";
+
 interface Diagnosis {
   id: number;
   workorder_id: number;
@@ -13,9 +18,9 @@ interface Diagnosis {
 }
 
 @Component({
-  selector: 'app-diagnoses-detail',
-  templateUrl: './detail.page.html',
-  styleUrls: ['./detail.page.scss'],
+  selector: "app-diagnoses-detail",
+  templateUrl: "./detail.page.html",
+  styleUrls: ["./detail.page.scss"],
   standalone: false,
 })
 export class DetailPage implements OnInit {
@@ -25,6 +30,8 @@ export class DetailPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private loading: LoadingController,
+    private modalController: ModalController,
+    private alertController: AlertController,
   ) {}
 
   ngOnInit() {
@@ -32,31 +39,56 @@ export class DetailPage implements OnInit {
   }
 
   async chargerDiagnosis(): Promise<void> {
-    const id = this.route.snapshot.paramMap.get('id');
+    const id = this.route.snapshot.paramMap.get("id");
 
-    if(!id){
-      this.messageError='No se recibio ID';
+    if (!id) {
+      this.messageError = "No se recibió ID";
       return;
     }
 
     const loading = await this.loading.create({
-      message:'Cargando diagnostico...',
-      spinner:'bubbles',
+      message: "Cargando diagnóstico...",
+      spinner: "bubbles",
     });
-    
+
     await loading.present();
 
     try {
       const response = await axios.get<{ data: Diagnosis }>(
-        `${environment.apiUrl}/diagnoses/${encodeURIComponent(id)}`
+        `${environment.apiUrl}/diagnoses/${encodeURIComponent(id)}`,
       );
 
       this.diagnosis = response.data.data;
     } catch (error) {
-      console.error("Error al cargar diagnostico:", error);
-      this.messageError="No se pudo cargar el producto. Revisa el ID, la conexión y los permisos de lectura.";
-    }finally{
+      console.error("Error al cargar diagnóstico:", error);
+
+      this.messageError =
+        "No se pudo cargar el diagnóstico. Revisa el ID, la conexión y los permisos de lectura.";
+    } finally {
       await loading.dismiss();
+    }
+  }
+
+  async editDiagnosis(): Promise<void> {
+    if (!this.diagnosis) {
+      return;
+    }
+
+    const modal = await this.modalController.create({
+      component: FormPage,
+      componentProps: {
+        id: this.diagnosis.id,
+      },
+      breakpoints: [0, 0.5, 0.95],
+      initialBreakpoint: 0.95,
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if (data?.saved) {
+      await this.chargerDiagnosis();
     }
   }
 }

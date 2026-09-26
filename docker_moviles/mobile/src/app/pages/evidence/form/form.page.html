@@ -1,13 +1,103 @@
-<ion-header [translucent]="true">
+<ion-header>
+
   <ion-toolbar>
-    <ion-title>form</ion-title>
+
+    <ion-buttons slot="start">
+
+      <ion-button
+        (click)="closeModal()"
+      >
+
+        <ion-icon
+          name="close-outline"
+        ></ion-icon>
+
+      </ion-button>
+
+    </ion-buttons>
+
+
+    <ion-title>
+      Nueva Evidencia
+    </ion-title>
+
   </ion-toolbar>
+
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">form</ion-title>
-    </ion-toolbar>
-  </ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-card>
+
+    <ion-card-header>
+
+      <ion-card-title>
+        Evidencia de la orden
+      </ion-card-title>
+
+    </ion-card-header>
+
+
+    <ion-card-content>
+
+      <ion-item>
+
+        <ion-input
+          label="Orden de trabajo"
+          labelPlacement="floating"
+          [value]="
+            workorderId !== undefined
+              ? 'Orden #' + workorderId
+              : ''
+          "
+          readonly
+        ></ion-input>
+
+      </ion-item>
+
+
+      <ion-text color="medium">
+
+        <p class="information-message">
+          La evidencia corresponde a fotografías
+          o archivos asociados a esta orden de trabajo.
+        </p>
+
+      </ion-text>
+
+
+      <ion-button
+        expand="block"
+        class="ion-margin-top"
+        (click)="showPendingMessage()"
+      >
+
+        <ion-icon
+          slot="start"
+          name="camera-outline"
+        ></ion-icon>
+
+        Seleccionar evidencia
+
+      </ion-button>
+
+    </ion-card-content>
+
+  </ion-card>
+
+
+  <div class="buttons-container">
+
+    <ion-button
+      expand="block"
+      fill="outline"
+      color="medium"
+      (click)="closeModal()"
+    >
+      Cerrar
+    </ion-button>
+
+  </div>
+
 </ion-content>
