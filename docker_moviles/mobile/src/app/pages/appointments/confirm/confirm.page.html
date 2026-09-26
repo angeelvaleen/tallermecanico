@@ -1,0 +1,153 @@
+<ion-header>
+  <ion-toolbar>
+
+    <ion-buttons slot="start">
+      <ion-button
+        (click)="closeModal()"
+      >
+        <ion-icon
+          name="close-outline"
+        ></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title>
+      Confirmar cita
+    </ion-title>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-card *ngIf="appointment">
+
+    <ion-card-header>
+
+      <ion-card-title>
+        Cita #{{ appointment.id }}
+      </ion-card-title>
+
+    </ion-card-header>
+
+    <ion-card-content>
+
+      <p>
+        <strong>Vehículo:</strong>
+        {{ appointment.vehicle_id }}
+      </p>
+
+      <p>
+        <strong>Fecha:</strong>
+        {{ appointment.date }}
+      </p>
+
+      <p>
+        <strong>Hora:</strong>
+        {{ appointment.time }}
+      </p>
+
+      <p>
+        <strong>Motivo:</strong>
+        {{ appointment.reason || "Sin motivo" }}
+      </p>
+
+    </ion-card-content>
+
+  </ion-card>
+
+
+  <form
+    *ngIf="confirmForm"
+    [formGroup]="confirmForm"
+    (ngSubmit)="confirmAppointment()"
+  >
+
+    <!-- Mecánico -->
+    <ion-item>
+
+      <ion-select
+        label="Mecánico"
+        labelPlacement="stacked"
+        placeholder="Selecciona un mecánico"
+        interface="popover"
+        formControlName="mechanic_id"
+      >
+
+        <ion-select-option
+          *ngFor="let mechanic of mechanics"
+          [value]="mechanic.id"
+        >
+          {{ getMechanicName(mechanic) }}
+        </ion-select-option>
+
+      </ion-select>
+
+    </ion-item>
+
+    <ion-note
+      color="danger"
+      *ngIf="getError('mechanic_id') as error"
+    >
+      {{ error }}
+    </ion-note>
+
+
+    <!-- Kilometraje -->
+    <ion-item>
+
+      <ion-input
+        label="Kilometraje"
+        labelPlacement="stacked"
+        type="number"
+        placeholder="Ingrese el kilometraje"
+        formControlName="mileage"
+      ></ion-input>
+
+    </ion-item>
+
+    <ion-note
+      color="danger"
+      *ngIf="getError('mileage') as error"
+    >
+      {{ error }}
+    </ion-note>
+
+
+    <!-- Confirmar -->
+    <ion-button
+      expand="block"
+      type="submit"
+      color="success"
+      class="ion-margin-top"
+      [disabled]="saving"
+    >
+
+      <ion-spinner
+        *ngIf="saving"
+        name="crescent"
+      ></ion-spinner>
+
+      <span *ngIf="!saving">
+        Confirmar y crear orden
+      </span>
+
+    </ion-button>
+
+
+    <!-- Cancelar -->
+    <ion-button
+      expand="block"
+      fill="outline"
+      type="button"
+      color="medium"
+      class="ion-margin-top"
+      [disabled]="saving"
+      (click)="closeModal()"
+    >
+      Cancelar
+    </ion-button>
+
+  </form>
+
+</ion-content>

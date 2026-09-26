@@ -185,7 +185,7 @@ const routes: Routes = [
   {
     path: 'workorders/list',
     loadChildren: () => import('./pages/workorders/list/list.module').then( m => m.ListPageModule)
-  }
+  },
 ];
 @NgModule({
   imports: [

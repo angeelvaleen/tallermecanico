@@ -4,18 +4,13 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-fab slot="fixed" vertical="bottom" horizontal="center">
-  <ion-fab-button (click)="createAppointment()">
-    <ion-icon name="add"></ion-icon>
-  </ion-fab-button>
-</ion-fab>
-
 <ion-content>
   <ion-list>
 
     <ion-item *ngFor="let item of appointments">
 
       <ion-label class="ion-text-wrap">
+
         <h2>
           {{ item.date }} - {{ item.time }}
         </h2>
@@ -23,27 +18,63 @@
         <p>
           Estado: {{ getStatusName(item.status_id) }}
         </p>
+
       </ion-label>
 
-      <!-- Detalle -->
+      <!-- Ver detalle -->
       <ion-button
         slot="end"
+        fill="clear"
         [routerLink]="['/appointments/detail', item.id]"
       >
         <ion-icon name="eye-outline"></ion-icon>
       </ion-button>
 
-      <!-- Editar solamente si está pendiente -->
+      <!-- Editar -->
       <ion-button
         *ngIf="canEditAppointment(item)"
         slot="end"
+        fill="clear"
         color="warning"
         (click)="editAppointment(item.id)"
       >
         <ion-icon name="pencil"></ion-icon>
       </ion-button>
 
+      <!-- Confirmar -->
+      <ion-button
+        *ngIf="canConfirmAppointment(item)"
+        slot="end"
+        fill="clear"
+        color="success"
+        (click)="confirmAppointment(item.id)"
+      >
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+      </ion-button>
+
+      <!-- Cancelar -->
+      <ion-button
+        *ngIf="canCancelAppointment(item)"
+        slot="end"
+        fill="clear"
+        color="danger"
+        (click)="cancelAppointment(item.id)"
+      >
+        <ion-icon name="close-circle-outline"></ion-icon>
+      </ion-button>
+
     </ion-item>
 
   </ion-list>
+
+  <ion-fab
+    slot="fixed"
+    vertical="bottom"
+    horizontal="center"
+  >
+    <ion-fab-button (click)="createAppointment()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
 </ion-content>

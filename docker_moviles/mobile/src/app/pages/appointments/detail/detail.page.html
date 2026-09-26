@@ -1,22 +1,32 @@
 <ion-header>
   <ion-toolbar>
+
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/appointments/list"></ion-back-button>
+      <ion-back-button
+        defaultHref="/appointments/list"
+      ></ion-back-button>
     </ion-buttons>
 
-    <ion-title>Detalle de Cita</ion-title>
+    <ion-title>
+      Detalle de Cita
+    </ion-title>
+
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
 
+  <!-- Información de la cita -->
   <div *ngIf="appointment">
 
     <ion-card>
+
       <ion-card-header>
+
         <ion-card-title>
           Cita #{{ appointment.id }}
         </ion-card-title>
+
       </ion-card-header>
 
       <ion-card-content>
@@ -43,30 +53,71 @@
 
         <p>
           <strong>Motivo:</strong>
-          {{ appointment.reason || 'Sin motivo' }}
+          {{ appointment.reason || "Sin motivo" }}
         </p>
 
         <p>
           <strong>Registro:</strong>
-          {{ appointment.created_at | date:'yyyy-MM-dd' }}
+          {{ appointment.created_at | date:"yyyy-MM-dd" }}
         </p>
 
-        <ion-button
-          *ngIf="canEditAppointment()"
-          expand="block"
-          color="warning"
-          class="ion-margin-top"
-          (click)="editAppointment()"
-        >
-          <ion-icon name="pencil" slot="start"></ion-icon>
-          Editar cita
-        </ion-button>
-
       </ion-card-content>
+
     </ion-card>
+
+    <!-- Acciones -->
+    <div *ngIf="appointment.status_id === 1">
+
+      <!-- Editar -->
+      <ion-button
+        expand="block"
+        color="warning"
+        class="ion-margin-top"
+        (click)="editAppointment()"
+      >
+        <ion-icon
+          name="pencil"
+          slot="start"
+        ></ion-icon>
+
+        Editar cita
+      </ion-button>
+
+      <!-- Confirmar -->
+      <ion-button
+        expand="block"
+        color="success"
+        class="ion-margin-top"
+        (click)="confirmAppointment()"
+      >
+        <ion-icon
+          name="checkmark-circle-outline"
+          slot="start"
+        ></ion-icon>
+
+        Confirmar cita
+      </ion-button>
+
+      <!-- Cancelar -->
+      <ion-button
+        expand="block"
+        color="danger"
+        class="ion-margin-top"
+        (click)="cancelAppointment()"
+      >
+        <ion-icon
+          name="close-circle-outline"
+          slot="start"
+        ></ion-icon>
+
+        Cancelar cita
+      </ion-button>
+
+    </div>
 
   </div>
 
+  <!-- Cargando -->
   <div
     *ngIf="!appointment && !messageError"
     class="ion-text-center"
@@ -74,6 +125,7 @@
     <p>Cargando información...</p>
   </div>
 
+  <!-- Error -->
   <div
     *ngIf="messageError"
     class="ion-text-center"
