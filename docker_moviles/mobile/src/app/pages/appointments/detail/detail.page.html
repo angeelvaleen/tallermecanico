@@ -3,24 +3,84 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/appointments/list"></ion-back-button>
     </ion-buttons>
+
     <ion-title>Detalle de Cita</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
+
   <div *ngIf="appointment">
+
     <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          Cita #{{ appointment.id }}
+        </ion-card-title>
+      </ion-card-header>
+
       <ion-card-content>
-        <h2>Fecha: {{ appointment.date }}</h2>
-        <p><strong>Hora:</strong> {{ appointment.time }}</p>
-        <p><strong>Vehiculo ID:</strong> {{ appointment.vehicle_id }}</p>
-        <p><strong>Estado ID:</strong> {{ appointment.status_id }}</p>
-        <p><strong>Motivo:</strong> {{ appointment.reason || 'Sin motivo' }}</p>
-        <p><strong>Registro:</strong> {{ appointment.created_at | date:'yyyy-MM-dd' }}</p>
+
+        <p>
+          <strong>Fecha:</strong>
+          {{ appointment.date }}
+        </p>
+
+        <p>
+          <strong>Hora:</strong>
+          {{ appointment.time }}
+        </p>
+
+        <p>
+          <strong>Vehículo ID:</strong>
+          {{ appointment.vehicle_id }}
+        </p>
+
+        <p>
+          <strong>Estado:</strong>
+          {{ getStatusName(appointment.status_id) }}
+        </p>
+
+        <p>
+          <strong>Motivo:</strong>
+          {{ appointment.reason || 'Sin motivo' }}
+        </p>
+
+        <p>
+          <strong>Registro:</strong>
+          {{ appointment.created_at | date:'yyyy-MM-dd' }}
+        </p>
+
+        <ion-button
+          *ngIf="canEditAppointment()"
+          expand="block"
+          color="warning"
+          class="ion-margin-top"
+          (click)="editAppointment()"
+        >
+          <ion-icon name="pencil" slot="start"></ion-icon>
+          Editar cita
+        </ion-button>
+
       </ion-card-content>
     </ion-card>
+
   </div>
-  <div *ngIf="!appointment" class="ion-text-center">
-    <p>Cargando informacion...</p>
+
+  <div
+    *ngIf="!appointment && !messageError"
+    class="ion-text-center"
+  >
+    <p>Cargando información...</p>
   </div>
+
+  <div
+    *ngIf="messageError"
+    class="ion-text-center"
+  >
+    <ion-text color="danger">
+      <p>{{ messageError }}</p>
+    </ion-text>
+  </div>
+
 </ion-content>

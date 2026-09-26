@@ -1,12 +1,17 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button (click)="closeModal()">
+      <ion-button
+        (click)="closeModal()"
+        [disabled]="saved"
+      >
         <ion-icon name="close-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
 
-    <ion-title>Nuevo Servicio</ion-title>
+    <ion-title>
+      {{ isEdition ? 'Editar servicio' : 'Nuevo servicio' }}
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -19,42 +24,49 @@
 
     <ion-list>
 
-      <!-- Nombre -->
       <ion-item>
         <ion-input
           label="Nombre"
           labelPlacement="stacked"
           type="text"
           formControlName="name"
+          maxlength="100"
         ></ion-input>
       </ion-item>
 
-      <ion-note color="danger" *ngIf="getError('name') as error">
+      <ion-note
+        color="danger"
+        *ngIf="getError('name') as error"
+      >
         {{ error }}
       </ion-note>
 
 
-      <!-- Precio -->
       <ion-item>
         <ion-input
           label="Precio"
           labelPlacement="stacked"
           type="number"
           formControlName="price"
+          min="0"
+          step="0.01"
         ></ion-input>
       </ion-item>
 
-      <ion-note color="danger" *ngIf="getError('price') as error">
+      <ion-note
+        color="danger"
+        *ngIf="getError('price') as error"
+      >
         {{ error }}
       </ion-note>
 
 
-      <!-- Descripción -->
       <ion-item>
         <ion-textarea
           label="Descripción"
           labelPlacement="stacked"
           formControlName="description"
+          autoGrow="true"
         ></ion-textarea>
       </ion-item>
 
@@ -64,9 +76,13 @@
       expand="block"
       type="submit"
       class="ion-margin-top"
-      [disabled]="saved"
+      [disabled]="saved || loading"
     >
-      {{ saved ? 'Guardando...' : 'Guardar' }}
+      {{
+        saved
+          ? 'Guardando...'
+          : (isEdition ? 'Actualizar' : 'Guardar')
+      }}
     </ion-button>
 
   </form>

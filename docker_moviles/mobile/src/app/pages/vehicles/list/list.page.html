@@ -1,25 +1,48 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Vehiculos</ion-title>
+    <ion-title>Vehículos</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-fab slot="fixed" vertical="bottom" horizontal="center">
-    <ion-fab-button (click)="createVehicle()">
-        <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
+<ion-fab
+  slot="fixed"
+  vertical="bottom"
+  horizontal="center"
+>
+  <ion-fab-button (click)="createVehicle()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
 </ion-fab>
 
 <ion-content>
+
   <ion-list>
+
     <ion-item *ngFor="let vehicle of vehicles">
+
       <ion-label>
-        <h2>Placa: {{ vehicle.plate }}</h2>
-        <p>Year: {{ vehicle.year }}</p>
+        <h2>{{ vehicle.plate }}</h2>
       </ion-label>
-      <ion-button [routerLink]="['/vehicles/detail', vehicle.id]" >
-        <ion-icon name="eye-outline" ></ion-icon>
-    </ion-button>
+
+      <!-- Detalle -->
+      <ion-button
+        slot="end"
+        [routerLink]="['/vehicles/detail', vehicle.id]"
+      >
+        <ion-icon name="eye-outline"></ion-icon>
+      </ion-button>
+
+      <!-- Editar -->
+      <ion-button
+        slot="end"
+        color="warning"
+        (click)="editVehicle(vehicle.id)"
+      >
+        <ion-icon name="pencil"></ion-icon>
+      </ion-button>
+
     </ion-item>
+
   </ion-list>
+
 </ion-content>

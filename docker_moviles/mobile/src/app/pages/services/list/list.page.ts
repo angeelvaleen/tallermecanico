@@ -9,8 +9,8 @@ interface Service {
   name: string;
   price: number;
   description: string;
-  is_active:boolean;
-  created_at:string;
+  is_active: boolean;
+  created_at: string;
 }
 
 @Component({
@@ -26,34 +26,54 @@ export class ListPage implements OnInit {
     private modalController: ModalController,
   ) {}
 
-  ngOnInit() {
-    this.chargerServices();
+  ngOnInit(): void {
+    this.loadServices();
   }
 
-  async chargerServices(): Promise<void> {
+  async loadServices(): Promise<void> {
     try {
       const response = await axios.get<{ data: Service[] }>(
-        `${environment.apiUrl}/services`
+        `${environment.apiUrl}/services`,
       );
+
       this.services = response.data.data;
     } catch (error) {
-      console.log('Error al cargar servicios', error);
+      console.error('Error al cargar servicios:', error);
     }
   }
 
   async createService(): Promise<void> {
-      const modal = await this.modalController.create({
-        component: FormPage,
-        breakpoints: [0, 0.5, 0.95],
-        initialBreakpoint: 0.95,
-      });
-  
-      await modal.present();
-  
-      const { data } = await modal.onDidDismiss();
-  
-      if (data?.saved) {
-        await this.chargerServices();
-      }
+    const modal = await this.modalController.create({
+      component: FormPage,
+      breakpoints: [0, 0.5, 0.95],
+      initialBreakpoint: 0.95,
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if (data?.saved) {
+      await this.loadServices();
     }
+  }
+
+  async editService(id: number): Promise<void> {
+    const modal = await this.modalController.create({
+      component: FormPage,
+      componentProps: {
+        id,
+      },
+      breakpoints: [0, 0.5, 0.95],
+      initialBreakpoint: 0.95,
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if (data?.saved) {
+      await this.loadServices();
+    }
+  }
 }

@@ -25,11 +25,15 @@ export class ListPage implements OnInit {
 
   constructor(private modalController: ModalController) {}
 
-  ngOnInit() {
-    this.chargerAppointments();
+  ngOnInit(): void {
+    this.loadAppointments();
   }
 
-  async chargerAppointments(): Promise<void> {
+  async ionViewWillEnter(): Promise<void> {
+    await this.loadAppointments();
+  }
+
+  async loadAppointments(): Promise<void> {
     try {
       const response = await axios.get<{ data: Appointment[] }>(
         `${environment.apiUrl}/appointments`,
@@ -39,6 +43,23 @@ export class ListPage implements OnInit {
     } catch (error) {
       console.log("Error al cargar citas", error);
     }
+  }
+
+  getStatusName(statusId: number): string {
+    switch (statusId) {
+      case 1:
+        return "Pendiente";
+      case 2:
+        return "Confirmada";
+      case 3:
+        return "Cancelada";
+      default:
+        return "Desconocido";
+    }
+  }
+
+  canEditAppointment(appointment: Appointment): boolean {
+    return appointment.status_id === 1;
   }
 
   async createAppointment(): Promise<void> {
@@ -53,7 +74,38 @@ export class ListPage implements OnInit {
     const { data } = await modal.onDidDismiss();
 
     if (data?.saved) {
-      await this.chargerAppointments();
+      await this.loadAppointments();
+    }
+  }
+
+  async editAppointment(id: number): Promise<void> {
+    const appointment = this.appointments.find(
+      (item) => item.id === id,
+    );
+
+    if (!appointment) {
+      return;
+    }
+
+    if (!this.canEditAppointment(appointment)) {
+      return;
+    }
+
+    const modal = await this.modalController.create({
+      component: FormPage,
+      componentProps: {
+        id,
+      },
+      breakpoints: [0, 0.5, 0.95],
+      initialBreakpoint: 0.95,
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if (data?.saved) {
+      await this.loadAppointments();
     }
   }
 }

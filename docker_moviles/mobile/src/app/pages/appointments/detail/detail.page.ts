@@ -1,8 +1,9 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
-import { LoadingController } from "@ionic/angular";
+import { LoadingController, ModalController } from "@ionic/angular";
 import axios from "axios";
 import { environment } from "src/environments/environment";
+import { FormPage } from "../form/form.page";
 
 interface Appointment {
   id: number;
@@ -27,22 +28,23 @@ export class DetailPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private loading: LoadingController,
+    private modalController: ModalController,
   ) {}
 
-  ngOnInit() {
-    this.chargerAppointment();
+  ngOnInit(): void {
+    this.loadAppointment();
   }
 
-  async chargerAppointment(): Promise<void> {
+  async loadAppointment(): Promise<void> {
     const id = this.route.snapshot.paramMap.get("id");
 
     if (!id) {
-      this.messageError = "No se recibio el ID";
+      this.messageError = "No se recibió el ID de la cita.";
       return;
     }
 
     const loading = await this.loading.create({
-      message: "Cargando marca...",
+      message: "Cargando cita...",
       spinner: "bubbles",
     });
 
@@ -55,11 +57,52 @@ export class DetailPage implements OnInit {
 
       this.appointment = response.data.data;
     } catch (error) {
-      console.error("Error al cargar el producto:", error);
+      console.error("Error al cargar la cita:", error);
+
       this.messageError =
-        "No se pudo cargar el producto. Revisa el ID, la conexión y los permisos de lectura.";
+        "No se pudo cargar la cita. Revisa el ID, la conexión y los permisos de lectura.";
     } finally {
       await loading.dismiss();
+    }
+  }
+
+  getStatusName(statusId: number): string {
+    switch (statusId) {
+      case 1:
+        return "Pendiente";
+      case 2:
+        return "Confirmada";
+      case 3:
+        return "Cancelada";
+      default:
+        return "Desconocido";
+    }
+  }
+
+  canEditAppointment(): boolean {
+    return this.appointment?.status_id === 1;
+  }
+
+  async editAppointment(): Promise<void> {
+    if (!this.appointment || !this.canEditAppointment()) {
+      return;
+    }
+
+    const modal = await this.modalController.create({
+      component: FormPage,
+      componentProps: {
+        id: this.appointment.id,
+      },
+      breakpoints: [0, 0.5, 0.95],
+      initialBreakpoint: 0.95,
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if (data?.saved) {
+      await this.loadAppointment();
     }
   }
 }
