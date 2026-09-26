@@ -1,28 +1,56 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button (click)="closeModal()">
+      <ion-button
+        (click)="closeModal()"
+        [disabled]="saved"
+      >
         <ion-icon name="close-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>Nuevo Color</ion-title>
+
+    <ion-title>
+      {{ isEdition ? 'Editar color' : 'Nuevo color' }}
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form *ngIf="colorForm" [formGroup]="colorForm" (ngSubmit)="saveColor()">
+  <form
+    *ngIf="colorForm"
+    [formGroup]="colorForm"
+    (ngSubmit)="saveColor()"
+  >
     <ion-list>
       <ion-item>
-        <ion-input label="Nombre" labelPlacement="stacked" type="text" formControlName="name" maxlength="30"></ion-input>
+        <ion-input
+          label="Nombre"
+          labelPlacement="stacked"
+          type="text"
+          formControlName="name"
+          maxlength="30"
+        ></ion-input>
       </ion-item>
-      <ion-note color="danger" *ngIf="getError('name') as error">
+
+      <ion-note
+        color="danger"
+        *ngIf="getError('name') as error"
+      >
         {{ error }}
       </ion-note>
-
     </ion-list>
 
-    <ion-button expand="block" type="submit" class="ion-margin-top" [disabled]="saved">
-      {{ saved ? 'Guardando...' : 'Guardar' }}
+    <ion-button
+      expand="block"
+      type="submit"
+      class="ion-margin-top"
+      [disabled]="saved || loading"
+    >
+      {{
+        saved
+          ? 'Guardando...'
+          : (isEdition ? 'Actualizar' : 'Guardar')
+      }}
     </ion-button>
   </form>
 </ion-content>

@@ -1,8 +1,8 @@
-import { Component, OnInit } from "@angular/core";
-import { ModalController } from "@ionic/angular";
-import axios from "axios";
-import { environment } from "src/environments/environment";
-import { FormPage } from "../form/form.page";
+import { Component, OnInit } from '@angular/core';
+import { ModalController } from '@ionic/angular';
+import axios from 'axios';
+import { environment } from 'src/environments/environment';
+import { FormPage } from '../form/form.page';
 
 interface Color {
   id: number;
@@ -12,28 +12,31 @@ interface Color {
 }
 
 @Component({
-  selector: "app-colors-list",
-  templateUrl: "./list.page.html",
-  styleUrls: ["./list.page.scss"],
+  selector: 'app-colors-list',
+  templateUrl: './list.page.html',
+  styleUrls: ['./list.page.scss'],
   standalone: false,
 })
 export class ListPage implements OnInit {
   colors: Color[] = [];
 
-  constructor(private modalController: ModalController) {}
+  constructor(
+    private modalController: ModalController,
+  ) {}
 
-  ngOnInit() {
-    this.chargerColors();
+  ngOnInit(): void {
+    this.loadColors();
   }
 
-  async chargerColors(): Promise<void> {
+  async loadColors(): Promise<void> {
     try {
       const response = await axios.get<{ data: Color[] }>(
         `${environment.apiUrl}/colors`,
       );
+
       this.colors = response.data.data;
     } catch (error) {
-      console.log("Error al cargar colores", error);
+      console.error('Error al cargar colores:', error);
     }
   }
 
@@ -49,7 +52,7 @@ export class ListPage implements OnInit {
     const { data } = await modal.onDidDismiss();
 
     if (data?.saved) {
-      await this.chargerColors();
+      await this.loadColors();
     }
   }
 
@@ -57,7 +60,7 @@ export class ListPage implements OnInit {
     const modal = await this.modalController.create({
       component: FormPage,
       componentProps: {
-        id: id,
+        id,
       },
       breakpoints: [0, 0.5, 0.95],
       initialBreakpoint: 0.95,
@@ -68,7 +71,7 @@ export class ListPage implements OnInit {
     const { data } = await modal.onDidDismiss();
 
     if (data?.saved) {
-      await this.chargerColors();
+      await this.loadColors();
     }
   }
 }

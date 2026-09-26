@@ -4,16 +4,39 @@
   </ion-toolbar>
 </ion-header>
 
+<ion-fab
+  slot="fixed"
+  vertical="bottom"
+  horizontal="center"
+>
+  <ion-fab-button (click)="createBrand()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+
 <ion-content>
   <ion-list>
     <ion-item *ngFor="let brand of brands">
       <ion-label class="ion-text-wrap">
         <h2>{{ brand.name }}</h2>
-        <p>Estado: {{ brand.is_active ? 'Activo' : 'Inactivo' }}</p>
-        <p>Registro: {{ brand.created_at | date:'yyyy-MM-dd' }}</p>
+
+        <p>
+          Estado:
+          {{ brand.is_active ? 'Activo' : 'Inactivo' }}
+        </p>
+
+        <p>
+          Registro:
+          {{ brand.created_at | date:'yyyy-MM-dd' }}
+        </p>
       </ion-label>
-      <ion-button slot="end" [routerLink]="['/brands/detail', brand.id]">
-        <ion-icon name="eye-outline"></ion-icon>
+
+      <ion-button
+        slot="end"
+        color="warning"
+        (click)="editBrand(brand.id)"
+      >
+        <ion-icon name="pencil"></ion-icon>
       </ion-button>
     </ion-item>
   </ion-list>

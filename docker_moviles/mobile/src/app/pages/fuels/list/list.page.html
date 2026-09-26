@@ -4,15 +4,40 @@
   </ion-toolbar>
 </ion-header>
 
+<ion-fab
+  slot="fixed"
+  vertical="bottom"
+  horizontal="center"
+>
+  <ion-fab-button (click)="createFuel()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+
 <ion-content>
   <ion-list>
     <ion-item *ngFor="let fuel of fuels">
-      <ion-label>
+      <ion-label class="ion-text-wrap">
         <h2>{{ fuel.name }}</h2>
-        <ion-button [routerLink]="['/fuels/detail', fuel.id]">
-          <ion-icon name="eye-outline"></ion-icon>
-        </ion-button>
+
+        <p>
+          Estado:
+          {{ fuel.is_active ? 'Activo' : 'Inactivo' }}
+        </p>
+
+        <p>
+          Registro:
+          {{ fuel.created_at | date:'yyyy-MM-dd' }}
+        </p>
       </ion-label>
+
+      <ion-button
+        slot="end"
+        color="warning"
+        (click)="editFuel(fuel.id)"
+      >
+        <ion-icon name="pencil"></ion-icon>
+      </ion-button>
     </ion-item>
   </ion-list>
 </ion-content>

@@ -4,7 +4,11 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-fab slot="fixed" vertical="bottom" horizontal="center">
+<ion-fab
+  slot="fixed"
+  vertical="bottom"
+  horizontal="center"
+>
   <ion-fab-button (click)="createColor()">
     <ion-icon name="add"></ion-icon>
   </ion-fab-button>
@@ -13,15 +17,27 @@
 <ion-content>
   <ion-list>
     <ion-item *ngFor="let color of colors">
-      <ion-label>
+      <ion-label class="ion-text-wrap">
         <h2>{{ color.name }}</h2>
-        <ion-button [routerLink]="['/colors/detail', color.id]">
-          <ion-icon name="eye-outline"></ion-icon>
-        </ion-button>
-        <ion-button  color="warning" (click)="editColor(color.id)">
-          <ion-icon  name="pencil"></ion-icon>
-        </ion-button>
+
+        <p>
+          Estado:
+          {{ color.is_active ? 'Activo' : 'Inactivo' }}
+        </p>
+
+        <p>
+          Registro:
+          {{ color.created_at | date:'yyyy-MM-dd' }}
+        </p>
       </ion-label>
+
+      <ion-button
+        slot="end"
+        color="warning"
+        (click)="editColor(color.id)"
+      >
+        <ion-icon name="pencil"></ion-icon>
+      </ion-button>
     </ion-item>
   </ion-list>
 </ion-content>

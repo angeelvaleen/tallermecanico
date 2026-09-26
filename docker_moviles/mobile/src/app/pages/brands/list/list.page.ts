@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { ModalController } from '@ionic/angular';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
+import { FormPage } from '../form/form.page';
 
 interface Brand {
   id: number;
@@ -16,20 +18,21 @@ interface Brand {
   standalone: false,
 })
 export class ListPage implements OnInit {
-
   brands: Brand[] = [];
-  constructor() {}
 
-  ngOnInit() {
-    this.chargerBrands();
+  constructor(
+    private modalController: ModalController,
+  ) {}
+
+  ngOnInit(): void {
+    this.loadBrands();
   }
 
-  async chargerBrands():Promise<void> {
+  async loadBrands(): Promise<void> {
     try {
       const response = await axios.get<{ data: Brand[] }>(
-        `${environment.apiUrl}/brands`
+        `${environment.apiUrl}/brands`,
       );
-
 
       this.brands = response.data.data;
     } catch (error) {
@@ -37,4 +40,38 @@ export class ListPage implements OnInit {
     }
   }
 
+  async createBrand(): Promise<void> {
+    const modal = await this.modalController.create({
+      component: FormPage,
+      breakpoints: [0, 0.5, 0.95],
+      initialBreakpoint: 0.95,
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if (data?.saved) {
+      await this.loadBrands();
+    }
+  }
+
+  async editBrand(id: number): Promise<void> {
+    const modal = await this.modalController.create({
+      component: FormPage,
+      componentProps: {
+        id,
+      },
+      breakpoints: [0, 0.5, 0.95],
+      initialBreakpoint: 0.95,
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if (data?.saved) {
+      await this.loadBrands();
+    }
+  }
 }
