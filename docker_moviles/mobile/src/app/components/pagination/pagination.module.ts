@@ -2,18 +2,18 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 
-import { PaginacionComponent } from './paginacion.component';
+import { PaginationComponent } from './pagination.component';
 
 @NgModule({
   declarations: [
-    PaginacionComponent
+    PaginationComponent
   ],
   imports: [
     CommonModule,
     IonicModule
   ],
   exports: [
-    PaginacionComponent
+    PaginationComponent
   ]
 })
-export class PaginacionModule {}
+export class PaginationModule {}

@@ -3,7 +3,7 @@
 <ion-fab
   slot="fixed"
   vertical="bottom"
-  horizontal="center"
+  horizontal="end"
 >
   <ion-fab-button (click)="createColor()">
     <ion-icon name="add"></ion-icon>
@@ -36,4 +36,11 @@
       </ion-button>
     </ion-item>
   </ion-list>
+  <app-pagination
+  [total]="total"
+  [perPage]="perPage"
+  [currentPage]="currentPage"
+  [maxVisiblePage]="5"
+  (changePage)="changePage($event)"
+></app-pagination>
 </ion-content>
