@@ -8,6 +8,8 @@ import { ListPageRoutingModule } from './list-routing.module';
 
 import { ListPage } from './list.page';
 
+import { ToolbarModule } from 'src/app/components/toolbar/toolbar.module';
+
 import { FormPageModule } from '../form/form.module';
 
 @NgModule({
@@ -16,7 +18,8 @@ import { FormPageModule } from '../form/form.module';
     FormsModule,
     IonicModule,
     ListPageRoutingModule,
-    FormPageModule
+    FormPageModule,
+    ToolbarModule
   ],
   declarations: [ListPage]
 })
