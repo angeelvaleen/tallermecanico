@@ -10,6 +10,8 @@ import { ListPage } from "./list.page";
 
 import { FormPageModule } from "../form/form.module";
 
+import { ToolbarModule } from "src/app/components/toolbar/toolbar.module";
+
 @NgModule({
   imports: [
     CommonModule,
@@ -17,6 +19,7 @@ import { FormPageModule } from "../form/form.module";
     IonicModule,
     ListPageRoutingModule,
     FormPageModule,
+    ToolbarModule
   ],
   declarations: [
     ListPage,

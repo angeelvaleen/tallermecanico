@@ -8,13 +8,16 @@ import { ListPageRoutingModule } from './list-routing.module';
 
 import { ListPage } from './list.page';
 
+import { ToolbarModule } from 'src/app/components/toolbar/toolbar.module';
+
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    ListPageRoutingModule
-  ],
+    ListPageRoutingModule,
+    ToolbarModule
+    ],
   declarations: [ListPage]
 })
 export class ListPageModule {}
