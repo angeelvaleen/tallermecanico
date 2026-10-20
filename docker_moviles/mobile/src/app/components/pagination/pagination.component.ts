@@ -4,7 +4,6 @@ import {
   Input,
   Output,
   OnChanges,
-  OnInit,
 } from "@angular/core";
 
 @Component({
@@ -13,7 +12,7 @@ import {
   styleUrls: ["./pagination.component.scss"],
   standalone: false,
 })
-export class PaginationComponent implements OnInit {
+export class PaginationComponent implements OnChanges {
   @Input() total: number = 0;
   @Input() perPage: number = 10;
   @Input() currentPage: number = 1;
@@ -41,13 +40,13 @@ export class PaginationComponent implements OnInit {
 
     let start = Math.max(1, this.currentPage - middle);
 
-    let fin = Math.min(this.totalPages, start + this.maxVisiblePage - 1);
+    let end = Math.min(this.totalPages, start + this.maxVisiblePage - 1);
 
-    start = Math.max(1, fin - this.maxVisiblePage + 1);
+    start = Math.max(1, end - this.maxVisiblePage + 1);
 
     this.pageVisibles = [];
 
-    for (let page = start; page <= fin; page++) {
+    for (let page = start; page <= end; page++) {
       this.pageVisibles.push(page);
     }
   }

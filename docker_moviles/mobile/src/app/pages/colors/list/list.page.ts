@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { ModalController } from '@ionic/angular';
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
-import { FormPage } from '../form/form.page';
+import { Component, OnInit } from "@angular/core";
+import { ModalController } from "@ionic/angular";
+import axios from "axios";
+import { environment } from "src/environments/environment";
+import { FormPage } from "../form/form.page";
 
 interface Color {
   id: number;
@@ -12,20 +12,21 @@ interface Color {
 }
 
 @Component({
-  selector: 'app-colors-list',
-  templateUrl: './list.page.html',
-  styleUrls: ['./list.page.scss'],
+  selector: "app-colors-list",
+  templateUrl: "./list.page.html",
+  styleUrls: ["./list.page.scss"],
   standalone: false,
 })
-export class ListPage implements OnInit {
+export class ListPage {
+  total: number = 0;
+  currentPage: number = 1;
+  perPage: number = 5;
   colors: Color[] = [];
 
-  constructor(
-    private modalController: ModalController,
-  ) {}
+  constructor(private modalController: ModalController) {}
 
-  ngOnInit(): void {
-    this.loadColors();
+  ionViewWillEnter(): void {
+    void this.chargerData();
   }
 
   async loadColors(): Promise<void> {
@@ -36,7 +37,7 @@ export class ListPage implements OnInit {
 
       this.colors = response.data.data;
     } catch (error) {
-      console.error('Error al cargar colores:', error);
+      console.error("Error al cargar colores:", error);
     }
   }
 
@@ -73,5 +74,45 @@ export class ListPage implements OnInit {
     if (data?.saved) {
       await this.loadColors();
     }
+  }
+
+  async chargerTotal(): Promise<void> {
+    try {
+      const response = await axios.get<{ data: { count: number | string }[] }>(
+        `${environment.apiUrl}/colors?aggregate[count]=*`,
+      );
+
+      this.total = Number(response.data.data[0]?.count ?? 0);
+    } catch (error) {
+      console.error("Error al obtener el total de colores:", error);
+
+      this.total = 0;
+    }
+  }
+
+  private adjustCurrentPage(): void {
+    const totalPages = Math.ceil(this.total / this.perPage);
+
+    if (totalPages === 0) {
+      this.currentPage = 1;
+      return;
+    }
+
+    if (this.currentPage > totalPages) {
+      this.currentPage = totalPages;
+    }
+  }
+
+
+  async chargerData(): Promise<void> {
+    await this.chargerTotal();
+    this.adjustCurrentPage();
+    await this.loadColors();
+  }
+
+
+  async changePage(page: number): Promise<void> {
+    this.currentPage = page;
+    await this.loadColors();
   }
 }
