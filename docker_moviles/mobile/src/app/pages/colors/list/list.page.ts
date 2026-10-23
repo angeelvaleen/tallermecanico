@@ -22,6 +22,7 @@ export class ListPage {
   currentPage: number = 1;
   perPage: number = 5;
   colors: Color[] = [];
+  search: string = "";
 
   constructor(private modalController: ModalController) {}
 
@@ -33,6 +34,14 @@ export class ListPage {
     try {
       const response = await axios.get<{ data: Color[] }>(
         `${environment.apiUrl}/colors`,
+        {
+          params: {
+          limit: this.perPage,
+          page: this.currentPage,
+          sort: 'id',
+          ...this.searchParameters()
+          }
+        }
       );
 
       this.colors = response.data.data;
@@ -80,6 +89,7 @@ export class ListPage {
     try {
       const response = await axios.get<{ data: { count: number | string }[] }>(
         `${environment.apiUrl}/colors?aggregate[count]=*`,
+        { params: this.searchParameters() }
       );
 
       this.total = Number(response.data.data[0]?.count ?? 0);
@@ -114,5 +124,22 @@ export class ListPage {
   async changePage(page: number): Promise<void> {
     this.currentPage = page;
     await this.loadColors();
+  }
+
+   private searchParameters(): Record<string, string> {
+    const text = this.search.trim();
+    return text ? {
+      filter: JSON.stringify({
+        _or: [
+          { name: { _icontains: text } },
+        ]
+      })
+    } : {};
+  }
+
+  async handleInput(event: CustomEvent<{ value?: string | null }>): Promise<void> {
+    this.search = event.detail.value ?? '';
+    this.currentPage = 1;
+    await this.chargerData();
   }
 }
