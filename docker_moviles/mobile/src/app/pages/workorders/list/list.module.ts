@@ -11,6 +11,8 @@ import { ListPage } from "./list.page";
 import { FormPageModule } from "../form/form.module";
 
 import { ToolbarModule } from "src/app/components/toolbar/toolbar.module";
+import { PaginationModule } from "src/app/components/pagination/pagination.module";
+import { SearchbarModule } from "src/app/components/searchbar/searchbar.module";
 
 @NgModule({
   imports: [
@@ -19,7 +21,9 @@ import { ToolbarModule } from "src/app/components/toolbar/toolbar.module";
     IonicModule,
     ListPageRoutingModule,
     FormPageModule,
-    ToolbarModule
+    ToolbarModule,
+    PaginationModule,
+    SearchbarModule
   ],
   declarations: [
     ListPage,

@@ -3,6 +3,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AlertController, ModalController } from '@ionic/angular';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
+import { firstValueFrom } from 'rxjs';
+import { ColorServices } from '../../../services/colors/colors';
+
 
 interface ColorCreate {
   name: string;
@@ -40,6 +43,7 @@ export class FormPage implements OnInit {
     private formBuilder: FormBuilder,
     private alertController: AlertController,
     private modalController: ModalController,
+    private colorServices: ColorServices
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -101,25 +105,9 @@ export class FormPage implements OnInit {
 
     try {
       if (this.isEdition && this.id !== undefined) {
-        await axios.patch(
-          `${environment.apiUrl}/colors/${this.id}`,
-          color,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          },
-        );
+        await firstValueFrom(this.colorServices.update(this.id,color));
       } else {
-        await axios.post(
-          `${environment.apiUrl}/colors`,
-          color,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          },
-        );
+        await firstValueFrom(this.colorServices.create(color));
       }
 
       await this.showAlert(
@@ -159,11 +147,7 @@ export class FormPage implements OnInit {
     this.loading = true;
 
     try {
-      const response = await axios.get<{ data: ColorDetail }>(
-        `${environment.apiUrl}/colors/${this.id}`,
-      );
-
-      const color = response.data.data;
+      const color = await firstValueFrom(this.colorServices.detail(this.id));
 
       this.colorForm.patchValue({
         name: color.name,

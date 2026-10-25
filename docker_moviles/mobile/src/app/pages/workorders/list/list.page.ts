@@ -3,10 +3,10 @@ import {
   AlertController,
   ModalController,
 } from "@ionic/angular";
-import axios from "axios";
-import { environment } from "src/environments/environment";
 
 import { FormPage } from "../form/form.page";
+import { firstValueFrom } from 'rxjs';
+import { WorkorderServices } from "src/app/services/workorders/workorders";
 
 interface Workorder {
   id: number;
@@ -24,31 +24,26 @@ interface Workorder {
   styleUrls: ["./list.page.scss"],
   standalone: false,
 })
-export class ListPage implements OnInit {
+export class ListPage {
   workorders: Workorder[] = [];
+  total: number = 0;
+  currentPage: number = 1;
+  perPage: number = 5;
+  search: string = "";
 
   constructor(
     private modalController: ModalController,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private workorderServices: WorkorderServices,
   ) {}
 
-  ngOnInit(): void {
-    this.loadWorkorders();
-  }
-
   async ionViewWillEnter(): Promise<void> {
-    await this.loadWorkorders();
+    await this.chargerData();
   }
 
   async loadWorkorders(): Promise<void> {
     try {
-      const response =
-        await axios.get<{ data: Workorder[] }>(
-          `${environment.apiUrl}/workorders`
-        );
-
-      this.workorders =
-        response.data.data;
+      this.workorders = await firstValueFrom(this.workorderServices.list(this.currentPage,this.perPage,this.search));
     } catch (error) {
       console.error(
         "Error al cargar órdenes de trabajo:",
@@ -128,5 +123,48 @@ export class ListPage implements OnInit {
     if (data?.saved) {
       await this.loadWorkorders();
     }
+  }
+
+  async chargerTotal(): Promise<void> {
+    try {
+      this.total = await firstValueFrom(this.workorderServices.total(this.search)); 
+    } catch (error) {
+      console.error("Error al obtener el total de servicios:", error);
+
+      this.total = 0;
+    }
+  }
+
+  private adjustCurrentPage(): void {
+    const totalPages = Math.ceil(this.total / this.perPage);
+
+    if (totalPages === 0) {
+      this.currentPage = 1;
+      return;
+    }
+
+    if (this.currentPage > totalPages) {
+      this.currentPage = totalPages;
+    }
+  }
+
+
+  async chargerData(): Promise<void> {
+    await this.chargerTotal();
+    this.adjustCurrentPage();
+    await this.loadWorkorders();
+  }
+
+
+  async changePage(page: number): Promise<void> {
+    this.currentPage = page;
+    await this.loadWorkorders();
+  }
+
+
+  async handleInput(text: string): Promise<void> {
+    this.search = text;
+    this.currentPage = 1;
+    await this.chargerData();
   }
 }

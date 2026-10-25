@@ -1,0 +1,19 @@
+
+.searchbar-custom {
+  --background: var(--ion-card-background, #ffffff);
+  --color: var(--ion-text-color, #1e293b);
+  --placeholder-color: #94a3b8;
+  --icon-color: #64748b;
+  --clear-button-color: #64748b;
+
+  --border-radius: 16px;
+  --box-shadow: 0 3px 12px rgba(15, 23, 42, 0.05);
+
+  padding: 8px 16px 14px;
+  transition: box-shadow 0.2s ease;
+}
+
+.searchbar-custom:focus-within {
+  --box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25),
+                0 4px 14px rgba(15, 23, 42, 0.06);
+}

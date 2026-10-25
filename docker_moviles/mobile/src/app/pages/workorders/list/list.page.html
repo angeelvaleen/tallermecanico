@@ -1,6 +1,12 @@
 <app-toolbar name="Ordenes de trabajo" color="dark"></app-toolbar>
 
 <ion-content>
+  <app-searchbar
+    [value]="search"
+    placeholder="Buscar servicio"
+    [debounce]="300"
+    (changeText)="handleInput($event)">
+  </app-searchbar>
 
   <ion-list>
 
@@ -72,5 +78,13 @@
     </ion-fab-button>
 
   </ion-fab>
+
+  <app-pagination
+  [total]="total"
+  [perPage]="perPage"
+  [currentPage]="currentPage"
+  [maxVisiblePage]="5"
+  (changePage)="changePage($event)"
+  ></app-pagination>
 
 </ion-content>

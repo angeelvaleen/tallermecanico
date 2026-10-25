@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
+import { firstValueFrom } from 'rxjs';
 import { FormPage } from '../form/form.page';
+import { BrandServices } from 'src/app/services/brands/brands';
 
 interface Brand {
   id: number;
@@ -22,6 +22,7 @@ export class ListPage implements OnInit {
 
   constructor(
     private modalController: ModalController,
+    private brandService: BrandServices,
   ) {}
 
   ngOnInit(): void {
@@ -30,11 +31,8 @@ export class ListPage implements OnInit {
 
   async loadBrands(): Promise<void> {
     try {
-      const response = await axios.get<{ data: Brand[] }>(
-        `${environment.apiUrl}/brands`,
-      );
-
-      this.brands = response.data.data;
+      
+      this.brands = await firstValueFrom(this.brandService.listWithOutFilters());
     } catch (error) {
       console.error('Error al cargar marcas:', error);
     }

@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
 import { FormPage } from '../form/form.page';
+
+import { firstValueFrom } from 'rxjs';
+import { VehicleServices } from 'src/app/services/vehicles/vehicles';
 
 interface Vehicle {
   id: number;
@@ -25,28 +26,27 @@ interface Vehicle {
   styleUrls: ['./list.page.scss'],
   standalone: false,
 })
-export class ListPage implements OnInit {
+export class ListPage {
 
   vehicles: Vehicle[] = [];
+  total: number = 0;
+  currentPage: number = 1;
+  perPage: number = 5;
+  search: string = "";
 
   constructor(
     private modalController: ModalController,
+    private vehicleServices: VehicleServices,
   ) {}
 
-  ngOnInit(): void {
-    this.loadVehicles();
+  ionViewWillEnter(): void {
+   void this.chargerData();
   }
 
   async loadVehicles(): Promise<void> {
 
     try {
-
-      const response = await axios.get<{ data: Vehicle[] }>(
-        `${environment.apiUrl}/vehicles`
-      );
-
-      this.vehicles = response.data.data;
-
+      this.vehicles = await firstValueFrom(this.vehicleServices.list(this.currentPage,this.perPage,this.search));
     } catch (error) {
 
       console.log(
@@ -92,4 +92,49 @@ export class ListPage implements OnInit {
       await this.loadVehicles();
     }
   }
+
+  async chargerTotal(): Promise<void> {
+    try {
+      this.total = await firstValueFrom(this.vehicleServices.total(this.search)); 
+    } catch (error) {
+      console.error("Error al obtener el total de servicios:", error);
+
+      this.total = 0;
+    }
+  }
+
+  private adjustCurrentPage(): void {
+    const totalPages = Math.ceil(this.total / this.perPage);
+
+    if (totalPages === 0) {
+      this.currentPage = 1;
+      return;
+    }
+
+    if (this.currentPage > totalPages) {
+      this.currentPage = totalPages;
+    }
+  }
+
+
+  async chargerData(): Promise<void> {
+    await this.chargerTotal();
+    this.adjustCurrentPage();
+    await this.loadVehicles();
+  }
+
+
+  async changePage(page: number): Promise<void> {
+    this.currentPage = page;
+    await this.loadVehicles();
+  }
+
+
+  async handleInput(text: string): Promise<void> {
+    this.search = text;
+    this.currentPage = 1;
+    await this.chargerData();
+  }
+
+
 }

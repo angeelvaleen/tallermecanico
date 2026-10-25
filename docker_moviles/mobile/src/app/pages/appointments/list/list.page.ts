@@ -1,8 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { AlertController, ModalController } from "@ionic/angular";
-import axios from "axios";
-import { environment } from "src/environments/environment";
-
+import { firstValueFrom } from 'rxjs';
+import { AppointmentServices } from '../../../services/appointments/appointments';
 import { FormPage } from "../form/form.page";
 import { ConfirmPage } from "../confirm/confirm.page";
 
@@ -22,29 +21,27 @@ interface Appointment {
   styleUrls: ["./list.page.scss"],
   standalone: false,
 })
-export class ListPage implements OnInit {
+export class ListPage  {
   appointments: Appointment[] = [];
+  total: number = 0;
+  currentPage: number = 1;
+  perPage: number = 5;
+  search: string = "";
+  selectedDate: string | null = null;
 
   constructor(
     private modalController: ModalController,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private appointmentServices: AppointmentServices,
   ) {}
 
-  ngOnInit(): void {
-    this.loadAppointments();
-  }
-
-  async ionViewWillEnter(): Promise<void> {
-    await this.loadAppointments();
+  ionViewWillEnter(): void {
+    void this.chargerData();
   }
 
   async loadAppointments(): Promise<void> {
     try {
-      const response = await axios.get<{ data: Appointment[] }>(
-        `${environment.apiUrl}/appointments`
-      );
-
-      this.appointments = response.data.data;
+      this.appointments = await firstValueFrom(this.appointmentServices.list(this.currentPage,this.perPage,this.search));
     } catch (error) {
       console.error("Error al cargar citas:", error);
 
@@ -200,12 +197,7 @@ export class ListPage implements OnInit {
 
   private async executeCancelAppointment(id: number): Promise<void> {
     try {
-      await axios.patch(
-        `${environment.apiUrl}/appointments/${id}`,
-        {
-          status_id: 3,
-        }
-      );
+      await firstValueFrom(this.appointmentServices.executeCancelAppointment(id));
 
       const alert = await this.alertController.create({
         header: "Cita cancelada",
@@ -215,7 +207,7 @@ export class ListPage implements OnInit {
 
       await alert.present();
 
-      await this.loadAppointments();
+      await this.chargerData();
     } catch (error) {
       console.error("Error al cancelar cita:", error);
 
@@ -228,4 +220,48 @@ export class ListPage implements OnInit {
       await alert.present();
     }
   }
+
+  async chargerTotal(): Promise<void> {
+    try {
+      this.total = await firstValueFrom(this.appointmentServices.total(this.search)); 
+    } catch (error) {
+      console.error("Error al obtener el total de citas:", error);
+
+      this.total = 0;
+    }
+  }
+
+  private adjustCurrentPage(): void {
+    const totalPages = Math.ceil(this.total / this.perPage);
+
+    if (totalPages === 0) {
+      this.currentPage = 1;
+      return;
+    }
+
+    if (this.currentPage > totalPages) {
+      this.currentPage = totalPages;
+    }
+  }
+
+
+  async chargerData(): Promise<void> {
+    await this.chargerTotal();
+    this.adjustCurrentPage();
+    await this.loadAppointments();
+  }
+
+
+  async changePage(page: number): Promise<void> {
+    this.currentPage = page;
+    await this.loadAppointments();
+  }
+
+
+  async handleInput(text: string): Promise<void> {
+    this.search = text;
+    this.currentPage = 1;
+    await this.chargerData();
+  }
+  
 }

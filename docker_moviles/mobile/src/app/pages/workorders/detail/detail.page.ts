@@ -14,12 +14,25 @@ import { FormPage as QuoteFormPage } from "../../quotes/form/form.page";
 
 interface Workorder {
   id: number;
-  vehicle_id: number;
-  mechanic_id: number;
-  status_id: number;
+  vehicle_id: Vehicle;
+  mechanic_id: User;
+  status_id: Status;
   mileage: number;
   delivery: string;
   created_at: string;
+}
+
+interface User {
+  name:string;
+}
+
+interface Vehicle {
+  plate: string;
+}
+
+interface Status {
+  id: number;
+  name: string;
 }
 
 interface Diagnosis {
@@ -111,10 +124,11 @@ export class DetailPage implements OnInit {
 
     try {
       const response = await axios.get<{ data: Workorder }>(
-        `${environment.apiUrl}/workorders/${encodeURIComponent(id)}`,
+        `${environment.apiUrl}/workorders/${encodeURIComponent(id)}?fields=*,mechanic_id.name,status_id.name,status_id.id,vehicle_id.plate`,
       );
 
       this.workorder = response.data.data;
+      console.log(this.workorder);
 
       await Promise.all([
         this.chargerDiagnoses(),

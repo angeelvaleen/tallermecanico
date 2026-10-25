@@ -11,6 +11,8 @@ import { ListPage } from "./list.page";
 import { ToolbarModule } from "src/app/components/toolbar/toolbar.module";
 import { FormPageModule } from "../form/form.module";
 import { ConfirmPageModule } from "../confirm/confirm.module";
+import { PaginationModule } from "src/app/components/pagination/pagination.module";
+import { SearchbarModule } from "src/app/components/searchbar/searchbar.module";
 
 @NgModule({
   imports: [
@@ -21,6 +23,8 @@ import { ConfirmPageModule } from "../confirm/confirm.module";
     FormPageModule,
     ConfirmPageModule,
     ToolbarModule,
+    PaginationModule,
+    SearchbarModule
   ],
   declarations: [ListPage],
 })

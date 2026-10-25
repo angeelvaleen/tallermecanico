@@ -11,6 +11,12 @@
 </ion-fab>
 
 <ion-content>
+  <app-searchbar
+    [value]="search"
+    placeholder="Buscar por nombre o marca"
+    [debounce]="300"
+    (changeText)="handleInput($event)">
+  </app-searchbar>
   <ion-list>
     <ion-item *ngFor="let model of models">
       <ion-label class="ion-text-wrap">
@@ -24,11 +30,6 @@
         <p>
           Estado:
           {{ model.is_active ? 'Activo' : 'Inactivo' }}
-        </p>
-
-        <p>
-          Registro:
-          {{ model.created_at | date:'yyyy-MM-dd' }}
         </p>
       </ion-label>
 
@@ -49,4 +50,11 @@
       </ion-button>
     </ion-item>
   </ion-list>
+  <app-pagination
+  [total]="total"
+  [perPage]="perPage"
+  [currentPage]="currentPage"
+  [maxVisiblePage]="5"
+  (changePage)="changePage($event)"
+  ></app-pagination>
 </ion-content>

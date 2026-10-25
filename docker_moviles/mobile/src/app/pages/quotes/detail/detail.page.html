@@ -54,7 +54,13 @@
 
         <p>
           <strong>Estado:</strong>
-          {{ quote.status_id.name }}
+          {{
+          quote.status_id.id == 9
+            ? 'Pendiente'
+              : quote.status_id.id == 10
+                ? 'Aceptada'
+                  : 'Rechazada'
+        }}
         </p>
 
         <p>
