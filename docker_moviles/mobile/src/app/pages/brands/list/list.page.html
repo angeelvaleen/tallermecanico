@@ -1,14 +1,11 @@
-<app-toolbar name="Marcas" color="dark"></app-toolbar>
+<app-toolbar name="Marcas" color="primary">
+  <ion-buttons slot="end">
+    <ion-button fill="primary" (click)="createBrand()" aria-label="Nuevo couta">
+      <ion-icon slot="icon-only" name="add"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</app-toolbar>
 
-<ion-fab
-  slot="fixed"
-  vertical="bottom"
-  horizontal="center"
->
-  <ion-fab-button (click)="createBrand()">
-    <ion-icon name="add"></ion-icon>
-  </ion-fab-button>
-</ion-fab>
 
 <ion-content>
   <ion-list>

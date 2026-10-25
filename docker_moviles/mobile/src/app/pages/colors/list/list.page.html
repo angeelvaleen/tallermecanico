@@ -1,14 +1,11 @@
-<app-toolbar name="Colores" color="dark"></app-toolbar>
+<app-toolbar name="Colores" color="primary">
+  <ion-buttons slot="end">
+    <ion-button fill="primary" (click)="createColor()" aria-label="Nuevo couta">
+      <ion-icon slot="icon-only" name="add"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</app-toolbar>
 
-<ion-fab
-  slot="fixed"
-  vertical="bottom"
-  horizontal="end"
->
-  <ion-fab-button (click)="createColor()">
-    <ion-icon name="add"></ion-icon>
-  </ion-fab-button>
-</ion-fab>
 
 <ion-content>
    <ion-searchbar [value]="search" [debounce]="300" (ionInput)="handleInput($event)" placeholder="Buscar colores" aria-label="Buscar colores"></ion-searchbar>

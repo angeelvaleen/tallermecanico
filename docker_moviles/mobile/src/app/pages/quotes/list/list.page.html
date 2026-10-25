@@ -1,10 +1,10 @@
-<app-toolbar name="Cotizaciones" color="dark"></app-toolbar>
-
-<ion-fab slot="fixed" vertical="bottom" horizontal="center">
-    <ion-fab-button (click)="createQuote()">
-        <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-</ion-fab>
+<app-toolbar name="Cotizaciones" color="primary">
+   <ion-buttons slot="end">
+    <ion-button fill="primary" (click)="createQuote()" aria-label="Nuevo couta">
+      <ion-icon slot="icon-only" name="add"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</app-toolbar>
 
 <ion-content>
   <app-searchbar

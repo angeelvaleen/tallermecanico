@@ -1,4 +1,10 @@
-<app-toolbar name="Citas" color="dark"></app-toolbar>
+<app-toolbar name="Citas" color="primary">
+  <ion-buttons slot="end">
+    <ion-button fill="primary" (click)="createAppointment()" aria-label="Nueva cita">
+      <ion-icon slot="icon-only" name="add"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</app-toolbar>
 
 <ion-content>
   <app-searchbar
@@ -70,15 +76,6 @@
 
   </ion-list>
 
-  <ion-fab
-    slot="fixed"
-    vertical="bottom"
-    horizontal="center"
-  >
-    <ion-fab-button (click)="createAppointment()">
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
 
   <app-pagination
   [total]="total"

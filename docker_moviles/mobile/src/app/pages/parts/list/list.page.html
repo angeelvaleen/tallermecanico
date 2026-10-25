@@ -1,14 +1,10 @@
-<app-toolbar name="Refacciones" color="dark"></app-toolbar>
-
-<ion-fab
-  slot="fixed"
-  vertical="bottom"
-  horizontal="center"
->
-  <ion-fab-button (click)="createPart()">
-    <ion-icon name="add"></ion-icon>
-  </ion-fab-button>
-</ion-fab>
+<app-toolbar name="Refacciones" color="primary">
+  <ion-buttons slot="end">
+    <ion-button fill="primary" (click)="createPart()" aria-label="Nuevo refaccion">
+      <ion-icon slot="icon-only" name="add"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</app-toolbar>
 
 <ion-content>
 
