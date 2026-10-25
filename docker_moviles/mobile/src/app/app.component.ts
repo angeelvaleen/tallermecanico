@@ -16,7 +16,14 @@ export class AppComponent {
     { path: "/parts/list", text: "Refacciones" },
     { path: "/services/list", text: "Servicios" },
     { path: "/vehicles/list", text: "Vehiculos" },
+    { path: "/quotes/list", text: "Coutas" },
+    { path: "/workorders/list", text: "Ordenes" },
+    { path: "/appointments/list", text: "Citas" },
+    { path: "/payment/list", text: "Pagos" },
     { path: "/methods/list", text: "Metodos de pago" },
+    { path: "/diagnoses/list", text: "Diagnosticos" },
+
+
 
   ];
 }

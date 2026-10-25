@@ -1,10 +1,10 @@
-<app-toolbar name="Diagnosticos" color="dark"></app-toolbar>
-
-<ion-fab slot="fixed" vertical="bottom" horizontal="center">
-  <ion-fab-button (click)="createDiagnosis()">
-    <ion-icon name="add"></ion-icon>
-  </ion-fab-button>
-</ion-fab>
+<app-toolbar name="Diagnosticos" color="primary">
+  <ion-buttons slot="end">
+    <ion-button fill="primary" (click)="createDiagnosis()" aria-label="Nuevo diagnostico">
+      <ion-icon slot="icon-only" name="add"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</app-toolbar>
 
 <ion-content>
   <ion-list>
@@ -17,27 +17,16 @@
         <p>
           {{ diagnosis.description }}
         </p>
-
-        <p>
-          Resultado:
-          {{ diagnosis.result || 'Sin resultado' }}
-        </p>
-
-        <p>
-          Registrado:
-          {{ diagnosis.created_at | date:'yyyy-MM-dd' }}
-        </p>
       </ion-label>
 
       <ion-button
         [routerLink]="['/diagnoses/detail', diagnosis.id]"
-        fill="clear"
       >
         <ion-icon name="eye-outline"></ion-icon>
       </ion-button>
 
       <ion-button
-        fill="clear"
+        color="tertiary"
         (click)="editDiagnosis(diagnosis.id)"
       >
         <ion-icon name="create-outline"></ion-icon>

@@ -1,14 +1,12 @@
-<app-toolbar name="Modelos" color="dark"></app-toolbar>
+<app-toolbar name="Modelos" color="primary">
+  <ion-buttons slot="end">
+    <ion-button fill="primary" (click)="createModel()" aria-label="Nuevo modelo">
+      <ion-icon slot="icon-only" name="add"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</app-toolbar>
 
-<ion-fab
-  slot="fixed"
-  vertical="bottom"
-  horizontal="center"
->
-  <ion-fab-button (click)="createModel()">
-    <ion-icon name="add"></ion-icon>
-  </ion-fab-button>
-</ion-fab>
+
 
 <ion-content>
   <app-searchbar

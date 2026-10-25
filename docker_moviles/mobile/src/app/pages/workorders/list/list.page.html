@@ -1,4 +1,10 @@
-<app-toolbar name="Ordenes de trabajo" color="dark"></app-toolbar>
+<app-toolbar name="Ordenes de trabajo" color="primary">
+  <ion-buttons slot="end">
+    <ion-button fill="primary" (click)="createWorkorder()" aria-label="Nuevo orden">
+      <ion-icon slot="icon-only" name="add"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</app-toolbar>
 
 <ion-content>
   <app-searchbar
@@ -61,23 +67,6 @@
     </ion-item>
 
   </ion-list>
-
-
-  <ion-fab
-    slot="fixed"
-    vertical="bottom"
-    horizontal="center"
-  >
-
-    <ion-fab-button
-      (click)="createWorkorder()"
-    >
-      <ion-icon
-        name="add"
-      ></ion-icon>
-    </ion-fab-button>
-
-  </ion-fab>
 
   <app-pagination
   [total]="total"
