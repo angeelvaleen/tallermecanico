@@ -45,18 +45,25 @@
       <ion-card-content>
 
         <p>
-          <strong>Vehículo ID:</strong>
-          {{ workorder.vehicle_id }}
+          <strong>Vehículo:</strong>
+          {{ workorder.vehicle_id.plate }}
         </p>
 
         <p>
-          <strong>Mecánico ID:</strong>
-          {{ workorder.mechanic_id }}
+          <strong>Mecánico:</strong>
+          {{ workorder.mechanic_id.name }}
         </p>
 
         <p>
-          <strong>Estado ID:</strong>
-          {{ workorder.status_id }}
+          <strong>Estado:</strong>
+          <span [ngSwitch]="workorder.status_id.id">
+            <span *ngSwitchCase="4">Recibido</span>
+            <span *ngSwitchCase="5">En Diagnostico</span>
+            <span *ngSwitchCase="6">Reparando</span>
+            <span *ngSwitchCase="7">Listo</span>
+            <span *ngSwitchCase="8">Entregado</span>
+            <span *ngSwitchDefault>Desconocido</span>
+          </span>
         </p>
 
         <p>
@@ -71,7 +78,7 @@
 
         <p>
           <strong>Registro:</strong>
-          {{ workorder.created_at | date:'yyyy-MM-dd' }}
+          {{ workorder.created_at|date: 'yyyy-MM-dd' }}
         </p>
 
       </ion-card-content>
@@ -139,7 +146,7 @@
 
               <p>
                 <strong>Fecha:</strong>
-                {{ diagnosis.created_at | date:'yyyy-MM-dd' }}
+                {{ diagnosis.created_at|date: 'yyyy-MM-dd' }}
               </p>
 
             </ion-label>
@@ -234,7 +241,7 @@
               </p>
 
               <p>
-                {{ evidence.created_at | date:'yyyy-MM-dd' }}
+                {{ evidence.created_at|date: 'yyyy-MM-dd' }}
               </p>
 
             </ion-label>
@@ -310,7 +317,7 @@
 
               <p>
                 <strong>Fecha:</strong>
-                {{ quote.created_at | date:'yyyy-MM-dd' }}
+                {{ quote.created_at|date: 'yyyy-MM-dd' }}
               </p>
 
               <p>
@@ -320,17 +327,17 @@
 
               <p>
                 <strong>Subtotal:</strong>
-                {{ quote.subtotal | number:'1.2-2' }}
+                {{ quote.subtotal|number: '1.2-2' }}
               </p>
 
               <p>
                 <strong>Impuesto:</strong>
-                {{ quote.tax | number:'1.2-2' }}
+                {{ quote.tax|number: '1.2-2' }}
               </p>
 
               <p>
                 <strong>Total:</strong>
-                {{ quote.total | number:'1.2-2' }}
+                {{ quote.total|number: '1.2-2' }}
               </p>
 
               <ion-badge

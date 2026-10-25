@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import axios from 'axios';
-import { environment } from '../../../../environments/environment';
+import { firstValueFrom } from 'rxjs';
+import { QuoteServices } from 'src/app/services/quotes/quotes';
 import { FormPage } from '../form/form.page';
 
 interface Quote {
@@ -16,29 +16,43 @@ interface Quote {
   created_at:string;
 }
 
+interface SavingQuote {
+  workorder_id: number;
+  user_id:number;
+  status_id:number;
+  subtotal:number;
+  tax:number;
+  total: number;
+  validity: string;
+
+}
+
 @Component({
   selector: 'app-quotes-list',
   templateUrl: './list.page.html',
   styleUrls: ['./list.page.scss'],
   standalone: false,
 })
-export class ListPage implements OnInit {
+export class ListPage  {
   quotes: Quote[] = [];
+  total: number = 0;
+  currentPage: number = 1;
+  perPage: number = 5;
+  search: string = "";
 
   constructor(
     private modalController:ModalController,
+    private quoteServices: QuoteServices,
   ) {}
 
-  ngOnInit() {
-    this.chargerQuotes();
+  ionViewWillEnter() {
+    this.chargerData();
   }
 
-  async chargerQuotes(): Promise<void> {
+  async loadQuotes(): Promise<void> {
     try {
-      const response = await axios.get<{ data: Quote[] }>(
-        `${environment.apiUrl}/quotes`
-      );
-      this.quotes = response.data.data;
+      
+      this.quotes = await firstValueFrom(this.quoteServices.list(this.currentPage,this.perPage,this.search))
     } catch (error) {
       console.log('Error al cargar cotizaciones', error);
     }
@@ -56,8 +70,50 @@ export class ListPage implements OnInit {
         const { data } = await modal.onDidDismiss();
     
         if(data?.saved){
-          await this.chargerQuotes();
+          await this.loadQuotes();
         }
-    
     }
+
+    async chargerTotal(): Promise<void> {
+    try {
+      this.total = await firstValueFrom(this.quoteServices.total(this.search)); 
+    } catch (error) {
+      console.error("Error al obtener el total de coutas:", error);
+
+      this.total = 0;
+    }
+  }
+
+  private adjustCurrentPage(): void {
+    const totalPages = Math.ceil(this.total / this.perPage);
+
+    if (totalPages === 0) {
+      this.currentPage = 1;
+      return;
+    }
+
+    if (this.currentPage > totalPages) {
+      this.currentPage = totalPages;
+    }
+  }
+
+
+  async chargerData(): Promise<void> {
+    await this.chargerTotal();
+    this.adjustCurrentPage();
+    await this.loadQuotes();
+  }
+
+
+  async changePage(page: number): Promise<void> {
+    this.currentPage = page;
+    await this.loadQuotes();
+  }
+
+
+  async handleInput(text: string): Promise<void> {
+    this.search = text;
+    this.currentPage = 1;
+    await this.chargerData();
+  }
 }

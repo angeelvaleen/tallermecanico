@@ -11,7 +11,12 @@
 </ion-fab>
 
 <ion-content>
-
+  <app-searchbar
+    [value]="search"
+    placeholder="Buscar servicio"
+    [debounce]="300"
+    (changeText)="handleInput($event)">
+  </app-searchbar>
   <ion-list>
 
     <ion-item *ngFor="let vehicle of vehicles">
@@ -40,5 +45,12 @@
     </ion-item>
 
   </ion-list>
+  <app-pagination
+  [total]="total"
+  [perPage]="perPage"
+  [currentPage]="currentPage"
+  [maxVisiblePage]="5"
+  (changePage)="changePage($event)"
+  ></app-pagination>
 
 </ion-content>

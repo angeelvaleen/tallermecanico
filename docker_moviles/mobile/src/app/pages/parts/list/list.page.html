@@ -12,6 +12,13 @@
 
 <ion-content>
 
+  <app-searchbar
+    [value]="search"
+    placeholder="Buscar refaccion"
+    [debounce]="300"
+    (changeText)="handleInput($event)">
+  </app-searchbar>
+
   <ion-list>
 
     <ion-item *ngFor="let part of parts">
@@ -40,5 +47,12 @@
     </ion-item>
 
   </ion-list>
+  <app-pagination
+  [total]="total"
+  [perPage]="perPage"
+  [currentPage]="currentPage"
+  [maxVisiblePage]="5"
+  (changePage)="changePage($event)"
+  ></app-pagination>
 
 </ion-content>

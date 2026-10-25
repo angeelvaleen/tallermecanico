@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
 import { FormPage } from '../form/form.page';
+import { firstValueFrom } from 'rxjs';
+import { BrandServices } from 'src/app/services/brands/brands';
+import { ModelServices } from 'src/app/services/models/models';
 
 interface Model {
   id: number;
@@ -24,26 +25,29 @@ interface Brand {
   styleUrls: ['./list.page.scss'],
   standalone: false,
 })
-export class ListPage implements OnInit {
+export class ListPage {
+
+  total: number = 0;
+  currentPage: number = 1;
+  perPage: number = 5;
+  search: string = "";
+
   models: Model[] = [];
   brands: Brand[] = [];
 
   constructor(
     private modalController: ModalController,
+    private brandServices: BrandServices,
+    private modelServices: ModelServices
   ) {}
 
-  async ngOnInit(): Promise<void> {
-    await this.loadBrands();
-    await this.loadModels();
+  async ionViewWillEnter(): Promise<void> {
+    this.chargerData();
   }
 
   async loadBrands(): Promise<void> {
     try {
-      const response = await axios.get<{ data: Brand[] }>(
-        `${environment.apiUrl}/brands`,
-      );
-
-      this.brands = response.data.data;
+      this.brands = await firstValueFrom(this.brandServices.listWithOutFilters()) //this.currentPage,this.perPage,this.search
     } catch (error) {
       console.error('Error al cargar marcas:', error);
     }
@@ -51,11 +55,7 @@ export class ListPage implements OnInit {
 
   async loadModels(): Promise<void> {
     try {
-      const response = await axios.get<{ data: Model[] }>(
-        `${environment.apiUrl}/models`,
-      );
-
-      this.models = response.data.data;
+      this.models = await firstValueFrom(this.modelServices.list(this.currentPage,this.perPage,this.search))
     } catch (error) {
       console.error('Error al cargar modelos:', error);
     }
@@ -102,5 +102,47 @@ export class ListPage implements OnInit {
     if (data?.saved) {
       await this.loadModels();
     }
+  }
+
+  async chargerTotal(): Promise<void> {
+    try {
+      this.total = await firstValueFrom(this.modelServices.total(this.search)); 
+    } catch (error) {
+      console.error("Error al obtener el total de modelos:", error);
+
+      this.total = 0;
+    }
+  }
+
+  private adjustCurrentPage(): void {
+    const totalPages = Math.ceil(this.total / this.perPage);
+
+    if (totalPages === 0) {
+      this.currentPage = 1;
+      return;
+    }
+
+    if (this.currentPage > totalPages) {
+      this.currentPage = totalPages;
+    }
+  }
+
+  async chargerData(): Promise<void> {
+    await this.chargerTotal();
+    this.adjustCurrentPage();
+    await this.loadBrands();
+    await this.loadModels();
+  }
+
+  async changePage(page: number): Promise<void> {
+    this.currentPage = page;
+    await this.loadBrands();
+    await this.loadModels();
+  }
+
+  async handleInput(text:string): Promise<void> {
+    this.search = text;
+    this.currentPage = 1;
+    await this.chargerData();
   }
 }

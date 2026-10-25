@@ -1,8 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { ModalController } from "@ionic/angular";
-import axios from "axios";
-import { environment } from "src/environments/environment";
 import { FormPage } from "../form/form.page";
+import { firstValueFrom } from 'rxjs';
+import { ColorServices } from '../../../services/colors/colors';
 
 interface Color {
   id: number;
@@ -24,7 +24,10 @@ export class ListPage {
   colors: Color[] = [];
   search: string = "";
 
-  constructor(private modalController: ModalController) {}
+  constructor(
+    private modalController: ModalController,
+    private colorServices: ColorServices,
+  ) {}
 
   ionViewWillEnter(): void {
     void this.chargerData();
@@ -32,19 +35,7 @@ export class ListPage {
 
   async loadColors(): Promise<void> {
     try {
-      const response = await axios.get<{ data: Color[] }>(
-        `${environment.apiUrl}/colors`,
-        {
-          params: {
-          limit: this.perPage,
-          page: this.currentPage,
-          sort: 'id',
-          ...this.searchParameters()
-          }
-        }
-      );
-
-      this.colors = response.data.data;
+      this.colors = await firstValueFrom(this.colorServices.list(this.currentPage, this.perPage, this.search));
     } catch (error) {
       console.error("Error al cargar colores:", error);
     }
@@ -87,12 +78,7 @@ export class ListPage {
 
   async chargerTotal(): Promise<void> {
     try {
-      const response = await axios.get<{ data: { count: number | string }[] }>(
-        `${environment.apiUrl}/colors?aggregate[count]=*`,
-        { params: this.searchParameters() }
-      );
-
-      this.total = Number(response.data.data[0]?.count ?? 0);
+      this.total = await firstValueFrom(this.colorServices.total(this.search)); 
     } catch (error) {
       console.error("Error al obtener el total de colores:", error);
 
@@ -126,16 +112,6 @@ export class ListPage {
     await this.loadColors();
   }
 
-   private searchParameters(): Record<string, string> {
-    const text = this.search.trim();
-    return text ? {
-      filter: JSON.stringify({
-        _or: [
-          { name: { _icontains: text } },
-        ]
-      })
-    } : {};
-  }
 
   async handleInput(event: CustomEvent<{ value?: string | null }>): Promise<void> {
     this.search = event.detail.value ?? '';
