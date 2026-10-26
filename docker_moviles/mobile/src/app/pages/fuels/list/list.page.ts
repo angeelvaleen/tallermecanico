@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
+import { FuelServices } from 'src/app/services/fuels/fuels';
+import { firstValueFrom } from 'rxjs';
 import { FormPage } from '../form/form.page';
 
 interface Fuel {
@@ -22,6 +22,7 @@ export class ListPage implements OnInit {
 
   constructor(
     private modalController: ModalController,
+    private fuelServices: FuelServices,
   ) {}
 
   ngOnInit(): void {
@@ -30,11 +31,9 @@ export class ListPage implements OnInit {
 
   async loadFuels(): Promise<void> {
     try {
-      const response = await axios.get<{ data: Fuel[] }>(
-        `${environment.apiUrl}/fuels`,
-      );
+      
 
-      this.fuels = response.data.data;
+      this.fuels = await firstValueFrom(this.fuelServices.listWithOutFilters());
     } catch (error) {
       console.error('Error al cargar combustibles:', error);
     }
