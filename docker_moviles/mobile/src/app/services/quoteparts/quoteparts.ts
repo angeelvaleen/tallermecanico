@@ -4,7 +4,7 @@ import axios from 'axios';
 import { environment } from 'src/environments/environment';
 
 
-interface SavingQuotePart {
+export interface SavingQuotePart {
   quote_id: number;
   part_id: number;
   quantity: number;
@@ -14,7 +14,7 @@ interface SavingQuotePart {
   is_approved: boolean;
 }
 
-interface QuotePart {
+export interface QuotePart {
   id: number;
   part_id: any;
   quantity: number;
@@ -25,7 +25,7 @@ interface QuotePart {
 }
 
 @Injectable({ providedIn: 'root' })
-export class QuoteitemServices {
+export class QuotepartServices {
   private url = environment.apiUrl + '/quoteparts';
 
   private filter(search: string): Record<string, string> {
@@ -36,24 +36,32 @@ export class QuoteitemServices {
     ] }) } : {};
   }
 
-  list(page = 1, perPage = 3, search = ''): Observable<QuoteItem[]> {
-    return defer(() => axios.get<{ data: QuoteItem[] }>(this.url, {
+  list(page = 1, perPage = 3, search = ''): Observable<QuotePart[]> {
+    return defer(() => axios.get<{ data: QuotePart[] }>(this.url, {
       params: { page: page, limit: perPage, sort: 'id', ...this.filter(search) }
     })).pipe(map(response => response.data.data));
   }
 
-  detail(id: number): Observable<QuoteItem> {
-    return defer(() => axios.get<{ data: QuoteItem }>(this.url + '/' + id))
+  ofQuote(id: number): Observable<QuotePart[]> {
+      return defer(() =>
+        axios.get<{ data: QuotePart[] }>(
+          `${this.url}?filter[quote_id][_eq]=${id}&fields=*,part_id.*`,
+        ),
+      ).pipe(map((response) => response.data.data));
+    }
+
+  detail(id: number): Observable<QuotePart> {
+    return defer(() => axios.get<{ data: QuotePart }>(this.url + '/' + id))
       .pipe(map(response => response.data.data));
   }
 
-  create(quoteitem: SavingQuoteItem): Observable<QuoteItem> {
-    return defer(() => axios.post<{ data: QuoteItem }>(this.url, quoteitem))
+  create(quotepart: SavingQuotePart): Observable<QuotePart> {
+    return defer(() => axios.post<{ data: QuotePart }>(this.url, quotepart))
       .pipe(map(response => response.data.data));
   }
 
-  update(id: number, quoteitem: SavingQuoteItem): Observable<QuoteItem> {
-    return defer(() => axios.patch<{ data: QuoteItem }>(this.url + '/' + id, quoteitem))
+  update(id: number, quotepart: SavingQuotePart): Observable<QuotePart> {
+    return defer(() => axios.patch<{ data: QuotePart }>(this.url + '/' + id, quotepart))
       .pipe(map(response => response.data.data));
   }
 
@@ -65,5 +73,13 @@ export class QuoteitemServices {
     return defer(() => axios.get<{ data: { count: string | number }[] }>(this.url, {
       params: { 'aggregate[count]': '*', ...this.filter(search) }
     })).pipe(map(response => Number(response.data.data[0]?.count ?? 0)));
+  }
+
+  toggle(id:number, option:Number): Observable<void> {
+    return defer(() =>
+      axios.patch(`${environment.apiUrl}/quoteparts/${id}`, {
+        is_approved: option,
+      }),
+    ).pipe(map(() => undefined));
   }
 }

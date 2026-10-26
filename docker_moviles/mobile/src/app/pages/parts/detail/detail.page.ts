@@ -1,17 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
+import { firstValueFrom } from 'rxjs';
+import { PartServices, Part } from 'src/app/services/parts/parts';
 
-interface Part {
-  id: number;
-  name: string;
-  price: number;
-  description: string;
-  is_active: boolean;
-  created_at: string;
-}
 
 @Component({
   selector: 'app-parts-detail',
@@ -27,6 +19,7 @@ export class DetailPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private loading: LoadingController,
+    private partServices: PartServices,
   ) {}
 
   ngOnInit(): void {
@@ -50,12 +43,7 @@ export class DetailPage implements OnInit {
     await loading.present();
 
     try {
-
-      const response = await axios.get<{ data: Part }>(
-        `${environment.apiUrl}/parts/${encodeURIComponent(id)}`
-      );
-
-      this.part = response.data.data;
+      this.part = await firstValueFrom(this.partServices.detail(Number(id)));
 
     } catch (error) {
 

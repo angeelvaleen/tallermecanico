@@ -1,41 +1,10 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { LoadingController, AlertController } from "@ionic/angular";
-import axios from "axios";
-import { environment } from "src/environments/environment";
-
-interface QuoteService {
-  id: number;
-  service_id: any;
-  price: number;
-  discount: number;
-  amount: number;
-  is_approved: number;
-}
-
-interface QuotePart {
-  id: number;
-  part_id: any;
-  quantity: number;
-  price: number;
-  discount: number;
-  amount: number;
-  is_approved: number;
-}
-
-interface Quote {
-  id: number;
-  workorder_id: any;
-  user_id: number;
-  status_id: any;
-  subtotal: number;
-  tax: number;
-  total: number;
-  validity: string;
-  created_at: string;
-  quoteitems: QuoteService[];
-  quoteparts: QuotePart[];
-}
+import { firstValueFrom } from 'rxjs';
+import { QuoteDetail, QuoteServices } from "src/app/services/quotes/quotes";
+import { QuoteItem ,QuoteitemServices } from "src/app/services/quoteitems/quoteitems";
+import { QuotePart ,QuotepartServices } from "src/app/services/quoteparts/quoteparts";
 
 @Component({
   selector: "app-quotes-detail",
@@ -44,7 +13,7 @@ interface Quote {
   standalone: false,
 })
 export class DetailPage implements OnInit {
-  quote: Quote | null = null;
+  quote: QuoteDetail | null = null;
   messageError: string = "";
 
   constructor(
@@ -52,6 +21,9 @@ export class DetailPage implements OnInit {
     private loading: LoadingController,
     private alertController: AlertController,
     private router: Router,
+    private quoteServices: QuoteServices,
+    private quoteitemServices: QuoteitemServices,
+    private quotepartServices: QuotepartServices
   ) {}
 
   ngOnInit() {
@@ -74,25 +46,17 @@ export class DetailPage implements OnInit {
     await loading.present();
 
     try {
-      // Obtener cotización
-      const quoteResponse = await axios.get<{ data: Quote }>(
-        `${environment.apiUrl}/quotes/${encodeURIComponent(id)}?fields=*,workorder_id.*,status_id.*`,
-      );
-
-      const quote = quoteResponse.data.data;
+     
+      const quote = await firstValueFrom(this.quoteServices.detail(Number(id)));
 
       // Obtener servicios de la cotización
-      const itemsResponse = await axios.get<{ data: QuoteService[] }>(
-        `${environment.apiUrl}/quoteitems?filter[quote_id][_eq]=${encodeURIComponent(id)}&fields=*,service_id.*`,
-      );
+      const itemsResponse = await firstValueFrom(this.quoteitemServices.ofQuote(Number(id)));
 
       // Obtener refacciones de la cotización
-      const partsResponse = await axios.get<{ data: QuotePart[] }>(
-        `${environment.apiUrl}/quoteparts?filter[quote_id][_eq]=${encodeURIComponent(id)}&fields=*,part_id.*`,
-      );
+      const partsResponse = await firstValueFrom(this.quotepartServices.ofQuote(Number(id)));
 
-      quote.quoteitems = itemsResponse.data.data;
-      quote.quoteparts = partsResponse.data.data;
+      quote.quoteitems = itemsResponse;
+      quote.quoteparts = partsResponse;
 
       this.quote = quote;
 
@@ -138,17 +102,7 @@ export class DetailPage implements OnInit {
     await loading.present();
 
     try {
-      await axios.patch(
-        `${environment.apiUrl}/quotes/${this.quote.id}`,
-        {
-          status_id: 10,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
+      await firstValueFrom(this.quoteServices.approve(Number(this.quote.id)));
 
       this.quote.status_id = {
         id: 10,
@@ -182,17 +136,7 @@ export class DetailPage implements OnInit {
     await loading.present();
 
     try {
-      await axios.patch(
-        `${environment.apiUrl}/quotes/${this.quote.id}`,
-        {
-          status_id: 11,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
+      await firstValueFrom(this.quoteServices.reject(Number(this.quote.id)));
 
       this.quote.status_id = {
         id: 11,
@@ -207,23 +151,13 @@ export class DetailPage implements OnInit {
     }
   }
 
-  async toggleService(item: QuoteService): Promise<void> {
-    const nuevoEstado = item.is_approved === 1 ? 0 : 1;
+  async toggleService(item: QuoteItem): Promise<void> {
+    const newState = item.is_approved === 1 ? 0 : 1;
 
     try {
-      await axios.patch(
-        `${environment.apiUrl}/quoteitems/${item.id}`,
-        {
-          is_approved: nuevoEstado,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
+      await firstValueFrom(this.quoteitemServices.toggle(Number(item.id),newState));
 
-      item.is_approved = nuevoEstado;
+      item.is_approved = newState;
 
       await this.recalculateQuote();
     } catch (error) {
@@ -233,22 +167,12 @@ export class DetailPage implements OnInit {
   }
 
   async togglePart(part: QuotePart): Promise<void> {
-    const nuevoEstado = part.is_approved === 1 ? 0 : 1;
+    const newState = part.is_approved === 1 ? 0 : 1;
 
     try {
-      await axios.patch(
-        `${environment.apiUrl}/quoteparts/${part.id}`,
-        {
-          is_approved: nuevoEstado,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
+      await firstValueFrom(this.quotepartServices.toggle(Number(part.id),newState));
 
-      part.is_approved = nuevoEstado;
+      part.is_approved = newState;
 
       await this.recalculateQuote();
     } catch (error) {
@@ -277,19 +201,7 @@ export class DetailPage implements OnInit {
     const total = subtotal + tax;
 
     try {
-      await axios.patch(
-        `${environment.apiUrl}/quotes/${this.quote.id}`,
-        {
-          subtotal: subtotal.toFixed(2),
-          tax: tax.toFixed(2),
-          total: total.toFixed(2),
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
+      await firstValueFrom(this.quoteServices.recalculate(Number(this.quote.id),subtotal,tax,total));
 
       this.quote.subtotal = subtotal;
       this.quote.tax = tax;

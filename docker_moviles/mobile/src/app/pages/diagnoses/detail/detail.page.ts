@@ -5,17 +5,10 @@ import {
   LoadingController,
   ModalController,
 } from "@ionic/angular";
-import axios from "axios";
-import { environment } from "src/environments/environment";
 import { FormPage } from "../form/form.page";
+import { DiagnosisServices, Diagnosis } from "src/app/services/diagnoses/diagnoses";
+import { firstValueFrom } from 'rxjs';
 
-interface Diagnosis {
-  id: number;
-  workorder_id: number;
-  description: string;
-  result: string;
-  created_at: string;
-}
 
 @Component({
   selector: "app-diagnoses-detail",
@@ -32,6 +25,7 @@ export class DetailPage implements OnInit {
     private loading: LoadingController,
     private modalController: ModalController,
     private alertController: AlertController,
+    private diagnosisServices: DiagnosisServices
   ) {}
 
   ngOnInit() {
@@ -54,11 +48,7 @@ export class DetailPage implements OnInit {
     await loading.present();
 
     try {
-      const response = await axios.get<{ data: Diagnosis }>(
-        `${environment.apiUrl}/diagnoses/${encodeURIComponent(id)}`,
-      );
-
-      this.diagnosis = response.data.data;
+      this.diagnosis = await firstValueFrom(this.diagnosisServices.detail(Number(id)));
     } catch (error) {
       console.error("Error al cargar diagnóstico:", error);
 
