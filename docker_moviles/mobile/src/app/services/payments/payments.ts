@@ -3,6 +3,13 @@ import { Injectable } from '@angular/core';
 import { defer, map, Observable } from 'rxjs';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
+import { Quote } from '../quotes/quotes';
+import { Method } from '../methods/methods';
+
+interface PaymentUser {
+  id: string;
+  name: string;
+}
 
 export interface Payment {
   id: number;
@@ -14,6 +21,16 @@ export interface Payment {
   paid_at:string;
 }
 
+export interface PaymentDetail {
+  id: number;
+  amount: string;
+  reference: string | null;
+  paid_at: string | null;
+  quote_id: Quote;
+  method_id: Method;
+  user_id: PaymentUser;
+}
+
 export interface SavingPayment {
   id: number;
   quote_id: number;
@@ -21,6 +38,8 @@ export interface SavingPayment {
   method_id:number;
   amount: number;
 }
+
+
 
 @Injectable({ providedIn: 'root' })
 export class PaymentServices {
@@ -43,8 +62,8 @@ export class PaymentServices {
     return defer(() => axios.get<{ data: Payment[] }>(this.url)).pipe(map(response => response.data.data));
   }
 
-  detail(id: number): Observable<Payment> {
-    return defer(() => axios.get<{ data: Payment }>(this.url + '/' + id))
+  detail(id: number): Observable<PaymentDetail> {
+    return defer(() => axios.get<{ data: PaymentDetail }>(`${environment.apiUrl}/payment/${encodeURIComponent(id)}?fields=*,quote_id.*,method_id.*,user_id.*`))
       .pipe(map(response => response.data.data));
   }
 

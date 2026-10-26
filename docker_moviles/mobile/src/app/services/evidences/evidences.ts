@@ -8,6 +8,7 @@ export interface Evidence {
   workorder_id: number;
   path: string;
   format: string;
+  size: string
   created_at: string;
 }
 
@@ -15,6 +16,7 @@ export interface SavingEvidence {
   workorder_id: number;
   path: string;
   format: string;
+  size:string
 }
 
 @Injectable({ providedIn: 'root' })

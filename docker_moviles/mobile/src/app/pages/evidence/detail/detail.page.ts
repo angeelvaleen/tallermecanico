@@ -1,17 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
+import { firstValueFrom } from 'rxjs';
+import { EvidenceServices, Evidence } from 'src/app/services/evidences/evidences';
 
-interface Evidence {
-  id: number;
-  workorder_id: number;
-  path: string;
-  format: string;
-  size: number;
-  created_at: string;
-}
 
 @Component({
   selector: 'app-evidences-detail',
@@ -26,6 +18,7 @@ export class DetailPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private loading: LoadingController,
+    private evidenceServices: EvidenceServices,
   ) {}
 
   ngOnInit() {
@@ -48,11 +41,7 @@ export class DetailPage implements OnInit {
     await loading.present();
     
     try {
-      const response = await axios.get<{ data: Evidence }>(
-        `${environment.apiUrl}/evidence/${encodeURIComponent(id)}`
-      );
-      
-      this.evidence = response.data.data;
+      this.evidence = await firstValueFrom(this.evidenceServices.detail(Number(id)));
     } catch (error) {
       console.log('Error al cargar detalle de evidencia', error);
       this.messageError= "No se pudo cargar el producto. Revisa el ID, la conexión y los permisos de lectura.";

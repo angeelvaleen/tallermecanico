@@ -12,7 +12,7 @@ export interface Model {
   created_at: string;
 }
 
-export interface ListModel {
+export interface ModelList {
   id: number;
   brand_id: Brand;
   name: string;
@@ -42,8 +42,8 @@ export class ModelServices {
     ] }) } : {};
   }
 
-  list(page = 1, perPage = 3, search = ''): Observable<ListModel[]> {
-    return defer(() => axios.get<{ data: ListModel[] }>(`${this.url}?fields=*,brand_id.*`, {
+  list(page = 1, perPage = 3, search = ''): Observable<ModelList[]> {
+    return defer(() => axios.get<{ data: ModelList[] }>(`${this.url}?fields=*,brand_id.*`, {
       params: { page: page, limit: perPage, sort: 'id', ...this.filter(search) }
     })).pipe(map(response => response.data.data));
   }

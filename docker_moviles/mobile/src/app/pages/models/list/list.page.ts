@@ -3,7 +3,7 @@ import { ModalController } from '@ionic/angular';
 import { FormPage } from '../form/form.page';
 import { firstValueFrom } from 'rxjs';
 import { BrandServices } from 'src/app/services/brands/brands';
-import { ModelServices, ListModel } from 'src/app/services/models/models';
+import { ModelServices, ModelList } from 'src/app/services/models/models';
 
 @Component({
   selector: 'app-models-list',
@@ -18,7 +18,7 @@ export class ListPage {
   perPage: number = 5;
   search: string = "";
 
-  models: ListModel[] = [];
+  models: ModelList[] = [];
 
   constructor(
     private modalController: ModalController,
