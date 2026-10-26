@@ -3,22 +3,8 @@ import { ModalController } from '@ionic/angular';
 import { FormPage } from '../form/form.page';
 
 import { firstValueFrom } from 'rxjs';
-import { VehicleServices } from 'src/app/services/vehicles/vehicles';
+import { VehicleServices, Vehicle } from 'src/app/services/vehicles/vehicles';
 
-interface Vehicle {
-  id: number;
-  model_id: number;
-  user_id: number;
-  fuel_id: number;
-  color_id: number;
-  plate: string;
-  vin: string;
-  year: number;
-  mileage: number;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
 
 @Component({
   selector: 'app-vehicles-list',

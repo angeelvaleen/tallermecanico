@@ -3,7 +3,7 @@ import { defer, map, Observable } from 'rxjs';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
 
-interface Quote {
+export interface Quote {
   id: number;
   workorder_id: number;
   user_id:number;
@@ -15,7 +15,7 @@ interface Quote {
   created_at:string;
 }
 
-interface SavingQuote {
+export interface SavingQuote {
   workorder_id: number;
   user_id:number;
   status_id:number;

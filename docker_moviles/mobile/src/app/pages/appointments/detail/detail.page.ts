@@ -5,21 +5,11 @@ import {
   LoadingController,
   ModalController,
 } from "@ionic/angular";
-import axios from "axios";
-import { environment } from "src/environments/environment";
 
+import { AppointmentServices, DetailAppointment } from "src/app/services/appointments/appointments";
 import { FormPage } from "../form/form.page";
 import { ConfirmPage } from "../confirm/confirm.page";
-
-interface Appointment {
-  id: number;
-  vehicle_id: number;
-  status_id: number;
-  date: string;
-  time: string;
-  reason: string;
-  created_at: string;
-}
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: "app-appointments-detail",
@@ -28,7 +18,7 @@ interface Appointment {
   standalone: false,
 })
 export class DetailPage implements OnInit {
-  appointment: Appointment | null = null;
+  appointment: DetailAppointment | null = null;
 
   messageError: string = "";
 
@@ -36,7 +26,8 @@ export class DetailPage implements OnInit {
     private route: ActivatedRoute,
     private loading: LoadingController,
     private modalController: ModalController,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private appointmentServices: AppointmentServices,
   ) {}
 
   ngOnInit(): void {
@@ -59,11 +50,9 @@ export class DetailPage implements OnInit {
     await loading.present();
 
     try {
-      const response = await axios.get<{ data: Appointment }>(
-        `${environment.apiUrl}/appointments/${encodeURIComponent(id)}`
-      );
+      
 
-      this.appointment = response.data.data;
+      this.appointment = await firstValueFrom(this.appointmentServices.detail(Number(id)));
       this.messageError = "";
     } catch (error) {
       console.error("Error al cargar la cita:", error);
@@ -181,12 +170,7 @@ export class DetailPage implements OnInit {
     }
 
     try {
-      await axios.patch(
-        `${environment.apiUrl}/appointments/${this.appointment.id}`,
-        {
-          status_id: 3,
-        }
-      );
+      await firstValueFrom(this.appointmentServices.executeCancelAppointment(this.appointment.id));
 
       const alert = await this.alertController.create({
         header: "Cita cancelada",

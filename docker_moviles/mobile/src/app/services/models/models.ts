@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { defer, map, Observable } from 'rxjs';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
+import { Brand } from '../brands/brands';
 
-interface Model {
+export interface Model {
   id: number;
   brand_id: number;
   name: string;
@@ -11,7 +12,15 @@ interface Model {
   created_at: string;
 }
 
-interface SavingModel {
+export interface ListModel {
+  id: number;
+  brand_id: Brand;
+  name: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface SavingModel {
   brand_id: number;
   name: string;
   is_active: boolean;
@@ -33,8 +42,8 @@ export class ModelServices {
     ] }) } : {};
   }
 
-  list(page = 1, perPage = 3, search = ''): Observable<Model[]> {
-    return defer(() => axios.get<{ data: Model[] }>(this.url, {
+  list(page = 1, perPage = 3, search = ''): Observable<ListModel[]> {
+    return defer(() => axios.get<{ data: ListModel[] }>(`${this.url}?fields=*,brand_id.*`, {
       params: { page: page, limit: perPage, sort: 'id', ...this.filter(search) }
     })).pipe(map(response => response.data.data));
   }

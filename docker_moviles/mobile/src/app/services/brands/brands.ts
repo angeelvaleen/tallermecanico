@@ -3,14 +3,14 @@ import { defer, map, Observable } from 'rxjs';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
 
-interface Brand {
+export interface Brand {
   id: number;
   name: string;
   is_active: boolean;
   created_at: string;
 }
 
-interface SavingBrand {
+export interface SavingBrand {
   name: string;
 }
 

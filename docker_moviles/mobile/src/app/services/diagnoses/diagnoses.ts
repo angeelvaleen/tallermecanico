@@ -3,7 +3,7 @@ import { defer, map, Observable } from 'rxjs';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
 
-interface Diagnosis {
+export interface Diagnosis {
   id: number;
   workorder_id: number;
   description: string;
@@ -11,7 +11,7 @@ interface Diagnosis {
   created_at: string;
 }
 
-interface SavingDiagnosis {
+export interface SavingDiagnosis {
   workorder_id: number;
   description: string;
   result: string;

@@ -1,17 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
-import { ServiceServices } from 'src/app/services/services/services';
+import { ServiceServices, Service } from 'src/app/services/services/services';
 import { FormPage } from '../form/form.page';
 
-interface Service {
-  id: number;
-  name: string;
-  price: number;
-  description: string;
-  is_active: boolean;
-  created_at: string;
-}
 
 @Component({
   selector: 'app-services-list',

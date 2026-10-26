@@ -4,7 +4,7 @@ import { defer, map, Observable } from 'rxjs';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
 
-interface Payment {
+export interface Payment {
   id: number;
   quote_id: number;
   user_id: number;
@@ -14,7 +14,7 @@ interface Payment {
   paid_at:string;
 }
 
-interface SavingPayment {
+export interface SavingPayment {
   id: number;
   quote_id: number;
   user_id: number;

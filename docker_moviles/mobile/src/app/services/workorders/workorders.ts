@@ -4,7 +4,7 @@ import axios from 'axios';
 import { environment } from 'src/environments/environment';
 
 
-interface Workorder {
+export interface Workorder {
   id: number;
   vehicle_id: number;
   mechanic_id: number;
@@ -14,7 +14,7 @@ interface Workorder {
   created_at: string;
 }
 
-interface SavingWorkorder{
+export interface SavingWorkorder{
   vehicle_id: number;
   mechanic_id: number;
   status_id: number;

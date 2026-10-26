@@ -6,17 +6,7 @@ import {
 
 import { FormPage } from "../form/form.page";
 import { firstValueFrom } from 'rxjs';
-import { WorkorderServices } from "src/app/services/workorders/workorders";
-
-interface Workorder {
-  id: number;
-  vehicle_id: number;
-  mechanic_id: number;
-  status_id: number;
-  mileage: number;
-  delivery: string;
-  created_at: string;
-}
+import { WorkorderServices , Workorder} from "src/app/services/workorders/workorders";
 
 @Component({
   selector: "app-workorders-list",

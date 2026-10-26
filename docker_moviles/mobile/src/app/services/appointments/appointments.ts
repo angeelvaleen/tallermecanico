@@ -2,8 +2,9 @@ import { Injectable } from "@angular/core";
 import { defer, map, Observable } from "rxjs";
 import axios from "axios";
 import { environment } from "src/environments/environment";
+import { Vehicle } from "../vehicles/vehicles";
 
-interface Appointment {
+export interface Appointment {
   id: number;
   vehicle_id: number;
   status_id: number;
@@ -13,7 +14,17 @@ interface Appointment {
   created_at: string;
 }
 
-interface SavingAppointment {
+export interface DetailAppointment {
+  id: number;
+  vehicle_id: Vehicle;
+  status_id: number;
+  date: string;
+  time: string;
+  reason: string;
+  created_at: string;
+}
+
+export interface SavingAppointment {
   vehicle_id: number;
   status_id: number;
   date: string;
@@ -74,8 +85,8 @@ export class AppointmentServices {
     ).pipe(map((response) => response.data.data));
   }
 
-  detail(id: number): Observable<Appointment> {
-    return defer(() => axios.get<{ data: Appointment }>(this.url + "/" + id)).pipe(
+  detail(id: number): Observable<DetailAppointment> {
+    return defer(() => axios.get<{ data: DetailAppointment }>(`${this.url}/${id}?fields=*,vehicle_id.plate`)).pipe(
       map((response) => response.data.data),
     );
   }
