@@ -1,15 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { FuelServices } from 'src/app/services/fuels/fuels';
+import { FuelServices, Fuel } from 'src/app/services/fuels/fuels';
 import { firstValueFrom } from 'rxjs';
 import { FormPage } from '../form/form.page';
-
-interface Fuel {
-  id: number;
-  name: string;
-  is_active: boolean;
-  created_at: string;
-}
 
 @Component({
   selector: 'app-fuels-list',

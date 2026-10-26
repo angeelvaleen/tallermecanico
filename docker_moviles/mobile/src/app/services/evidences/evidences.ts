@@ -3,7 +3,7 @@ import { defer, map, Observable } from 'rxjs';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
 
-interface Evidence {
+export interface Evidence {
   id: number;
   workorder_id: number;
   path: string;
@@ -11,7 +11,7 @@ interface Evidence {
   created_at: string;
 }
 
-interface SavingEvidence {
+export interface SavingEvidence {
   workorder_id: number;
   path: string;
   format: string;

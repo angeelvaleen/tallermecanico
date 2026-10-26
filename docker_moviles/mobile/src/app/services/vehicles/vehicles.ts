@@ -4,7 +4,7 @@ import axios from 'axios';
 import { environment } from 'src/environments/environment';
 
 
-interface Vehicle {
+export interface Vehicle {
   id: number;
   model_id: number;
   user_id: number;
@@ -20,7 +20,7 @@ interface Vehicle {
 }
 
 
-interface SavingVehicle {
+export interface SavingVehicle {
   model_id: number;
   user_id: number;
   fuel_id: number;

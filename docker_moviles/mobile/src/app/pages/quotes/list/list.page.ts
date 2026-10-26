@@ -1,20 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
-import { QuoteServices } from 'src/app/services/quotes/quotes';
+import { QuoteServices, Quote } from 'src/app/services/quotes/quotes';
 import { FormPage } from '../form/form.page';
-
-interface Quote {
-  id: number;
-  workorder_id: number;
-  user_id:number;
-  status_id:number;
-  subtotal:number;
-  tax:number;
-  total: number;
-  validity: string;
-  created_at:string;
-}
 
 interface SavingQuote {
   workorder_id: number;

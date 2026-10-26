@@ -2,16 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { FormPage } from '../form/form.page';
 import { firstValueFrom } from 'rxjs';
-import { PartServices } from 'src/app/services/parts/parts';
-
-interface Part {
-  id: number;
-  name: string;
-  price: number;
-  description: string;
-  is_active: boolean;
-  created_at: string;
-}
+import { PartServices, Part } from 'src/app/services/parts/parts';
 
 @Component({
   selector: 'app-parts-list',

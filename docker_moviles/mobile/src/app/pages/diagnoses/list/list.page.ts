@@ -1,16 +1,10 @@
 import { Component, OnInit } from "@angular/core";
 import { ModalController } from "@ionic/angular";
 import { firstValueFrom } from 'rxjs';
-import { DiagnosisServices } from "src/app/services/diagnoses/diagnoses";
+import { DiagnosisServices, Diagnosis } from "src/app/services/diagnoses/diagnoses";
 import { FormPage } from "../form/form.page";
 
-interface Diagnosis {
-  id: number;
-  workorder_id: number;
-  description: string;
-  result: string;
-  created_at: string;
-}
+
 
 @Component({
   selector: "app-diagnoses-list",

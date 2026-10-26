@@ -1,16 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { PaymentServices } from 'src/app/services/payments/payments';
+import { PaymentServices, Payment } from 'src/app/services/payments/payments';
 
-interface Payment {
-  id: number;
-  quote_id: number;
-  user_id: number;
-  method_id:number;
-  amount: number;
-  reference: string;
-  paid_at:string;
-}
+
 
 @Component({
   selector: 'app-payment-list',

@@ -3,21 +3,7 @@ import { ModalController } from '@ionic/angular';
 import { FormPage } from '../form/form.page';
 import { firstValueFrom } from 'rxjs';
 import { BrandServices } from 'src/app/services/brands/brands';
-import { ModelServices } from 'src/app/services/models/models';
-
-interface Model {
-  id: number;
-  brand_id: number;
-  name: string;
-  is_active: boolean;
-  created_at: string;
-}
-
-interface Brand {
-  id: number;
-  name: string;
-  is_active: boolean;
-}
+import { ModelServices, ListModel } from 'src/app/services/models/models';
 
 @Component({
   selector: 'app-models-list',
@@ -32,25 +18,16 @@ export class ListPage {
   perPage: number = 5;
   search: string = "";
 
-  models: Model[] = [];
-  brands: Brand[] = [];
+  models: ListModel[] = [];
 
   constructor(
     private modalController: ModalController,
-    private brandServices: BrandServices,
+   
     private modelServices: ModelServices
   ) {}
 
   async ionViewWillEnter(): Promise<void> {
     this.chargerData();
-  }
-
-  async loadBrands(): Promise<void> {
-    try {
-      this.brands = await firstValueFrom(this.brandServices.listWithOutFilters()) //this.currentPage,this.perPage,this.search
-    } catch (error) {
-      console.error('Error al cargar marcas:', error);
-    }
   }
 
   async loadModels(): Promise<void> {
@@ -59,14 +36,6 @@ export class ListPage {
     } catch (error) {
       console.error('Error al cargar modelos:', error);
     }
-  }
-
-  getBrandName(brandId: number): string {
-    const brand = this.brands.find(
-      (item) => item.id === brandId,
-    );
-
-    return brand?.name ?? 'Marca no encontrada';
   }
 
   async createModel(): Promise<void> {
@@ -130,13 +99,11 @@ export class ListPage {
   async chargerData(): Promise<void> {
     await this.chargerTotal();
     this.adjustCurrentPage();
-    await this.loadBrands();
     await this.loadModels();
   }
 
   async changePage(page: number): Promise<void> {
     this.currentPage = page;
-    await this.loadBrands();
     await this.loadModels();
   }
 

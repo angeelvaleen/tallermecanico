@@ -2,14 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
 import { FormPage } from '../form/form.page';
-import { BrandServices } from 'src/app/services/brands/brands';
-
-interface Brand {
-  id: number;
-  name: string;
-  is_active: boolean;
-  created_at: string;
-}
+import { BrandServices, Brand } from 'src/app/services/brands/brands';
 
 @Component({
   selector: 'app-brands-list',

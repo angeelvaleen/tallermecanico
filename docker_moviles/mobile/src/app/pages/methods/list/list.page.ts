@@ -1,15 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
-import { MethodServices } from 'src/app/services/methods/methods';
+import { MethodServices, Method } from 'src/app/services/methods/methods';
 import { FormPage } from '../form/form.page';
 
-interface Method {
-  id: number;
-  name: string;
-  is_active: boolean;
-  created_at: string;
-}
 
 @Component({
   selector: 'app-methods-list',

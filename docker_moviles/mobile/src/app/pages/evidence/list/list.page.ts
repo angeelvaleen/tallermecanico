@@ -1,15 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { EvidenceServices } from 'src/app/services/evidences/evidences';
+import { EvidenceServices, Evidence } from 'src/app/services/evidences/evidences';
 import { firstValueFrom } from 'rxjs';
-
-
-interface Evidence {
-  id: number;
-  workorder_id: number;
-  path: string;
-  format: string;
-  created_at: string;
-}
 
 @Component({
   selector: 'app-evidence-list',

@@ -4,14 +4,14 @@ import { defer, map, Observable } from 'rxjs';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
 
-interface Fuel {
+export interface Fuel {
   id: number;
   name: string;
   is_active: boolean;
   created_at: string;
 }
 
-interface SavingFuel {
+export interface SavingFuel {
   name: string;
   is_active: boolean;
 }

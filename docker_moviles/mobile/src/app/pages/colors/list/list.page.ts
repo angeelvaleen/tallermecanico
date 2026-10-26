@@ -2,14 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { ModalController } from "@ionic/angular";
 import { FormPage } from "../form/form.page";
 import { firstValueFrom } from 'rxjs';
-import { ColorServices } from '../../../services/colors/colors';
-
-interface Color {
-  id: number;
-  name: string;
-  is_active: boolean;
-  created_at: string;
-}
+import { ColorServices, Color } from '../../../services/colors/colors';
 
 @Component({
   selector: "app-colors-list",
