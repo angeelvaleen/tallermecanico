@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
+import { firstValueFrom } from 'rxjs';
+import { MethodServices } from 'src/app/services/methods/methods';
 import { FormPage } from '../form/form.page';
 
 interface Method {
@@ -22,6 +22,7 @@ export class ListPage implements OnInit {
 
   constructor(
     private modalController: ModalController,
+    private methodService: MethodServices,
   ) {}
 
   ngOnInit(): void {
@@ -30,11 +31,7 @@ export class ListPage implements OnInit {
 
   async loadMethods(): Promise<void> {
     try {
-      const response = await axios.get<{ data: Method[] }>(
-        `${environment.apiUrl}/methods`,
-      );
-
-      this.methods = response.data.data;
+      this.methods = await firstValueFrom(this.methodService.listWithOutFilters());
     } catch (error) {
       console.error('Error al cargar métodos:', error);
     }

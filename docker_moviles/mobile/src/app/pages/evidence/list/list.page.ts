@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
+import { EvidenceServices } from 'src/app/services/evidences/evidences';
+import { firstValueFrom } from 'rxjs';
+
 
 interface Evidence {
   id: number;
@@ -19,7 +20,9 @@ interface Evidence {
 export class ListPage implements OnInit {
   evidences: Evidence[] = [];
 
-  constructor() {}
+  constructor(
+    private evidenceServices: EvidenceServices,
+  ) {}
 
   ngOnInit() {
     this.chargerEvidences();
@@ -27,10 +30,7 @@ export class ListPage implements OnInit {
 
   async chargerEvidences(): Promise<void> {
     try {
-      const response = await axios.get<{ data: Evidence[] }>(
-        `${environment.apiUrl}/evidence`
-      );
-      this.evidences = response.data.data;
+      this.evidences = await firstValueFrom(this.evidenceServices.listWithOutFilters());
     } catch (error) {
       console.log('Error al cargar evidencias', error);
     }

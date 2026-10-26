@@ -25,7 +25,7 @@ export class ListPage  {
   appointments: Appointment[] = [];
   total: number = 0;
   currentPage: number = 1;
-  perPage: number = 5;
+  perPage: number = 15;
   search: string = "";
   selectedDate: string | null = null;
 
@@ -251,7 +251,7 @@ export class ListPage  {
     await this.loadAppointments();
   }
 
-
+ 
   async changePage(page: number): Promise<void> {
     this.currentPage = page;
     await this.loadAppointments();

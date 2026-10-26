@@ -31,7 +31,7 @@ export class ListPage {
   vehicles: Vehicle[] = [];
   total: number = 0;
   currentPage: number = 1;
-  perPage: number = 5;
+  perPage: number = 15;
   search: string = "";
 
   constructor(

@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { ModalController } from "@ionic/angular";
-import axios from "axios";
-import { environment } from "src/environments/environment";
+import { firstValueFrom } from 'rxjs';
+import { DiagnosisServices } from "src/app/services/diagnoses/diagnoses";
 import { FormPage } from "../form/form.page";
 
 interface Diagnosis {
@@ -23,6 +23,7 @@ export class ListPage implements OnInit {
 
   constructor(
     private modalController: ModalController,
+    private diagnosesServices: DiagnosisServices,
   ) {}
 
   ngOnInit() {
@@ -35,11 +36,8 @@ export class ListPage implements OnInit {
 
   async chargerDiagnoses(): Promise<void> {
     try {
-      const response = await axios.get<{ data: Diagnosis[] }>(
-        `${environment.apiUrl}/diagnoses`,
-      );
-
-      this.diagnoses = response.data.data;
+      
+      this.diagnoses = await firstValueFrom(this.diagnosesServices.listWithOutFilters());
     } catch (error) {
       console.log("Error al cargar diagnósticos", error);
     }
