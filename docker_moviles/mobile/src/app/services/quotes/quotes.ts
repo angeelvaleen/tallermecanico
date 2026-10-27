@@ -24,7 +24,7 @@ export interface Quote {
   created_at: string;
 }
 
-export interface QuoteDetail {
+export interface  QuoteDetail {
   id: number;
   workorder_id: Workorder;
   user_id: number;
