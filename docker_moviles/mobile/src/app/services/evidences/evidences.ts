@@ -12,7 +12,7 @@ export interface Evidence {
   created_at: string;
 }
 
-export interface SavingEvidence {
+export interface EvidenceCreate {
   workorder_id: number;
   path: string;
   format: string;
@@ -45,12 +45,12 @@ export class EvidenceServices {
       .pipe(map(response => response.data.data));
   }
 
-  create(evidence: SavingEvidence): Observable<Evidence> {
+  create(evidence: EvidenceCreate): Observable<Evidence> {
     return defer(() => axios.post<{ data: Evidence }>(this.url, evidence))
       .pipe(map(response => response.data.data));
   }
 
-  update(id: number, evidence: SavingEvidence): Observable<Evidence> {
+  update(id: number, evidence: EvidenceCreate): Observable<Evidence> {
     return defer(() => axios.patch<{ data: Evidence }>(this.url + '/' + id, evidence))
       .pipe(map(response => response.data.data));
   }

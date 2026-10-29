@@ -31,7 +31,7 @@ export interface PaymentDetail {
   user_id: PaymentUser;
 }
 
-export interface SavingPayment {
+export interface PaymentCreate {
   id: number;
   quote_id: number;
   user_id: number;
@@ -67,12 +67,12 @@ export class PaymentServices {
       .pipe(map(response => response.data.data));
   }
 
-  create(payment: SavingPayment): Observable<Payment> {
+  create(payment: PaymentCreate): Observable<Payment> {
     return defer(() => axios.post<{ data: Payment }>(this.url, payment))
       .pipe(map(response => response.data.data));
   }
 
-  update(id: number, payment: SavingPayment): Observable<Payment> {
+  update(id: number, payment: PaymentCreate): Observable<Payment> {
     return defer(() => axios.patch<{ data: Payment }>(this.url + '/' + id, payment))
       .pipe(map(response => response.data.data));
   }

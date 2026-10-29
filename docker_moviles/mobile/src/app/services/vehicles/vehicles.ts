@@ -41,7 +41,7 @@ export interface VehicleDetail {
   
 }
 
-export interface SavingVehicle {
+export interface VehicleCreate {
   model_id: number;
   user_id: number;
   fuel_id: number;
@@ -78,12 +78,12 @@ export class VehicleServices {
       .pipe(map(response => response.data.data));
   }
 
-  create(vehicle: SavingVehicle): Observable<Vehicle> {
+  create(vehicle: VehicleCreate): Observable<Vehicle> {
     return defer(() => axios.post<{ data: Vehicle }>(this.url, vehicle))
       .pipe(map(response => response.data.data));
   }
 
-  update(id: number, vehicle: SavingVehicle): Observable<Vehicle> {
+  update(id: number, vehicle: VehicleCreate): Observable<Vehicle> {
     return defer(() => axios.patch<{ data: Vehicle }>(this.url + '/' + id, vehicle))
       .pipe(map(response => response.data.data));
   }

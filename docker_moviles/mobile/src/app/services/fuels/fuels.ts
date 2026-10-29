@@ -11,7 +11,7 @@ export interface Fuel {
   created_at: string;
 }
 
-export interface SavingFuel {
+export interface FuelCreate {
   name: string;
   is_active: boolean;
 }
@@ -44,12 +44,12 @@ export class FuelServices {
       .pipe(map(response => response.data.data));
   }
 
-  create(fuel: SavingFuel): Observable<Fuel> {
+  create(fuel: FuelCreate): Observable<Fuel> {
     return defer(() => axios.post<{ data: Fuel }>(this.url, fuel))
       .pipe(map(response => response.data.data));
   }
 
-  update(id: number, fuel: SavingFuel): Observable<Fuel> {
+  update(id: number, fuel: FuelCreate): Observable<Fuel> {
     return defer(() => axios.patch<{ data: Fuel }>(this.url + '/' + id, fuel))
       .pipe(map(response => response.data.data));
   }

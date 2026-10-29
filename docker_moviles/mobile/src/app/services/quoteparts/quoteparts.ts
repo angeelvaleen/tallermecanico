@@ -4,7 +4,7 @@ import axios from 'axios';
 import { environment } from 'src/environments/environment';
 
 
-export interface SavingQuotePart {
+export interface QuotePartCreate {
   quote_id: number;
   part_id: number;
   quantity: number;
@@ -55,12 +55,12 @@ export class QuotepartServices {
       .pipe(map(response => response.data.data));
   }
 
-  create(quotepart: SavingQuotePart): Observable<QuotePart> {
+  create(quotepart: QuotePartCreate): Observable<QuotePart> {
     return defer(() => axios.post<{ data: QuotePart }>(this.url, quotepart))
       .pipe(map(response => response.data.data));
   }
 
-  update(id: number, quotepart: SavingQuotePart): Observable<QuotePart> {
+  update(id: number, quotepart: QuotePartCreate): Observable<QuotePart> {
     return defer(() => axios.patch<{ data: QuotePart }>(this.url + '/' + id, quotepart))
       .pipe(map(response => response.data.data));
   }

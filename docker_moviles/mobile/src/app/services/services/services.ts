@@ -12,7 +12,7 @@ export interface Service {
   created_at: string;
 }
 
-export interface SavingService {
+export interface ServiceCreate {
   name: string;
   price: number;
   description: string;
@@ -42,12 +42,12 @@ export class ServiceServices {
       .pipe(map(response => response.data.data));
   }
 
-  create(service: SavingService): Observable<Service> {
+  create(service: ServiceCreate): Observable<Service> {
     return defer(() => axios.post<{ data: Service }>(this.url, service))
       .pipe(map(response => response.data.data));
   }
 
-  update(id: number, service: SavingService): Observable<Service> {
+  update(id: number, service: ServiceCreate): Observable<Service> {
     return defer(() => axios.patch<{ data: Service }>(this.url + '/' + id, service))
       .pipe(map(response => response.data.data));
   }

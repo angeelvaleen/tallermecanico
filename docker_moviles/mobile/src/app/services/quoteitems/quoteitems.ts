@@ -3,15 +3,6 @@ import { defer, map, Observable } from "rxjs";
 import axios from "axios";
 import { environment } from "src/environments/environment";
 
-export interface SavingQuoteItem {
-  quote_id: number;
-  service_id: number;
-  price: number;
-  discount: number;
-  amount: number;
-  is_approved: boolean;
-}
-
 export interface QuoteItem {
   id: number;
   service_id: any;
@@ -19,6 +10,15 @@ export interface QuoteItem {
   discount: number;
   amount: number;
   is_approved: number;
+}
+
+export interface QuoteItemCreate {
+  quote_id: number;
+  service_id: number;
+  price: number;
+  discount: number;
+  amount: number;
+  is_approved: boolean;
 }
 
 @Injectable({ providedIn: "root" })
@@ -66,13 +66,13 @@ export class QuoteitemServices {
     ).pipe(map((response) => response.data.data));
   }
 
-  create(quoteitem: SavingQuoteItem): Observable<QuoteItem> {
+  create(quoteitem: QuoteItemCreate): Observable<QuoteItem> {
     return defer(() =>
       axios.post<{ data: QuoteItem }>(this.url, quoteitem),
     ).pipe(map((response) => response.data.data));
   }
 
-  update(id: number, quoteitem: SavingQuoteItem): Observable<QuoteItem> {
+  update(id: number, quoteitem: QuoteItemCreate): Observable<QuoteItem> {
     return defer(() =>
       axios.patch<{ data: QuoteItem }>(this.url + "/" + id, quoteitem),
     ).pipe(map((response) => response.data.data));
