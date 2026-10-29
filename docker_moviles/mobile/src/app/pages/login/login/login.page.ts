@@ -12,8 +12,8 @@ import { AuthService } from 'src/app/services/auth/auth';
 export class LoginPage implements OnInit {
 
   form: FormGroup;
-  enviando = false;
-  mensaje = '';
+  sending = false;
+  message = '';
 
   constructor(fb: FormBuilder, private auth: AuthService, private router: Router) {
     this.form = fb.group({ email: ['', [Validators.required, Validators.email]], password: ['', Validators.required] });
@@ -22,17 +22,17 @@ export class LoginPage implements OnInit {
   ngOnInit() {
   }
 
-  async ingresar(): Promise<void> {
+  async signin(): Promise<void> {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
-    this.enviando = true;
-    this.mensaje = '';
+    this.sending = true;
+    this.message = '';
     try {
-      await this.auth.ingresar(this.form.value.email, this.form.value.password);
+      await this.auth.signin(this.form.value.email, this.form.value.password);
       const destino = new URLSearchParams(location.search).get('returnUrl');
       await this.router.navigateByUrl(destino?.startsWith('/') && !destino.startsWith('//') ? destino : '/workorders/list', { replaceUrl: true });
       this.form.reset();
-    } catch { this.mensaje = 'No fue posible iniciar sesión. Revisa tus datos y el acceso al servidor.'; }
-    finally { this.enviando = false; }
+    } catch { this.message = 'No fue posible iniciar sesión. Revisa tus datos y el acceso al servidor.'; }
+    finally { this.sending = false; }
   }
 
 }
