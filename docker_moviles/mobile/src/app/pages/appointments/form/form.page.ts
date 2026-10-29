@@ -8,32 +8,10 @@ import {
   AlertController,
   ModalController,
 } from "@ionic/angular";
-import axios from "axios";
-import { environment } from "src/environments/environment";
 
-interface Vehicle {
-  id: number;
-  plate: string;
-  model_id: number;
-}
-
-interface AppointmentCreate {
-  vehicle_id: number;
-  status_id: number;
-  date: string;
-  time: string;
-  reason: string;
-}
-
-interface AppointmentDetail {
-  id: number;
-  vehicle_id: number;
-  status_id: number;
-  date: string;
-  time: string;
-  reason: string;
-  created_at: string;
-}
+import { firstValueFrom } from 'rxjs';
+import { Vehicle, VehicleServices } from "src/app/services/vehicles/vehicles";
+import { AppointmentCreate, AppointmentServices } from "src/app/services/appointments/appointments";
 
 @Component({
   selector: "app-appoinments-form",
@@ -75,7 +53,9 @@ export class FormPage implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private alertController: AlertController,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private vehicleServices: VehicleServices,
+    private appointmentServices: AppointmentServices
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -117,12 +97,7 @@ export class FormPage implements OnInit {
 
   async loadVehicles(): Promise<void> {
     try {
-      const response =
-        await axios.get<{ data: Vehicle[] }>(
-          `${environment.apiUrl}/vehicles`
-        );
-
-      this.vehicles = response.data.data;
+      this.vehicles = await firstValueFrom(this.vehicleServices.listWithOutFilters());
     } catch (error) {
       console.error(
         "Error al cargar vehículos:",
@@ -147,17 +122,7 @@ export class FormPage implements OnInit {
     }
 
     try {
-      const response =
-        await axios.get<{
-          data: AppointmentDetail;
-        }>(
-          `${environment.apiUrl}/appointments/${encodeURIComponent(
-            this.id
-          )}`
-        );
-
-      const appointment =
-        response.data.data;
+      const appointment = await firstValueFrom(this.appointmentServices.detail(Number(this.id)));
 
       if (appointment.status_id !== 1) {
         const alert =
@@ -181,7 +146,7 @@ export class FormPage implements OnInit {
 
       this.appointmentForm.patchValue({
         vehicle_id:
-          appointment.vehicle_id,
+          appointment.vehicle_id.id,
 
         date:
           appointment.date,
@@ -279,27 +244,9 @@ export class FormPage implements OnInit {
         this.isEdition &&
         this.id
       ) {
-        await axios.patch(
-          `${environment.apiUrl}/appointments/${this.id}`,
-          {
-            vehicle_id:
-              appointment.vehicle_id,
-
-            date:
-              appointment.date,
-
-            time:
-              appointment.time,
-
-            reason:
-              appointment.reason,
-          }
-        );
+        await firstValueFrom(this.appointmentServices.update(this.id,appointment))
       } else {
-        await axios.post(
-          `${environment.apiUrl}/appointments`,
-          appointment
-        );
+        await firstValueFrom(this.appointmentServices.create(appointment));
       }
 
       const alert =
