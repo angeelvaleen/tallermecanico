@@ -36,22 +36,22 @@
 
         <p>
           <strong>Marca:</strong>
-          {{ getBrandName() }}
+            {{ vehicle.model_id.brand_id.name }}
         </p>
 
         <p>
           <strong>Modelo:</strong>
-          {{ getModelName() }}
+            {{ vehicle.model_id.name }}
         </p>
 
         <p>
           <strong>Combustible:</strong>
-          {{ getFuelName() }}
+            {{ vehicle.fuel_id.name }}
         </p>
 
         <p>
           <strong>Color:</strong>
-          {{ getColorName() }}
+            {{ vehicle.color_id.name }}
         </p>
 
         <p>

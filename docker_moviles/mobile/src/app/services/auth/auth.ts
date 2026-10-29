@@ -1,11 +1,18 @@
 import { Injectable } from '@angular/core';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
+
+export interface User {
+  id: number;
+  name: string;
+}
+
 interface SesionDirectus {
   access_token: string;
   refresh_token: string;
   expires: number;
 }
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private token = '';

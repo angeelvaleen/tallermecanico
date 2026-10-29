@@ -64,4 +64,9 @@ export class EvidenceServices {
       params: { 'aggregate[count]': '*', ...this.filter(search) }
     })).pipe(map(response => Number(response.data.data[0]?.count ?? 0)));
   }
+
+  ofWorkorder(id:number): Observable<Evidence[]>{
+      return defer(() => axios.get<{ data: Evidence[] }>(`${this.url}?filter[workorder_id][_eq]=${id}`))
+        .pipe(map(response => response.data.data));
+    }
 }
