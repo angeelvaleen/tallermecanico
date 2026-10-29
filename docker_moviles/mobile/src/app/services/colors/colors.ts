@@ -9,7 +9,7 @@ export interface Color {
   is_active: boolean;
   created_at: string;
 }
-export interface SavingColor {
+export interface ColorCreate {
   name: string;
 }
 
@@ -35,12 +35,12 @@ export class ColorServices {
       .pipe(map(response => response.data.data));
   }
 
-  create(color: SavingColor): Observable<Color> {
+  create(color: ColorCreate): Observable<Color> {
     return defer(() => axios.post<{ data: Color }>(this.url, color))
       .pipe(map(response => response.data.data));
   }
 
-  update(id: number, color: SavingColor): Observable<Color> {
+  update(id: number, color: ColorCreate): Observable<Color> {
     return defer(() => axios.patch<{ data: Color }>(this.url + '/' + id, color))
       .pipe(map(response => response.data.data));
   }

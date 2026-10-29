@@ -12,7 +12,7 @@ export interface Part {
   created_at: string;
 }
 
-export interface SavingPart {
+export interface PartCreate {
   name: string;
   price: number;
   description: string;
@@ -41,12 +41,12 @@ export class PartServices {
       .pipe(map(response => response.data.data));
   }
 
-  create(part: SavingPart): Observable<Part> {
+  create(part: PartCreate): Observable<Part> {
     return defer(() => axios.post<{ data: Part }>(this.url, part))
       .pipe(map(response => response.data.data));
   }
 
-  update(id: number, part: SavingPart): Observable<Part> {
+  update(id: number, part: PartCreate): Observable<Part> {
     return defer(() => axios.patch<{ data: Part }>(this.url + '/' + id, part))
       .pipe(map(response => response.data.data));
   }

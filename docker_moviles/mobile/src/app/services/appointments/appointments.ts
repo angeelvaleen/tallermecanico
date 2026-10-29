@@ -24,7 +24,7 @@ export interface DetailAppointment {
   created_at: string;
 }
 
-export interface SavingAppointment {
+export interface AppointmentCreate {
   vehicle_id: number;
   status_id: number;
   date: string;
@@ -91,13 +91,13 @@ export class AppointmentServices {
     );
   }
 
-  create(appointment: SavingAppointment): Observable<Appointment> {
+  create(appointment: AppointmentCreate): Observable<Appointment> {
     return defer(() => axios.post<{ data: Appointment }>(this.url, appointment)).pipe(
       map((response) => response.data.data),
     );
   }
 
-  update(id: number, appointment: SavingAppointment): Observable<Appointment> {
+  update(id: number, appointment: AppointmentCreate): Observable<Appointment> {
     return defer(() =>
       axios.patch<{ data: Appointment }>(this.url + "/" + id, appointment),
     ).pipe(map((response) => response.data.data));

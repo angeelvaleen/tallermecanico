@@ -11,7 +11,7 @@ export interface Method {
   created_at: string;
 }
 
-export interface SavingMethod {
+export interface MethodCreate {
   name: string;
   is_active: boolean;
 }
@@ -42,12 +42,12 @@ export class MethodServices {
       .pipe(map(response => response.data.data));
   }
 
-  create(method: SavingMethod): Observable<Method> {
+  create(method: MethodCreate): Observable<Method> {
     return defer(() => axios.post<{ data: Method }>(this.url, method))
       .pipe(map(response => response.data.data));
   }
 
-  update(id: number, method: SavingMethod): Observable<Method> {
+  update(id: number, method: MethodCreate): Observable<Method> {
     return defer(() => axios.patch<{ data: Method }>(this.url + '/' + id, method))
       .pipe(map(response => response.data.data));
   }

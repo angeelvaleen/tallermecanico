@@ -32,7 +32,7 @@ export interface WorkorderDetail {
   created_at: string;
 }
 
-export interface SavingWorkorder{
+export interface WorkorderCreate{
   vehicle_id: number;
   mechanic_id: number;
   status_id: number;
@@ -77,12 +77,12 @@ export class WorkorderServices {
       .pipe(map(response => response.data.data));
   }
 
-  create(workorder: SavingWorkorder): Observable<Workorder> {
+  create(workorder: WorkorderCreate): Observable<Workorder> {
     return defer(() => axios.post<{ data: Workorder }>(this.url, workorder))
       .pipe(map(response => response.data.data));
   }
 
-  update(id: number, workorder: SavingWorkorder): Observable<Workorder> {
+  update(id: number, workorder: WorkorderCreate): Observable<Workorder> {
     return defer(() => axios.patch<{ data: Workorder }>(this.url + '/' + id, workorder))
       .pipe(map(response => response.data.data));
   }

@@ -20,7 +20,7 @@ export interface ModelList {
   created_at: string;
 }
 
-export interface SavingModel {
+export interface ModelCreate {
   brand_id: number;
   name: string;
   is_active: boolean;
@@ -53,12 +53,12 @@ export class ModelServices {
       .pipe(map(response => response.data.data));
   }
 
-  create(model: SavingModel): Observable<Model> {
+  create(model: ModelCreate): Observable<Model> {
     return defer(() => axios.post<{ data: Model }>(this.url, model))
       .pipe(map(response => response.data.data));
   }
 
-  update(id: number, model: SavingModel): Observable<Model> {
+  update(id: number, model: ModelCreate): Observable<Model> {
     return defer(() => axios.patch<{ data: Model }>(this.url + '/' + id, model))
       .pipe(map(response => response.data.data));
   }

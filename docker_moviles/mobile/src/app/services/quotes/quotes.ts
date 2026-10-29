@@ -52,7 +52,7 @@ export interface QuoteWorkorder {
   created_at: string;
 }
 
-export interface SavingQuote {
+export interface QuoteCreate {
   workorder_id: number;
   user_id: number;
   status_id: number;
@@ -92,13 +92,13 @@ export class QuoteServices {
     ).pipe(map((response) => response.data.data));
   }
 
-  create(quote: SavingQuote): Observable<Quote> {
+  create(quote: QuoteCreate): Observable<Quote> {
     return defer(() => axios.post<{ data: Quote }>(this.url, quote)).pipe(
       map((response) => response.data.data),
     );
   }
 
-  update(id: number, quote: SavingQuote): Observable<Quote> {
+  update(id: number, quote: QuoteCreate): Observable<Quote> {
     return defer(() =>
       axios.patch<{ data: Quote }>(this.url + "/" + id, quote),
     ).pipe(map((response) => response.data.data));

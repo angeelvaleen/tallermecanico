@@ -10,7 +10,7 @@ export interface Brand {
   created_at: string;
 }
 
-export interface SavingBrand {
+export interface BrandCreate {
   name: string;
 }
 
@@ -40,12 +40,12 @@ export class BrandServices {
       .pipe(map(response => response.data.data));
   }
 
-  create(brand: SavingBrand): Observable<Brand> {
+  create(brand: BrandCreate): Observable<Brand> {
     return defer(() => axios.post<{ data: Brand }>(this.url, brand))
       .pipe(map(response => response.data.data));
   }
 
-  update(id: number, brand: SavingBrand): Observable<Brand> {
+  update(id: number, brand: BrandCreate): Observable<Brand> {
     return defer(() => axios.patch<{ data: Brand }>(this.url + '/' + id, brand))
       .pipe(map(response => response.data.data));
   }

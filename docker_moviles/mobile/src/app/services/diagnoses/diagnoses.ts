@@ -11,7 +11,7 @@ export interface Diagnosis {
   created_at: string;
 }
 
-export interface SavingDiagnosis {
+export interface DiagnosisCreate {
   workorder_id: number;
   description: string;
   result: string;
@@ -43,12 +43,12 @@ export class DiagnosisServices {
       .pipe(map(response => response.data.data));
   }
 
-  create(diagnosis: SavingDiagnosis): Observable<Diagnosis> {
+  create(diagnosis: DiagnosisCreate): Observable<Diagnosis> {
     return defer(() => axios.post<{ data: Diagnosis }>(this.url, diagnosis))
       .pipe(map(response => response.data.data));
   }
 
-  update(id: number, diagnosis: SavingDiagnosis): Observable<Diagnosis> {
+  update(id: number, diagnosis: DiagnosisCreate): Observable<Diagnosis> {
     return defer(() => axios.patch<{ data: Diagnosis }>(this.url + '/' + id, diagnosis))
       .pipe(map(response => response.data.data));
   }
