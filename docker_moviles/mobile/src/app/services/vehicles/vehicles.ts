@@ -73,6 +73,10 @@ export class VehicleServices {
     })).pipe(map(response => response.data.data));
   }
 
+  listWithOutFilters(): Observable<Vehicle[]> {
+    return defer(() => axios.get<{ data:Vehicle[] }>(this.url)).pipe(map(response => response.data.data));
+  }
+
   detail(id: number): Observable<VehicleDetail> {
     return defer(() => axios.get<{ data: VehicleDetail }>(`${this.url}/${id}?fields=*,color_id.*,fuel_id.*,user_id.*,model_id.*,model_id.brand_id.*`))
       .pipe(map(response => response.data.data));

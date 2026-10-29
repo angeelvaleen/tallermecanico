@@ -86,7 +86,7 @@ export class AppointmentServices {
   }
 
   detail(id: number): Observable<DetailAppointment> {
-    return defer(() => axios.get<{ data: DetailAppointment }>(`${this.url}/${id}?fields=*,vehicle_id.plate`)).pipe(
+    return defer(() => axios.get<{ data: DetailAppointment }>(`${this.url}/${id}?fields=*,vehicle_id.*`)).pipe(
       map((response) => response.data.data),
     );
   }
