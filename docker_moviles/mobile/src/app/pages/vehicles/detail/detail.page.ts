@@ -1,44 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
-
-interface Brand {
-  id: number;
-  name: string;
-}
-
-interface Model {
-  id: number;
-  brand_id: number;
-  name: string;
-}
-
-interface Fuel {
-  id: number;
-  name: string;
-}
-
-interface Color {
-  id: number;
-  name: string;
-}
-
-interface Vehicle {
-  id: number;
-  model_id: number;
-  user_id: number;
-  fuel_id: number;
-  color_id: number;
-  plate: string;
-  vin: string;
-  year: number;
-  mileage: number;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
+import { firstValueFrom } from 'rxjs';
+import { VehicleDetail, VehicleServices } from 'src/app/services/vehicles/vehicles';
 
 @Component({
   selector: 'app-vehicles-detail',
@@ -48,18 +12,14 @@ interface Vehicle {
 })
 export class DetailPage implements OnInit {
 
-  vehicle: Vehicle | null = null;
-
-  brands: Brand[] = [];
-  models: Model[] = [];
-  fuels: Fuel[] = [];
-  colors: Color[] = [];
+  vehicle: VehicleDetail | null = null;
 
   messageError: string = '';
 
   constructor(
     private route: ActivatedRoute,
     private loading: LoadingController,
+    private vehicleService: VehicleServices,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -84,40 +44,9 @@ export class DetailPage implements OnInit {
 
     try {
 
-      const [
-        vehicleResponse,
-        brandsResponse,
-        modelsResponse,
-        fuelsResponse,
-        colorsResponse,
-      ] = await Promise.all([
-        axios.get<{ data: Vehicle }>(
-          `${environment.apiUrl}/vehicles/${encodeURIComponent(id)}`
-        ),
-
-        axios.get<{ data: Brand[] }>(
-          `${environment.apiUrl}/brands`
-        ),
-
-        axios.get<{ data: Model[] }>(
-          `${environment.apiUrl}/models`
-        ),
-
-        axios.get<{ data: Fuel[] }>(
-          `${environment.apiUrl}/fuels`
-        ),
-
-        axios.get<{ data: Color[] }>(
-          `${environment.apiUrl}/colors`
-        ),
-      ]);
-
-      this.vehicle = vehicleResponse.data.data;
-      this.brands = brandsResponse.data.data;
-      this.models = modelsResponse.data.data;
-      this.fuels = fuelsResponse.data.data;
-      this.colors = colorsResponse.data.data;
-
+      this.vehicle = await firstValueFrom(this.vehicleService.detail(Number(id)));
+      
+      
     } catch (error) {
 
       this.messageError =
@@ -132,61 +61,5 @@ export class DetailPage implements OnInit {
 
       await loading.dismiss();
     }
-  }
-
-  getModelName(): string {
-
-    if (!this.vehicle) {
-      return 'Sin modelo';
-    }
-
-    return (
-      this.models.find(
-        model => model.id === this.vehicle?.model_id
-      )?.name ?? 'Sin modelo'
-    );
-  }
-
-  getBrandName(): string {
-
-    if (!this.vehicle) {
-      return 'Sin marca';
-    }
-
-    const model = this.models.find(
-      item => item.id === this.vehicle?.model_id
-    );
-
-    return (
-      this.brands.find(
-        brand => brand.id === model?.brand_id
-      )?.name ?? 'Sin marca'
-    );
-  }
-
-  getFuelName(): string {
-
-    if (!this.vehicle) {
-      return 'Sin combustible';
-    }
-
-    return (
-      this.fuels.find(
-        fuel => fuel.id === this.vehicle?.fuel_id
-      )?.name ?? 'Sin combustible'
-    );
-  }
-
-  getColorName(): string {
-
-    if (!this.vehicle) {
-      return 'Sin color';
-    }
-
-    return (
-      this.colors.find(
-        color => color.id === this.vehicle?.color_id
-      )?.name ?? 'Sin color'
-    );
   }
 }

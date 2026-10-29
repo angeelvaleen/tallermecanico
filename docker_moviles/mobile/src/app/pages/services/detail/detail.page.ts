@@ -1,17 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
-
-interface Service {
-  id: number;
-  name: string;
-  price: number;
-  description: string;
-  is_active: boolean;
-  created_at: string;
-}
+import { firstValueFrom } from 'rxjs';
+import { Service, ServiceServices } from 'src/app/services/services/services';
 
 @Component({
   selector: 'app-services-detail',
@@ -26,6 +17,7 @@ export class DetailPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private loading: LoadingController,
+    private serviceServices: ServiceServices,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -51,11 +43,7 @@ export class DetailPage implements OnInit {
     await loading.present();
 
     try {
-      const response = await axios.get<{ data: Service }>(
-        `${environment.apiUrl}/services/${encodeURIComponent(id)}`,
-      );
-
-      this.service = response.data.data;
+      this.service = await firstValueFrom(this.serviceServices.detail(Number(id)));
     } catch (error) {
       console.error('Error al cargar el detalle del servicio:', error);
 

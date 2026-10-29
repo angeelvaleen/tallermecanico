@@ -3,12 +3,30 @@ import { defer, map, Observable } from 'rxjs';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
 
+import { Vehicle } from '../vehicles/vehicles';
+import { User } from '../auth/auth';
+
+interface Status {
+  id: number;
+  name: string;
+}
+
 
 export interface Workorder {
   id: number;
   vehicle_id: number;
   mechanic_id: number;
   status_id: number;
+  mileage: number;
+  delivery: string;
+  created_at: string;
+}
+
+export interface WorkorderDetail {
+  id: number;
+  vehicle_id: Vehicle;
+  mechanic_id: User;
+  status_id: Status;
   mileage: number;
   delivery: string;
   created_at: string;
@@ -54,8 +72,8 @@ export class WorkorderServices {
     })).pipe(map(response => response.data.data));
   }
 
-  detail(id: number): Observable<Workorder> {
-    return defer(() => axios.get<{ data: Workorder }>(this.url + '/' + id))
+  detail(id: number): Observable<WorkorderDetail> {
+    return defer(() => axios.get<{ data: WorkorderDetail }>(`${this.url}/${id}?fields=*,mechanic_id.name,status_id.name,status_id.id,vehicle_id.plate`))
       .pipe(map(response => response.data.data));
   }
 

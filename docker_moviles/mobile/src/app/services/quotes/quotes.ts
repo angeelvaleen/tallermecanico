@@ -6,6 +6,8 @@ import { environment } from "src/environments/environment";
 import { QuoteItem } from "../quoteitems/quoteitems";
 import { QuotePart } from "../quoteparts/quoteparts";
 import { Workorder } from "../workorders/workorders";
+import { User } from "../auth/auth";
+
 
 interface Status {
   id: number;
@@ -36,6 +38,18 @@ export interface  QuoteDetail {
   created_at: string;
   quoteitems: QuoteItem[];
   quoteparts: QuotePart[];
+}
+
+export interface QuoteWorkorder {
+  id: number;
+  workorder_id: number;
+  user_id: number;
+  status_id: Status;
+  subtotal: number;
+  tax: number;
+  total: number;
+  validity: string;
+  created_at: string;
 }
 
 export interface SavingQuote {
@@ -132,4 +146,9 @@ export class QuoteServices {
         },),
     ).pipe(map(() => undefined));
   } 
+
+  ofWorkorder(id:number): Observable<QuoteWorkorder[]>{
+      return defer(() => axios.get<{ data: QuoteWorkorder[] }>(`${this.url}?filter[workorder_id][_eq]=${id}&fields=*,status_id.*`))
+        .pipe(map(response => response.data.data));
+    }
 }

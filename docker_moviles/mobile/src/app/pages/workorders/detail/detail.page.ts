@@ -5,67 +5,19 @@ import {
   LoadingController,
   ModalController,
 } from "@ionic/angular";
-import axios from "axios";
-import { environment } from "src/environments/environment";
+
+import { firstValueFrom } from 'rxjs';
 
 import { FormPage as DiagnosisFormPage } from "../../diagnoses/form/form.page";
 import { FormPage as EvidenceFormPage } from "../../evidence/form/form.page";
 import { FormPage as QuoteFormPage } from "../../quotes/form/form.page";
+import { WorkorderDetail,WorkorderServices } from "src/app/services/workorders/workorders";
+import { Diagnosis,DiagnosisServices } from "src/app/services/diagnoses/diagnoses";
+import { Evidence,EvidenceServices } from "src/app/services/evidences/evidences";
+import { QuoteWorkorder, QuoteServices } from "src/app/services/quotes/quotes";
 
-interface Workorder {
-  id: number;
-  vehicle_id: Vehicle;
-  mechanic_id: User;
-  status_id: Status;
-  mileage: number;
-  delivery: string;
-  created_at: string;
-}
 
-interface User {
-  name:string;
-}
 
-interface Vehicle {
-  plate: string;
-}
-
-interface Status {
-  id: number;
-  name: string;
-}
-
-interface Diagnosis {
-  id: number;
-  workorder_id: number;
-  description: string;
-  result: string;
-  created_at: string;
-}
-
-interface Evidence {
-  id: number;
-  workorder_id: number;
-  path: string;
-  created_at: string;
-}
-
-interface QuoteStatus {
-  id: number;
-  name: string;
-}
-
-interface Quote {
-  id: number;
-  workorder_id: number;
-  user_id: number;
-  status_id: number | QuoteStatus;
-  subtotal: number;
-  tax: number;
-  total: number;
-  validity: string;
-  created_at: string;
-}
 
 @Component({
   selector: "app-workorders-detail",
@@ -74,13 +26,13 @@ interface Quote {
   standalone: false,
 })
 export class DetailPage implements OnInit {
-  workorder: Workorder | null = null;
+  workorder: WorkorderDetail | null = null;
 
   diagnoses: Diagnosis[] = [];
 
   evidences: Evidence[] = [];
 
-  quotes: Quote[] = [];
+  quotes: QuoteWorkorder[] = [];
 
   messageError: string = "";
 
@@ -89,6 +41,10 @@ export class DetailPage implements OnInit {
     private loading: LoadingController,
     private alertController: AlertController,
     private modalController: ModalController,
+    private workorderServices: WorkorderServices,
+    private quoteServices: QuoteServices,
+    private diagnosisServices: DiagnosisServices,
+    private evidenceServices: EvidenceServices,
   ) {}
 
   ngOnInit() {
@@ -123,11 +79,8 @@ export class DetailPage implements OnInit {
     await loading.present();
 
     try {
-      const response = await axios.get<{ data: Workorder }>(
-        `${environment.apiUrl}/workorders/${encodeURIComponent(id)}?fields=*,mechanic_id.name,status_id.name,status_id.id,vehicle_id.plate`,
-      );
 
-      this.workorder = response.data.data;
+      this.workorder = await firstValueFrom(this.workorderServices.detail(Number(id)));
       console.log(this.workorder);
 
       await Promise.all([
@@ -135,6 +88,8 @@ export class DetailPage implements OnInit {
         this.chargerEvidences(),
         this.chargerQuotes(),
       ]);
+
+      console.log(this.workorder);
     } catch (error) {
       this.messageError =
         "Revisar ID, conexión a la base de datos o permisos";
@@ -154,13 +109,7 @@ export class DetailPage implements OnInit {
     }
 
     try {
-      const response = await axios.get<{
-        data: Diagnosis[];
-      }>(
-        `${environment.apiUrl}/diagnoses?filter[workorder_id][_eq]=${this.workorder.id}`,
-      );
-
-      this.diagnoses = response.data.data;
+      this.diagnoses = await firstValueFrom(this.diagnosisServices.ofWorkorder(Number(this.workorder.id)));
     } catch (error) {
       console.log(
         "Error al cargar diagnósticos",
@@ -177,13 +126,7 @@ export class DetailPage implements OnInit {
     }
 
     try {
-      const response = await axios.get<{
-        data: Evidence[];
-      }>(
-        `${environment.apiUrl}/evidence?filter[workorder_id][_eq]=${this.workorder.id}`,
-      );
-
-      this.evidences = response.data.data;
+      this.evidences = await firstValueFrom(this.evidenceServices.ofWorkorder(Number(this.workorder.id)));
     } catch (error) {
       console.log(
         "Error al cargar evidencias",
@@ -200,13 +143,7 @@ export class DetailPage implements OnInit {
     }
 
     try {
-      const response = await axios.get<{
-        data: Quote[];
-      }>(
-        `${environment.apiUrl}/quotes?filter[workorder_id][_eq]=${this.workorder.id}&fields=*,status_id.*`,
-      );
-
-      this.quotes = response.data.data;
+      this.quotes = await firstValueFrom(this.quoteServices.ofWorkorder(Number(this.workorder.id)));
     } catch (error) {
       console.log(
         "Error al cargar cotizaciones",
@@ -288,7 +225,7 @@ export class DetailPage implements OnInit {
     }
   }
 
-  getQuoteStatusId(quote: Quote): number {
+  getQuoteStatusId(quote: QuoteWorkorder): number {
     if (typeof quote.status_id === "number") {
       return quote.status_id;
     }
@@ -296,7 +233,7 @@ export class DetailPage implements OnInit {
     return quote.status_id?.id ?? 0;
   }
 
-  getQuoteStatusName(quote: Quote): string {
+  getQuoteStatusName(quote: QuoteWorkorder): string {
     const statusId = this.getQuoteStatusId(quote);
 
     switch (statusId) {
@@ -314,7 +251,7 @@ export class DetailPage implements OnInit {
     }
   }
 
-  getQuoteStatusColor(quote: Quote): string {
+  getQuoteStatusColor(quote: QuoteWorkorder): string {
     const statusId = this.getQuoteStatusId(quote);
 
     switch (statusId) {
