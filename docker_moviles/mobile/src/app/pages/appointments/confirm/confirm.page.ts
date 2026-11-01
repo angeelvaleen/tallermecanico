@@ -15,25 +15,11 @@ import {
   ModalController,
 } from "@ionic/angular";
 
-import axios from "axios";
+import { firstValueFrom } from "rxjs";
+import { Appointment,AppointmentServices } from '../../../services/appointments/appointments';
+import { WorkorderServices,WorkorderCreate } from '../../../services/workorders/workorders';
+import { User, AuthService } from "src/app/services/auth/auth";
 
-import { environment } from "src/environments/environment";
-
-interface Appointment {
-  id: number;
-  vehicle_id: number;
-  status_id: number;
-  date: string;
-  time: string;
-  reason: string;
-}
-
-interface Mechanic {
-  id: number;
-  first_name?: string;
-  last_name?: string;
-  email?: string;
-}
 
 @Component({
   selector: "app-appointment-confirm",
@@ -51,7 +37,7 @@ export class ConfirmPage
   appointment:
     Appointment | null = null;
 
-  mechanics: Mechanic[] = [];
+  mechanics: User[] = [];
 
   saving: boolean = false;
 
@@ -75,7 +61,10 @@ export class ConfirmPage
   constructor(
     private formBuilder: FormBuilder,
     private alertController: AlertController,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private appointmentService: AppointmentServices,
+    private authService: AuthService,
+    private workorderService: WorkorderServices,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -125,18 +114,9 @@ export class ConfirmPage
     }
 
     try {
-      const response =
-        await axios.get<{
-          data: Appointment;
-        }>(
-          `${environment.apiUrl}/appointments/${this.appointmentId}`
-        );
-
-      this.appointment =
-        response.data.data;
-
+      this.appointment = await firstValueFrom(this.appointmentService.get(this.appointmentId));
       if (
-        this.appointment.status_id !== 1
+        this.appointment?.status_id !== 1
       ) {
         await this.showAlert(
           "Cita no disponible",
@@ -162,15 +142,10 @@ export class ConfirmPage
 
   async loadMechanics(): Promise<void> {
     try {
-      const response =
-        await axios.get<{
-          data: Mechanic[];
-        }>(
-          `${environment.apiUrl}/users`
-        );
+  
 
-      this.mechanics =
-        response.data.data;
+      this.mechanics = await firstValueFrom(this.authService.listUsers());
+        
     } catch (error) {
       console.error(
         "Error al cargar mecánicos:",
@@ -185,15 +160,11 @@ export class ConfirmPage
   }
 
   getMechanicName(
-    mechanic: Mechanic
+    mechanic: User
   ): string {
-    const name =
-      `${mechanic.first_name || ""} ${
-        mechanic.last_name || ""
-      }`.trim();
 
-    if (name) {
-      return name;
+    if (mechanic.name) {
+      return mechanic.name;
     }
 
     if (mechanic.email) {
@@ -252,16 +223,8 @@ export class ConfirmPage
       number | undefined;
 
     try {
-      /*
-       * Primero creamos la orden de trabajo.
-       *
-       * status_id = 4
-       * corresponde a "Abierta".
-       */
-      const workorderResponse =
-        await axios.post(
-          `${environment.apiUrl}/workorders`,
-          {
+      
+      const workorderData: WorkorderCreate = {
             vehicle_id:
               this.appointment.vehicle_id,
 
@@ -278,23 +241,21 @@ export class ConfirmPage
                 this.confirmForm.value
                   .mileage
               ),
-          }
-        );
 
-      workorderId =
-        workorderResponse.data.data?.id ??
-        workorderResponse.data.id;
+            delivery: null,
+        }
+
+        console.log("Workorder que se enviará:", workorderData);
+      const workorderResponse =
+        await firstValueFrom(this.workorderService.create(workorderData));
+      
+        workorderId = workorderResponse.id;
 
       /*
        * Una vez creada correctamente
        * la orden, confirmamos la cita.
        */
-      await axios.patch(
-        `${environment.apiUrl}/appointments/${this.appointment.id}`,
-        {
-          status_id: 2,
-        }
-      );
+      await firstValueFrom(this.appointmentService.acceptedAppointment(this.appointment.id));
 
       const alert =
         await this.alertController.create({
@@ -326,9 +287,7 @@ export class ConfirmPage
        */
       if (workorderId) {
         try {
-          await axios.delete(
-            `${environment.apiUrl}/workorders/${workorderId}`
-          );
+          await firstValueFrom(this.workorderService.delete(workorderId));
         } catch (deleteError) {
           console.error(
             "No se pudo eliminar la orden creada después del error:",

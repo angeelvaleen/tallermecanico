@@ -85,6 +85,12 @@ export class AppointmentServices {
     ).pipe(map((response) => response.data.data));
   }
 
+  get(id: number): Observable<Appointment> {
+    return defer(() =>
+      axios.get<{ data: Appointment }>(this.url + "/" + id),
+    ).pipe(map((response) => response.data.data));
+  }
+
   detail(id: number): Observable<DetailAppointment> {
     return defer(() => axios.get<{ data: DetailAppointment }>(`${this.url}/${id}?fields=*,vehicle_id.*`)).pipe(
       map((response) => response.data.data),
@@ -120,6 +126,14 @@ export class AppointmentServices {
   executeCancelAppointment(id:number): Observable<void>{
     return defer(()=> axios.patch(`${this.url}/${id}`,{
       status_id:3,
+    })).pipe(
+      map(() => undefined),
+    );
+  }
+
+  acceptedAppointment(id:number): Observable<void>{
+    return defer(()=> axios.patch(`${this.url}/${id}`,{
+      status_id:2,
     })).pipe(
       map(() => undefined),
     );
