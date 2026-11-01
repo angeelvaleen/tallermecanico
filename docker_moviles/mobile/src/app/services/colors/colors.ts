@@ -30,6 +30,10 @@ export class ColorServices {
     })).pipe(map(response => response.data.data));
   }
 
+  listWithOutFilters(): Observable<Color[]> {
+    return defer(() => axios.get<{ data: Color[] }>(this.url)).pipe(map(response => response.data.data));
+  }
+
   detail(id: number): Observable<Color> {
     return defer(() => axios.get<{ data: Color }>(this.url + '/' + id))
       .pipe(map(response => response.data.data));

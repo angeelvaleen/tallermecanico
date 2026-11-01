@@ -16,54 +16,14 @@ import {
   ModalController,
 } from "@ionic/angular";
 
-import axios from "axios";
 
-import { environment } from "src/environments/environment";
-
-interface Workorder {
-  id: number;
-}
-
-interface Service {
-  id: number;
-  name: string;
-  price: number;
-}
-
-interface Part {
-  id: number;
-  name: string;
-  price: number;
-}
-
-interface QuoteCreate {
-  workorder_id: number;
-  user_id: number;
-  status_id: number;
-  subtotal: number;
-  tax: number;
-  total: number;
-  validity: string;
-}
-
-interface QuoteItemCreate {
-  quote_id: number;
-  service_id: number;
-  price: number;
-  discount: number;
-  amount: number;
-  is_approved: boolean;
-}
-
-interface QuotePartCreate {
-  quote_id: number;
-  part_id: number;
-  quantity: number;
-  price: number;
-  discount: number;
-  amount: number;
-  is_approved: boolean;
-}
+import { firstValueFrom } from "rxjs";
+import { QuoteCreate,QuoteServices,Quote } from "src/app/services/quotes/quotes";
+import { QuoteItemCreate, QuoteitemServices  } from "src/app/services/quoteitems/quoteitems";
+import { QuotePartCreate, QuotepartServices } from "src/app/services/quoteparts/quoteparts";
+import { Service,ServiceServices } from "src/app/services/services/services";
+import { Part,PartServices } from "src/app/services/parts/parts";
+import { Workorder, WorkorderServices } from "src/app/services/workorders/workorders";
 
 @Component({
   selector: "app-quotes-form",
@@ -105,10 +65,14 @@ export class FormPage implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-
     private alertController: AlertController,
-
     private modalController: ModalController,
+    private quoteServices: QuoteServices,
+    private quoteItemServices: QuoteitemServices,
+    private quotePartServices: QuotepartServices,
+    private workorderServices: WorkorderServices,
+    private serviceServices: ServiceServices,
+    private partServices: PartServices,
   ) {}
 
   ngOnInit() {
@@ -717,34 +681,23 @@ export class FormPage implements OnInit {
       ) {
 
         requests.push(
-          axios.get<{
-            data: Workorder[];
-          }>(
-            `${environment.apiUrl}/workorders`,
-          ),
+         firstValueFrom(this.workorderServices.listWithOutFilter())
         );
       }
 
       requests.push(
-        axios.get<{
-          data: Service[];
-        }>(
-          `${environment.apiUrl}/services`,
-        ),
+         firstValueFrom(this.serviceServices.listWithOutFilter())
       );
 
       requests.push(
-        axios.get<{
-          data: Part[];
-        }>(
-          `${environment.apiUrl}/parts`,
-        ),
+         firstValueFrom(this.partServices.listWithOutFilter())
       );
 
       const responses =
         await Promise.all(
           requests,
         );
+
 
       let index = 0;
 
@@ -761,16 +714,12 @@ export class FormPage implements OnInit {
       }
 
       this.services =
-        responses[
-          index
-        ].data.data;
+        responses[0];
 
       index++;
 
       this.parts =
-        responses[
-          index
-        ].data.data;
+        responses[1];
 
     } catch (error) {
 
@@ -871,23 +820,14 @@ export class FormPage implements OnInit {
     try {
 
       const quoteResponse =
-        await axios.post<{
-          data: {
-            id: number;
-          };
-        }>(
-          `${environment.apiUrl}/quotes`,
-          quote,
-          {
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-          },
+        await firstValueFrom(
+          this.quoteServices.create(
+            quote,
+          ),
         );
 
       const quoteId =
-        quoteResponse.data.data.id;
+        quoteResponse.id;
 
       for (
         const item of values.items
@@ -923,15 +863,10 @@ export class FormPage implements OnInit {
             false,
         };
 
-        await axios.post(
-          `${environment.apiUrl}/quoteitems`,
-          quoteItem,
-          {
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-          },
+        await firstValueFrom(
+          this.quoteItemServices.create(
+            quoteItem,
+          ),
         );
       }
 
@@ -974,15 +909,10 @@ export class FormPage implements OnInit {
             false,
         };
 
-        await axios.post(
-          `${environment.apiUrl}/quoteparts`,
-          quotePart,
-          {
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-          },
+        await firstValueFrom(
+          this.quotePartServices.create(
+            quotePart,
+          ),
         );
       }
 

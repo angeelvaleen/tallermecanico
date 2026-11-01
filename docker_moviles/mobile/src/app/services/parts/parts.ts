@@ -36,6 +36,12 @@ export class PartServices {
     })).pipe(map(response => response.data.data));
   }
 
+  listWithOutFilter(): Observable<Part[]> {
+    return defer(() => axios.get<{ data: Part[] }>(this.url, {
+      params: { sort: 'id' }
+    })).pipe(map(response => response.data.data));
+  }
+
   detail(id: number): Observable<Part> {
     return defer(() => axios.get<{ data: Part }>(this.url + '/' + id))
       .pipe(map(response => response.data.data));

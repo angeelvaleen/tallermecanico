@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
+import { Observable, defer } from "rxjs";
+import { map } from "rxjs/operators";
 
 export interface User {
   id: number;
+  email:string;
   name: string;
 }
 
@@ -83,5 +86,11 @@ export class AuthService {
         refresh_token: this.refreshToken, mode: 'json'
       });
     } finally { this.clean(); }
+  }
+
+  listUsers(): Observable<User[]> {
+    return defer(() => axios.get<{ data: User[] }>(environment.apiUrl + '/users', {
+      params: { fields: 'id,email,name', sort: 'name' }
+    })).pipe(map(response => response.data.data));
   }
 }

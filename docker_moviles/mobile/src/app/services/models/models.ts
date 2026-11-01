@@ -23,7 +23,6 @@ export interface ModelList {
 export interface ModelCreate {
   brand_id: number;
   name: string;
-  is_active: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -46,6 +45,10 @@ export class ModelServices {
     return defer(() => axios.get<{ data: ModelList[] }>(`${this.url}?fields=*,brand_id.*`, {
       params: { page: page, limit: perPage, sort: 'id', ...this.filter(search) }
     })).pipe(map(response => response.data.data));
+  }
+
+  listWithOutFilters(): Observable<ModelList[]> {
+    return defer(() => axios.get<{ data: ModelList[] }>(`${this.url}?fields=*,brand_id.*`)).pipe(map(response => response.data.data));
   }
 
   detail(id: number): Observable<Model> {

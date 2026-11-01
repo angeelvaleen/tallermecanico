@@ -73,7 +73,11 @@
 
         <p>
           <strong>Entrega:</strong>
-          {{ workorder.delivery ?? 'Sin fecha de entrega' | date: 'yyyy-MM-dd' }}
+         {{
+            workorder.delivery
+              ? (workorder.delivery | date:'dd/MM/yyyy')
+              : 'Sin fecha de entrega'
+          }}
         </p>
 
         <p>

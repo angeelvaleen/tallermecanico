@@ -15,23 +15,9 @@ import {
   ModalController,
 } from "@ionic/angular";
 
-import axios from "axios";
+import { firstValueFrom } from "rxjs";
+import {  Diagnosis, DiagnosisCreate, DiagnosisServices } from "../../../services/diagnoses/diagnoses";
 
-import { environment } from "src/environments/environment";
-
-interface DiagnosisCreate {
-  workorder_id: number;
-  description: string;
-  result?: string;
-}
-
-interface Diagnosis {
-  id: number;
-  workorder_id: number;
-  description: string;
-  result: string;
-  created_at: string;
-}
 
 @Component({
   selector: "app-diagnoses-form",
@@ -71,10 +57,9 @@ export class FormPage implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-
     private alertController: AlertController,
-
     private modalController: ModalController,
+    private diagnosisServices: DiagnosisServices
   ) {}
 
   ngOnInit() {
@@ -140,15 +125,11 @@ export class FormPage implements OnInit {
 
     try {
 
-      const response =
-        await axios.get<{
-          data: Diagnosis;
-        }>(
-          `${environment.apiUrl}/diagnoses/${this.id}`,
-        );
-
-      const diagnosis =
-        response.data.data;
+      const diagnosis = await firstValueFrom(
+        this.diagnosisServices.detail(
+          this.id,
+        ),
+      );
 
       this.diagnosisForm.patchValue({
 
@@ -271,28 +252,18 @@ export class FormPage implements OnInit {
 
       if (this.isEdition) {
 
-        await axios.patch(
-          `${environment.apiUrl}/diagnoses/${this.id}`,
-          diagnosis,
-          {
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-          },
+        await firstValueFrom(
+          this.diagnosisServices.update(
+            this.id!,
+            diagnosis,
+          ),
         );
 
       } else {
-
-        await axios.post(
-          `${environment.apiUrl}/diagnoses`,
-          diagnosis,
-          {
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-          },
+        await firstValueFrom(
+          this.diagnosisServices.create(
+            diagnosis,
+          ),
         );
       }
 

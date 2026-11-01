@@ -32,11 +32,12 @@ export interface PaymentDetail {
 }
 
 export interface PaymentCreate {
-  id: number;
   quote_id: number;
   user_id: number;
   method_id:number;
   amount: number;
+  reference: string;
+  paid_at:string;
 }
 
 

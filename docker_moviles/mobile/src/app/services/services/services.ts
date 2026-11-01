@@ -16,7 +16,6 @@ export interface ServiceCreate {
   name: string;
   price: number;
   description: string;
-  is_active: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -34,6 +33,12 @@ export class ServiceServices {
   list(page = 1, perPage = 3, search = ''): Observable<Service[]> {
     return defer(() => axios.get<{ data: Service[] }>(this.url, {
       params: { page: page, limit: perPage, sort: 'id', ...this.filter(search) }
+    })).pipe(map(response => response.data.data));
+  }
+  
+  listWithOutFilter(): Observable<Service[]> {
+    return defer(() => axios.get<{ data: Service[] }>(this.url, {
+      params: { sort: 'id' }
     })).pipe(map(response => response.data.data));
   }
 

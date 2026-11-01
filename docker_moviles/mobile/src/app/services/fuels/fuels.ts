@@ -13,7 +13,6 @@ export interface Fuel {
 
 export interface FuelCreate {
   name: string;
-  is_active: boolean;
 }
 
 

@@ -1,27 +1,12 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AlertController, ModalController } from '@ionic/angular';
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
 
-interface Brand {
-  id: number;
-  name: string;
-  is_active: boolean;
-}
+import { firstValueFrom } from 'rxjs';
+import { Brand, BrandServices } from 'src/app/services/brands/brands';
+import { Model,ModelCreate,ModelServices } from 'src/app/services/models/models';
 
-interface ModelCreate {
-  brand_id: number;
-  name: string;
-}
 
-interface ModelDetail {
-  id: number;
-  brand_id: number;
-  name: string;
-  is_active: boolean;
-  created_at: string;
-}
 
 @Component({
   selector: 'app-models-form',
@@ -53,6 +38,8 @@ export class FormPage implements OnInit {
     private formBuilder: FormBuilder,
     private alertController: AlertController,
     private modalController: ModalController,
+    private brandServices: BrandServices,
+    private modelServices: ModelServices
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -118,25 +105,11 @@ export class FormPage implements OnInit {
 
     try {
       if (this.isEdition && this.id !== undefined) {
-        await axios.patch(
-          `${environment.apiUrl}/models/${this.id}`,
-          model,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          },
+        await firstValueFrom(
+          this.modelServices.update(this.id, model)
         );
       } else {
-        await axios.post(
-          `${environment.apiUrl}/models`,
-          model,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          },
-        );
+        await firstValueFrom(this.modelServices.create(model));
       }
 
       await this.showAlert(
@@ -170,11 +143,11 @@ export class FormPage implements OnInit {
 
   private async loadBrands(): Promise<void> {
     try {
-      const response = await axios.get<{ data: Brand[] }>(
-        `${environment.apiUrl}/brands`,
+      const response = await firstValueFrom(
+        this.brandServices.listWithOutFilters(),
       );
 
-      this.brands = response.data.data.filter(
+      this.brands = response.filter(
         (brand) => brand.is_active,
       );
     } catch (error) {
@@ -195,11 +168,11 @@ export class FormPage implements OnInit {
     this.loading = true;
 
     try {
-      const response = await axios.get<{ data: ModelDetail }>(
-        `${environment.apiUrl}/models/${this.id}`,
+      const response = await firstValueFrom(
+        this.modelServices.detail(this.id),
       );
 
-      const model = response.data.data;
+      const model = response;
 
       this.modelForm.patchValue({
         brand_id: model.brand_id,

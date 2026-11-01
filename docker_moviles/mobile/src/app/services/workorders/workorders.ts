@@ -72,6 +72,12 @@ export class WorkorderServices {
     })).pipe(map(response => response.data.data));
   }
 
+  listWithOutFilter(): Observable<Workorder[]> {
+    return defer(() => axios.get<{ data: Workorder[] }>(this.url, {
+      params: { sort: 'id' }
+    })).pipe(map(response => response.data.data));
+  }
+
   detail(id: number): Observable<WorkorderDetail> {
     return defer(() => axios.get<{ data: WorkorderDetail }>(`${this.url}/${id}?fields=*,mechanic_id.name,status_id.name,status_id.id,vehicle_id.plate`))
       .pipe(map(response => response.data.data));

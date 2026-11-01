@@ -1,19 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AlertController, ModalController } from '@ionic/angular';
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
+import { firstValueFrom } from 'rxjs';
+import { Brand ,BrandCreate, BrandServices } from 'src/app/services/brands/brands';
 
-interface BrandCreate {
-  name: string;
-}
 
-interface BrandDetail {
-  id: number;
-  name: string;
-  is_active: boolean;
-  created_at: string;
-}
 
 @Component({
   selector: 'app-brands-form',
@@ -40,6 +31,7 @@ export class FormPage implements OnInit {
     private formBuilder: FormBuilder,
     private alertController: AlertController,
     private modalController: ModalController,
+    private brandServices: BrandServices,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -101,25 +93,9 @@ export class FormPage implements OnInit {
 
     try {
       if (this.isEdition && this.id !== undefined) {
-        await axios.patch(
-          `${environment.apiUrl}/brands/${this.id}`,
-          brand,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          },
-        );
+        await firstValueFrom(this.brandServices.update(this.id, brand));
       } else {
-        await axios.post(
-          `${environment.apiUrl}/brands`,
-          brand,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          },
-        );
+        await firstValueFrom(this.brandServices.create(brand));
       }
 
       await this.showAlert(
@@ -159,11 +135,7 @@ export class FormPage implements OnInit {
     this.loading = true;
 
     try {
-      const response = await axios.get<{ data: BrandDetail }>(
-        `${environment.apiUrl}/brands/${this.id}`,
-      );
-
-      const brand = response.data.data;
+      const brand = await firstValueFrom(this.brandServices.detail(this.id));
 
       this.brandForm.patchValue({
         name: brand.name,

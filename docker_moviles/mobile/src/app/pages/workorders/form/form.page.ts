@@ -15,39 +15,11 @@ import {
   ModalController,
 } from "@ionic/angular";
 
-import axios from "axios";
+import { firstValueFrom } from "rxjs";
+import { User,AuthService } from "src/app/services/auth/auth";
+import { WorkorderServices,WorkorderDetail,WorkorderCreate } from '../../../services/workorders/workorders';
+import { Vehicle,VehicleServices } from "src/app/services/vehicles/vehicles";
 
-import { environment } from "src/environments/environment";
-
-interface Vehicle {
-  id: number;
-  plate: string;
-}
-
-interface Mechanic {
-  id: number;
-  first_name?: string;
-  last_name?: string;
-  email?: string;
-}
-
-interface WorkorderDetail {
-  id: number;
-  vehicle_id: number;
-  mechanic_id: number;
-  status_id: number;
-  mileage: number;
-  delivery?: string;
-  created_at: string;
-}
-
-interface WorkorderCreate {
-  vehicle_id: number;
-  status_id: number;
-  mechanic_id: number;
-  mileage: number;
-  delivery?: string;
-}
 
 @Component({
   selector: "app-workorders-form",
@@ -63,7 +35,7 @@ export class FormPage
   workorderForm!: FormGroup;
 
   vehicles: Vehicle[] = [];
-  mechanics: Mechanic[] = [];
+  mechanics: User[] = [];
 
   saved: boolean = false;
   isEdition: boolean = false;
@@ -102,7 +74,10 @@ export class FormPage
   constructor(
     private formBuilder: FormBuilder,
     private alertController: AlertController,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private vehicleServices: VehicleServices,
+    private workorderServices: WorkorderServices,
+    private authService: AuthService,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -153,15 +128,9 @@ export class FormPage
 
   async loadVehicles(): Promise<void> {
     try {
-      const response =
-        await axios.get<{
-          data: Vehicle[];
-        }>(
-          `${environment.apiUrl}/vehicles`
-        );
-
-      this.vehicles =
-        response.data.data;
+      this.vehicles = await firstValueFrom(
+        this.vehicleServices.listWithOutFilters()
+      );
     } catch (error) {
       console.error(
         "Error al cargar vehículos:",
@@ -177,15 +146,9 @@ export class FormPage
 
   async loadMechanics(): Promise<void> {
     try {
-      const response =
-        await axios.get<{
-          data: Mechanic[];
-        }>(
-          `${environment.apiUrl}/users`
-        );
 
-      this.mechanics =
-        response.data.data;
+      this.mechanics = await firstValueFrom(this.authService.listUsers());
+      
     } catch (error) {
       console.error(
         "Error al cargar mecánicos:",
@@ -205,15 +168,11 @@ export class FormPage
     }
 
     try {
-      const response =
-        await axios.get<{
-          data: WorkorderDetail;
-        }>(
-          `${environment.apiUrl}/workorders/${this.id}`
-        );
+      
 
-      const workorder =
-        response.data.data;
+      const workorder = await firstValueFrom(
+        this.workorderServices.detail(this.id)
+      );
 
       this.workorderForm.patchValue({
         vehicle_id:
@@ -245,12 +204,11 @@ export class FormPage
   }
 
   getMechanicName(
-    mechanic: Mechanic
+    mechanic:User
   ): string {
     const name =
-      `${mechanic.first_name || ""} ${
-        mechanic.last_name || ""
-      }`.trim();
+      `${mechanic.name || ""} 
+      `.trim();
 
     if (name) {
       return name;
@@ -360,9 +318,11 @@ export class FormPage
         this.isEdition &&
         this.id
       ) {
-        await axios.patch(
-          `${environment.apiUrl}/workorders/${this.id}`,
-          workorder
+        await firstValueFrom(
+          this.workorderServices.update(
+            this.id,
+            workorder
+          )
         );
       } else {
         /*
@@ -371,9 +331,10 @@ export class FormPage
          */
         workorder.status_id = 4;
 
-        await axios.post(
-          `${environment.apiUrl}/workorders`,
-          workorder
+        await firstValueFrom(
+          this.workorderServices.create(
+            workorder
+          )
         );
       }
 
