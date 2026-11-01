@@ -18,7 +18,7 @@ export interface Workorder {
   mechanic_id: number;
   status_id: number;
   mileage: number;
-  delivery: string;
+  delivery: string|null;
   created_at: string;
 }
 
@@ -28,7 +28,7 @@ export interface WorkorderDetail {
   mechanic_id: User;
   status_id: Status;
   mileage: number;
-  delivery: string;
+  delivery: string|null;
   created_at: string;
 }
 
@@ -37,7 +37,7 @@ export interface WorkorderCreate{
   mechanic_id: number;
   status_id: number;
   mileage: number;
-  delivery: string;
+  delivery: string|null;
 }
 
 @Injectable({ providedIn: 'root' })
