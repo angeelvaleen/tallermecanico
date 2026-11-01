@@ -1,59 +1,15 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { AlertController, ModalController } from "@ionic/angular";
-import axios from "axios";
-import { environment } from "src/environments/environment";
 
-interface Brand {
-  id: number;
-  name: string;
-  is_active: boolean;
-}
+import { firstValueFrom } from "rxjs";
+import { VehicleCreate,VehicleDetail,VehicleServices } from "src/app/services/vehicles/vehicles";
+import { Model,ModelList,ModelServices } from "src/app/services/models/models";
+import { Brand,BrandServices } from "src/app/services/brands/brands";
+import { Fuel,FuelServices } from "src/app/services/fuels/fuels";
+import { Color,ColorServices } from "src/app/services/colors/colors";
 
-interface Model {
-  id: number;
-  brand_id: number;
-  name: string;
-  is_active: boolean;
-}
 
-interface Fuel {
-  id: number;
-  name: string;
-  is_active: boolean;
-}
-
-interface Color {
-  id: number;
-  name: string;
-  is_active: boolean;
-}
-
-interface VehicleCreate {
-  user_id: number;
-  model_id: number;
-  fuel_id: number;
-  color_id: number;
-  plate: string;
-  vin: string;
-  year: number;
-  mileage: number;
-}
-
-interface VehicleDetail {
-  id: number;
-  user_id: number;
-  model_id: number;
-  fuel_id: number;
-  color_id: number;
-  plate: string;
-  vin: string;
-  year: number;
-  mileage: number;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
 
 @Component({
   selector: "app-vehicles-form",
@@ -67,8 +23,8 @@ export class FormPage implements OnInit {
   vehicleForm!: FormGroup;
 
   brands: Brand[] = [];
-  models: Model[] = [];
-  filteredModels: Model[] = [];
+  models: ModelList[] = [];
+  filteredModels: ModelList[] = [];
   fuels: Fuel[] = [];
   colors: Color[] = [];
 
@@ -116,6 +72,11 @@ export class FormPage implements OnInit {
     private formBuilder: FormBuilder,
     private alertController: AlertController,
     private modalController: ModalController,
+    private vehicleServices: VehicleServices,
+    private brandServices: BrandServices,
+    private fuelServices: FuelServices,
+    private colorServices: ColorServices,
+    private modelServices: ModelServices,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -163,11 +124,8 @@ export class FormPage implements OnInit {
 
   private async loadBrands(): Promise<void> {
     try {
-      const response = await axios.get<{ data: Brand[] }>(
-        `${environment.apiUrl}/brands`,
-      );
-
-      this.brands = response.data.data.filter((brand) => brand.is_active);
+      
+      this.brands = (await firstValueFrom(this.brandServices.listWithOutFilters())).filter((brand) => brand.is_active);
     } catch (error) {
       console.log("Error al cargar marcas", error);
 
@@ -177,11 +135,8 @@ export class FormPage implements OnInit {
 
   private async loadFuels(): Promise<void> {
     try {
-      const response = await axios.get<{ data: Fuel[] }>(
-        `${environment.apiUrl}/fuels`,
-      );
 
-      this.fuels = response.data.data.filter((fuel) => fuel.is_active);
+      this.fuels = (await firstValueFrom(this.fuelServices.listWithOutFilters())).filter((fuel) => fuel.is_active);
     } catch (error) {
       console.log("Error al cargar combustibles", error);
 
@@ -191,11 +146,8 @@ export class FormPage implements OnInit {
 
   private async loadColors(): Promise<void> {
     try {
-      const response = await axios.get<{ data: Color[] }>(
-        `${environment.apiUrl}/colors`,
-      );
-
-      this.colors = response.data.data.filter((color) => color.is_active);
+  
+      this.colors = (await firstValueFrom(this.colorServices.listWithOutFilters())).filter((color) => color.is_active);
     } catch (error) {
       console.log("Error al cargar colores", error);
 
@@ -205,17 +157,21 @@ export class FormPage implements OnInit {
 
   private async loadModels(): Promise<void> {
     try {
-      const response = await axios.get<{ data: Model[] }>(
-        `${environment.apiUrl}/models`,
-      );
-
-      this.models = response.data.data.filter((model) => model.is_active);
+      this.models = (
+        await firstValueFrom(
+          this.modelServices.listWithOutFilters()
+        )
+      ).filter((model) => model.is_active);
 
       this.filterModels();
+
     } catch (error) {
       console.log("Error al cargar modelos", error);
 
-      await this.showAlert("Error", "No fue posible cargar los modelos");
+      await this.showAlert(
+        "Error",
+        "No fue posible cargar los modelos"
+      );
     }
   }
 
@@ -234,7 +190,9 @@ export class FormPage implements OnInit {
   }
 
   private filterModels(): void {
-    const brandId = Number(this.vehicleForm.get("brand_id")?.value);
+    const brandId = Number(
+      this.vehicleForm.get("brand_id")?.value
+    );
 
     if (!brandId) {
       this.filteredModels = [];
@@ -242,7 +200,7 @@ export class FormPage implements OnInit {
     }
 
     this.filteredModels = this.models.filter(
-      (model) => model.brand_id === brandId,
+      (model) => model.brand_id.id === brandId
     );
   }
 
@@ -250,19 +208,15 @@ export class FormPage implements OnInit {
     try {
       await this.loadModels();
 
-      const response = await axios.get<{ data: VehicleDetail }>(
-        `${environment.apiUrl}/vehicles/${this.id}`,
-      );
+      const vehicle = await firstValueFrom(this.vehicleServices.detail(this.id!));
 
-      const vehicle = response.data.data;
-
-      const model = this.models.find((item) => item.id === vehicle.model_id);
+      const model = this.models.find((item) => item.id === vehicle.model_id.id);
 
       this.vehicleForm.patchValue({
-        brand_id: model?.brand_id ?? "",
-        model_id: vehicle.model_id,
-        fuel_id: vehicle.fuel_id,
-        color_id: vehicle.color_id,
+        brand_id: model?.brand_id.id ?? "",
+        model_id: vehicle.model_id.id,
+        fuel_id: vehicle.fuel_id.id,
+        color_id: vehicle.color_id.id,
         plate: vehicle.plate,
         vin: vehicle.vin,
         year: vehicle.year,
@@ -324,26 +278,14 @@ export class FormPage implements OnInit {
 
     try {
       if (this.isEdition && this.id) {
-        await axios.patch(
-          `${environment.apiUrl}/vehicles/${this.id}`,
-          vehicle,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          },
-        );
+        await firstValueFrom(this.vehicleServices.update(this.id, vehicle));
 
         await this.showAlert(
           "Vehículo actualizado",
           "El vehículo fue actualizado exitosamente",
         );
       } else {
-        await axios.post(`${environment.apiUrl}/vehicles`, vehicle, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        await firstValueFrom(this.vehicleServices.create(vehicle));
 
         await this.showAlert(
           "Vehículo guardado",

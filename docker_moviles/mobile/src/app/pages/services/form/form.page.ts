@@ -1,23 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AlertController, ModalController } from '@ionic/angular';
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
 
-interface ServiceCreate {
-  name: string;
-  price: number;
-  description: string;
-}
+import { firstValueFrom } from 'rxjs';
+import { ServiceServices,ServiceCreate } from 'src/app/services/services/services';
 
-interface ServiceDetail {
-  id: number;
-  name: string;
-  price: number;
-  description: string;
-  is_active: boolean;
-  created_at: string;
-}
 
 @Component({
   selector: 'app-services-form',
@@ -49,6 +36,7 @@ export class FormPage implements OnInit {
     private formBuilder: FormBuilder,
     private alertController: AlertController,
     private modalController: ModalController,
+    private serviceServices: ServiceServices,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -127,25 +115,9 @@ export class FormPage implements OnInit {
 
     try {
       if (this.isEdition && this.id !== undefined) {
-        await axios.patch(
-          `${environment.apiUrl}/services/${this.id}`,
-          service,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          },
-        );
+        await firstValueFrom(this.serviceServices.update(this.id, service));
       } else {
-        await axios.post(
-          `${environment.apiUrl}/services`,
-          service,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          },
-        );
+        await firstValueFrom(this.serviceServices.create(service));
       }
 
       await this.showAlert(
@@ -185,11 +157,8 @@ export class FormPage implements OnInit {
     this.loading = true;
 
     try {
-      const response = await axios.get<{ data: ServiceDetail }>(
-        `${environment.apiUrl}/services/${this.id}`,
-      );
-
-      const service = response.data.data;
+    
+      const service = await firstValueFrom(this.serviceServices.detail(this.id));
 
       this.serviceForm.patchValue({
         name: service.name,

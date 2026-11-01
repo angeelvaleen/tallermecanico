@@ -14,7 +14,7 @@ import { FormPage } from './form.page';
     FormsModule,
     ReactiveFormsModule,
     IonicModule,
-    FormPageRoutingModule
+    FormPageRoutingModule,
   ],
   declarations: [FormPage]
 })

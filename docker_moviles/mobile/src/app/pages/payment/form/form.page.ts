@@ -2,34 +2,13 @@ import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 import { AlertController, LoadingController } from "@ionic/angular";
-import axios from "axios";
-import { environment } from "src/environments/environment";
 
-interface PaymentMethod {
-  id: number;
-  name: string;
-}
+import { firstValueFrom } from "rxjs";
+import { PaymentServices,PaymentCreate } from "src/app/services/payments/payments";
+import { QuoteDetail,QuoteServices } from "src/app/services/quotes/quotes";
+import { Method,MethodServices } from "src/app/services/methods/methods";
 
-interface Quote {
-  id: number;
-  workorder_id: any;
-  user_id: number;
-  status_id: any;
-  subtotal: string;
-  tax: string;
-  total: string;
-  validity: string;
-  created_at: string;
-}
 
-interface PaymentCreate {
-  quote_id: number;
-  user_id: number;
-  amount: number;
-  method_id: number;
-  reference: string | null;
-  paid_at: string;
-}
 
 @Component({
   selector: "app-payment-form",
@@ -40,8 +19,8 @@ interface PaymentCreate {
 export class FormPage implements OnInit {
   paymentForm!: FormGroup;
 
-  quote: Quote | null = null;
-  paymentMethods: PaymentMethod[] = [];
+  quote: QuoteDetail | null = null;
+  paymentMethods: Method[] = [];
 
   formattedSubtotal: string = "";
   formattedTax: string = "";
@@ -61,6 +40,9 @@ export class FormPage implements OnInit {
     private router: Router,
     private alertController: AlertController,
     private loadingController: LoadingController,
+    private paymentServices: PaymentServices,
+    private quoteServices: QuoteServices,
+    private methodServices: MethodServices,
   ) {}
 
   ngOnInit(): void {
@@ -130,13 +112,10 @@ export class FormPage implements OnInit {
   }
 
   private async loadQuote(quoteId: string): Promise<void> {
-    const response = await axios.get<{ data: Quote }>(
-      `${environment.apiUrl}/quotes/${encodeURIComponent(
-        quoteId,
-      )}?fields=*,workorder_id.*,status_id.*`,
+    
+    this.quote = await firstValueFrom(
+      this.quoteServices.detail(Number(quoteId)),
     );
-
-    this.quote = response.data.data;
 
     this.formattedSubtotal = Number(this.quote?.subtotal).toFixed(2);
 
@@ -146,11 +125,9 @@ export class FormPage implements OnInit {
   }
 
   private async loadPaymentMethods(): Promise<void> {
-    const response = await axios.get<{ data: PaymentMethod[] }>(
-      `${environment.apiUrl}/methods?fields=*`,
+    this.paymentMethods = await firstValueFrom(
+      this.methodServices.listWithOutFilters(),
     );
-
-    this.paymentMethods = response.data.data;
   }
 
   getError(controlName: string): string {
@@ -232,15 +209,7 @@ export class FormPage implements OnInit {
     try {
       const payment = this.createPaymentData();
 
-      const response = await axios.post(
-        `${environment.apiUrl}/payment`,
-        payment,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
+      const response = await firstValueFrom(this.paymentServices.create(payment));
 
       await loading.dismiss();
       this.saving = false;
@@ -254,7 +223,7 @@ export class FormPage implements OnInit {
       await alert.present();
       await alert.onDidDismiss();
 
-      await this.router.navigate(["/payment/detail", response.data.data.id], {
+      await this.router.navigate(["/payment/detail", response.id], {
         replaceUrl: true,
       });
     } catch (error) {

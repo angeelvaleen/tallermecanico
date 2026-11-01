@@ -13,7 +13,6 @@ export interface Method {
 
 export interface MethodCreate {
   name: string;
-  is_active: boolean;
 }
 
 @Injectable({ providedIn: 'root' })

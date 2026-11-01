@@ -50,9 +50,6 @@ export interface VehicleCreate {
   vin: string;
   year: number;
   mileage: number;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
 }
 
 @Injectable({ providedIn: 'root' })

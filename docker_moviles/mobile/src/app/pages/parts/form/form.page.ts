@@ -1,23 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AlertController, ModalController } from '@ionic/angular';
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
 
-interface PartCreate {
-  name: string;
-  price: number;
-  description: string;
-}
+import { firstValueFrom } from 'rxjs';
+import { PartCreate,PartServices } from 'src/app/services/parts/parts';
 
-interface PartDetail {
-  id: number;
-  name: string;
-  price: number;
-  description: string;
-  is_active: boolean;
-  created_at: string;
-}
 
 @Component({
   selector: 'app-parts-form',
@@ -49,6 +36,7 @@ export class FormPage implements OnInit {
     private formBuilder: FormBuilder,
     private alertController: AlertController,
     private modalController: ModalController,
+    private partServices: PartServices,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -84,12 +72,13 @@ export class FormPage implements OnInit {
   }
 
   private async loadPart(): Promise<void> {
-    try {
-      const response = await axios.get<{ data: PartDetail }>(
-        `${environment.apiUrl}/parts/${this.id}`
-      );
+    if (this.id === undefined) {
+      return;
+    }
 
-      const part = response.data.data;
+    try {
+  
+      const part = await firstValueFrom(this.partServices.detail(this.id));
 
       this.partForm.patchValue({
         name: part.name,
@@ -151,15 +140,7 @@ export class FormPage implements OnInit {
     try {
       if (this.isEdition && this.id) {
 
-        await axios.patch(
-          `${environment.apiUrl}/parts/${this.id}`,
-          part,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        await firstValueFrom(this.partServices.update(this.id, part));
 
         await this.showAlert(
           'Refacción actualizada',
@@ -168,15 +149,7 @@ export class FormPage implements OnInit {
 
       } else {
 
-        await axios.post(
-          `${environment.apiUrl}/parts`,
-          part,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        await firstValueFrom(this.partServices.create(part));
 
         await this.showAlert(
           'Refacción guardada',

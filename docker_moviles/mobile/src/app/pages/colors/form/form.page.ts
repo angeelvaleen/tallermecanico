@@ -1,22 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AlertController, ModalController } from '@ionic/angular';
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
 import { firstValueFrom } from 'rxjs';
-import { ColorServices } from '../../../services/colors/colors';
+import { Color,  ColorCreate, ColorServices } from '../../../services/colors/colors';
 
-
-interface ColorCreate {
-  name: string;
-}
-
-interface ColorDetail {
-  id: number;
-  name: string;
-  is_active: boolean;
-  created_at: string;
-}
 
 @Component({
   selector: 'app-colors-form',
