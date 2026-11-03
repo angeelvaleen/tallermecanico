@@ -1,19 +1,10 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-button
-        (click)="closeModal()"
-        [disabled]="saved"
-      >
-        <ion-icon name="close-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-
-    <ion-title>
-      {{ isEdition ? 'Editar servicio' : 'Nuevo servicio' }}
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-toolbar name="{{ isEdition ? 'Editar Servicio' : 'Nuevo Servicio' }}" color="primary" [showMenu]="false">
+  <ion-buttons slot="start">
+    <ion-button (click)="closeModal()" [disabled]="saved">
+      <ion-icon name="close-outline"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</app-toolbar>
 
 <ion-content class="ion-padding">
   <form
@@ -87,3 +78,5 @@
 
   </form>
 </ion-content>
+
+

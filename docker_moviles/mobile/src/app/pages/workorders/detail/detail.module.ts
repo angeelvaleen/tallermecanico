@@ -4,6 +4,8 @@ import { FormsModule } from "@angular/forms";
 
 import { IonicModule } from "@ionic/angular";
 
+import { ToolbarModule } from "src/app/components/toolbar/toolbar.module";
+
 import { DetailPageRoutingModule } from "./detail-routing.module";
 
 import { DetailPage } from "./detail.page";
@@ -19,6 +21,7 @@ import { FormPageModule as QuoteFormPageModule } from "../../quotes/form/form.mo
     CommonModule,
     FormsModule,
     IonicModule,
+    ToolbarModule,
     DetailPageRoutingModule,
     DiagnosisFormPageModule,
     EvidenceFormPageModule,
@@ -30,3 +33,4 @@ import { FormPageModule as QuoteFormPageModule } from "../../quotes/form/form.mo
   ],
 })
 export class DetailPageModule {}
+

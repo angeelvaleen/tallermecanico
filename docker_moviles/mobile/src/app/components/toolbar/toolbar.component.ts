@@ -10,6 +10,7 @@ export class ToolbarComponent  implements OnInit {
 
   @Input() name: string = '';
   @Input() color: string = 'primary';
+  @Input() showMenu: boolean = true;
 
   constructor() { }
 

@@ -1,11 +1,10 @@
-<app-toolbar name="Metodos de pago" color="primary">
+<app-toolbar name="Métodos de pago" color="primary">
   <ion-buttons slot="end">
-    <ion-button fill="primary" (click)="createMethod()" aria-label="Nuevo metodo">
+    <ion-button fill="primary" (click)="createMethod()" aria-label="Nuevo método">
       <ion-icon slot="icon-only" name="add"></ion-icon>
     </ion-button>
   </ion-buttons>
-</app-toolbar>>
-
+</app-toolbar>
 
 <ion-content>
   <ion-list>
@@ -18,10 +17,6 @@
           {{ method.is_active ? 'Activo' : 'Inactivo' }}
         </p>
 
-        <p>
-          Registro:
-          {{ method.created_at | date:'yyyy-MM-dd' }}
-        </p>
       </ion-label>
 
       <ion-button

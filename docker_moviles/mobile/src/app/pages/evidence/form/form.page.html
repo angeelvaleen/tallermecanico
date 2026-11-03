@@ -1,29 +1,10 @@
-<ion-header>
-
-  <ion-toolbar>
-
-    <ion-buttons slot="start">
-
-      <ion-button
-        (click)="closeModal()"
-      >
-
-        <ion-icon
-          name="close-outline"
-        ></ion-icon>
-
-      </ion-button>
-
-    </ion-buttons>
-
-
-    <ion-title>
-      Nueva Evidencia
-    </ion-title>
-
-  </ion-toolbar>
-
-</ion-header>
+<app-toolbar name="Nueva Evidencia" color="primary" [showMenu]="false">
+  <ion-buttons slot="start">
+    <ion-button (click)="closeModal()">
+      <ion-icon name="close-outline"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</app-toolbar>
 
 
 <ion-content class="ion-padding">
@@ -101,3 +82,5 @@
   </div>
 
 </ion-content>
+
+

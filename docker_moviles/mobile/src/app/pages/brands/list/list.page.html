@@ -1,13 +1,14 @@
 <app-toolbar name="Marcas" color="primary">
   <ion-buttons slot="end">
-    <ion-button fill="primary" (click)="createBrand()" aria-label="Nuevo couta">
+    <ion-button fill="primary" (click)="createBrand()" aria-label="Nueva marca">
       <ion-icon slot="icon-only" name="add"></ion-icon>
     </ion-button>
   </ion-buttons>
 </app-toolbar>
 
-
 <ion-content>
+   <ion-searchbar [value]="search" [debounce]="300" (ionInput)="handleInput($event)" placeholder="Buscar marcas" aria-label="Buscar marcas"></ion-searchbar>
+    <p class="ion-padding" *ngIf="total === 0">No se encontraron marcas.</p>
   <ion-list>
     <ion-item *ngFor="let brand of brands">
       <ion-label class="ion-text-wrap">
@@ -29,4 +30,11 @@
       </ion-button>
     </ion-item>
   </ion-list>
+  <app-pagination
+    [total]="total"
+    [perPage]="perPage"
+    [currentPage]="currentPage"
+    [maxVisiblePage]="5"
+    (changePage)="changePage($event)"
+  ></app-pagination>
 </ion-content>
