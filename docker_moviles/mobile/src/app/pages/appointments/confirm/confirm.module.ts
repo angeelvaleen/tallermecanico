@@ -8,6 +8,8 @@ import {
 
 import { IonicModule } from "@ionic/angular";
 
+import { ToolbarModule } from "src/app/components/toolbar/toolbar.module";
+
 import { ConfirmPage } from "./confirm.page";
 
 @NgModule({
@@ -16,6 +18,7 @@ import { ConfirmPage } from "./confirm.page";
     FormsModule,
     ReactiveFormsModule,
     IonicModule,
+    ToolbarModule,
   ],
 
   declarations: [

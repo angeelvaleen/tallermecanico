@@ -78,18 +78,7 @@ const routes: Routes = [
     path: 'fuels/list',
     loadChildren: () => import('./pages/fuels/list/list.module').then( m => m.ListPageModule)
   },
-  {
-    path: 'history/detail/:id',
-    loadChildren: () => import('./pages/history/detail/detail.module').then( m => m.DetailPageModule)
-  },
-  {
-    path: 'history/form',
-    loadChildren: () => import('./pages/history/form/form.module').then( m => m.FormPageModule)
-  },
-  {
-    path: 'history/list',
-    loadChildren: () => import('./pages/history/list/list.module').then( m => m.ListPageModule)
-  },
+
   {
     path: 'methods/detail/:id',
     loadChildren: () => import('./pages/methods/detail/detail.module').then( m => m.DetailPageModule)

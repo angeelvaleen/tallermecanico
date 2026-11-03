@@ -1,5 +1,4 @@
-<ion-header>
-  <ion-toolbar>
+<app-toolbar [showMenu]="false">
     <ion-buttons slot="start">
       <ion-button
         (click)="closeModal()"
@@ -12,8 +11,7 @@
     <ion-title>
       {{ isEdition ? 'Editar método de pago' : 'Nuevo método de pago' }}
     </ion-title>
-  </ion-toolbar>
-</ion-header>
+</app-toolbar>
 
 <ion-content class="ion-padding">
   <form
@@ -54,3 +52,7 @@
     </ion-button>
   </form>
 </ion-content>
+
+
+
+

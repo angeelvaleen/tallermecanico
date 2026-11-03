@@ -7,6 +7,8 @@ import {
 
 import { IonicModule } from "@ionic/angular";
 
+import { ToolbarModule } from "src/app/components/toolbar/toolbar.module";
+
 import { FormPageRoutingModule } from "./form-routing.module";
 
 import { FormPage } from "./form.page";
@@ -17,6 +19,7 @@ import { FormPage } from "./form.page";
     FormsModule,
     ReactiveFormsModule,
     IonicModule,
+    ToolbarModule,
     FormPageRoutingModule,
   ],
 
@@ -25,3 +28,4 @@ import { FormPage } from "./form.page";
   ],
 })
 export class FormPageModule {}
+

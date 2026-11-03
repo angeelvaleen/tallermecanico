@@ -8,12 +8,15 @@ import { DetailPageRoutingModule } from './detail-routing.module';
 
 import { DetailPage } from './detail.page';
 
+import { ToolbarModule } from 'src/app/components/toolbar/toolbar.module';
+
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    DetailPageRoutingModule
+    DetailPageRoutingModule,
+    ToolbarModule
   ],
   declarations: [DetailPage]
 })

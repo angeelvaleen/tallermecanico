@@ -1,5 +1,4 @@
-<ion-header>
-  <ion-toolbar>
+<app-toolbar [showMenu]="false">
 
     <ion-buttons slot="start">
       <ion-button (click)="closeModal()">
@@ -10,9 +9,7 @@
     <ion-title>
       {{ isEdition ? 'Editar Refacción' : 'Nueva Refacción' }}
     </ion-title>
-
-  </ion-toolbar>
-</ion-header>
+</app-toolbar>
 
 <ion-content class="ion-padding">
 
@@ -89,3 +86,7 @@
   </form>
 
 </ion-content>
+
+
+
+
