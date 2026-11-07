@@ -1,0 +1,30 @@
+<ion-content [fullscreen]="true">
+  <div class="forbidden-wrapper">
+    <div class="forbidden-card">
+      
+      <!-- Icono de Seguridad Minimalista -->
+      <div class="icon-badge">
+        <div class="icon-pulse"></div>
+        <ion-icon name="shield-checkmark-outline"></ion-icon>
+      </div>
+
+      <!-- Encabezado y Texto Esencial -->
+      <span class="error-badge">ERROR 403</span>
+      <h1 class="title">Acceso denegado</h1>
+      <p class="subtitle">
+        No tienes los permisos requeridos para ver este contenido.
+      </p>
+
+      <!-- Botón de Acción Principal -->
+      <ion-button 
+        expand="block" 
+        shape="round" 
+        class="action-btn" 
+        (click)="goHome()">
+        <ion-icon slot="start" name="arrow-back-outline"></ion-icon>
+        Volver al inicio
+      </ion-button>
+
+    </div>
+  </div>
+</ion-content>

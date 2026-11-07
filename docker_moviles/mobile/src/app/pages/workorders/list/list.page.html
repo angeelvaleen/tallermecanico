@@ -1,6 +1,6 @@
 <app-toolbar name="Ordenes de trabajo" color="primary">
   <ion-buttons slot="end">
-    <ion-button fill="primary" (click)="createWorkorder()" aria-label="Nuevo orden">
+    <ion-button *ngIf="canCreate" fill="primary" (click)="createWorkorder()" aria-label="Nuevo orden">
       <ion-icon slot="icon-only" name="add"></ion-icon>
     </ion-button>
   </ion-buttons>
@@ -57,6 +57,7 @@
         slot="end"
         fill="clear"
         color="warning"
+        *ngIf="canUpdate"
         (click)="editWorkorder(workorder.id)"
       >
         <ion-icon

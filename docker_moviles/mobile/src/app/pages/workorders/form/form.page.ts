@@ -147,7 +147,7 @@ export class FormPage
   async loadMechanics(): Promise<void> {
     try {
 
-      this.mechanics = await firstValueFrom(this.authService.listUsers());
+      this.mechanics = await firstValueFrom(this.authService.getMechanicList());
       
     } catch (error) {
       console.error(
@@ -207,7 +207,7 @@ export class FormPage
     mechanic:User
   ): string {
     const name =
-      `${mechanic.name || ""} 
+      `${mechanic.first_name || ""} 
       `.trim();
 
     if (name) {

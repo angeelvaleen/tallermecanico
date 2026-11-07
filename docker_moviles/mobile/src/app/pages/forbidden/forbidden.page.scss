@@ -1,0 +1,123 @@
+ion-content {
+--background: var(--ion-background-color, #f8fafc);
+}
+
+.forbidden-wrapper {
+min-height: 100%;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 24px;
+box-sizing: border-box;
+}
+
+.forbidden-card {
+width: 100%;
+max-width: 360px;
+display: flex;
+flex-direction: column;
+align-items: center;
+text-align: center;
+padding: 36px 24px;
+border-radius: 28px;
+background: var(--ion-card-background, rgba(255, 255, 255, 0.8));
+backdrop-filter: blur(16px);
+-webkit-backdrop-filter: blur(16px);
+border: 1px solid rgba(var(--ion-color-danger-rgb, 235, 68, 90), 0.12);
+box-shadow: 0 12px 32px rgba(0, 0, 0, 0.04);
+}
+
+// ------------------------------------------
+// ICONO PRINCIPAL CON EFECTO SUAVE DE LUZ
+// ------------------------------------------
+
+.icon-badge {
+position: relative;
+width: 88px;
+height: 88px;
+border-radius: 50%;
+background: rgba(var(--ion-color-danger-rgb, 235, 68, 90), 0.08);
+display: flex;
+align-items: center;
+justify-content: center;
+margin-bottom: 24px;
+
+ion-icon {
+font-size: 44px;
+color: var(--ion-color-danger, #eb445a);
+z-index: 2;
+}
+
+.icon-pulse {
+position: absolute;
+inset: -6px;
+border-radius: 50%;
+border: 1.5px solid rgba(var(--ion-color-danger-rgb, 235, 68, 90), 0.25);
+opacity: 0.6;
+}
+}
+
+// ------------------------------------------
+// TEXTOS Y TIPOGRAFÍA
+// ------------------------------------------
+
+.error-badge {
+display: inline-block;
+font-size: 11px;
+font-weight: 800;
+letter-spacing: 2px;
+color: var(--ion-color-danger, #eb445a);
+background: rgba(var(--ion-color-danger-rgb, 235, 68, 90), 0.1);
+padding: 4px 12px;
+border-radius: 20px;
+margin-bottom: 14px;
+}
+
+.title {
+font-size: 24px;
+font-weight: 700;
+color: var(--ion-text-color, #0f172a);
+margin: 0 0 10px 0;
+letter-spacing: -0.4px;
+}
+
+.subtitle {
+font-size: 14px;
+line-height: 1.5;
+color: var(--ion-color-medium, #64748b);
+margin: 0 0 32px 0;
+max-width: 260px;
+}
+
+// ------------------------------------------
+// BOTÓN PRINCIPAL
+// ------------------------------------------
+
+.action-btn {
+width: 100%;
+height: 50px;
+margin: 0 0 20px 0;
+--background: var(--ion-color-primary, #3880ff);
+--border-radius: 16px;
+--box-shadow: 0 8px 20px rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.28);
+font-size: 15px;
+font-weight: 600;
+letter-spacing: 0.2px;
+
+ion-icon {
+font-size: 18px;
+margin-right: 4px;
+}
+}
+
+// ------------------------------------------
+// PIE / METADATOS
+// ------------------------------------------
+
+.footer-meta {
+font-size: 10px;
+font-weight: 600;
+letter-spacing: 1px;
+color: var(--ion-color-step-400, #94a3b8);
+opacity: 0.7;
+}

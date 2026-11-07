@@ -4,6 +4,8 @@ import { FormPage } from '../form/form.page';
 
 import { firstValueFrom } from 'rxjs';
 import { VehicleServices, Vehicle } from 'src/app/services/vehicles/vehicles';
+import { ROLE_ACTIONS } from 'src/app/constants/role_actions';
+import { AuthService } from 'src/app/services/auth/auth';
 
 
 @Component({
@@ -12,18 +14,30 @@ import { VehicleServices, Vehicle } from 'src/app/services/vehicles/vehicles';
   styleUrls: ['./list.page.scss'],
   standalone: false,
 })
-export class ListPage {
+export class ListPage implements OnInit {
 
   vehicles: Vehicle[] = [];
   total: number = 0;
   currentPage: number = 1;
   perPage: number = 15;
   search: string = "";
+  canCreate = false;
+  canUpdate = false;
 
   constructor(
     private modalController: ModalController,
     private vehicleServices: VehicleServices,
+    private authService: AuthService
   ) {}
+
+  ngOnInit(): void {
+    this.canCreate = this.authService.canByRole(
+      ROLE_ACTIONS.vehicles.create
+    );
+    this.canUpdate = this.authService.canByRole(
+      ROLE_ACTIONS.vehicles.update
+    );
+  }
 
   ionViewWillEnter(): void {
    void this.chargerData();

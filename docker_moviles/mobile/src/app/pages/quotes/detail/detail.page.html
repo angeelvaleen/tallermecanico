@@ -132,6 +132,7 @@
             </ion-label>
 
             <ion-toggle
+              *ngIf="toggleItem"
               slot="end"
               [checked]="item.is_approved === 1"
               [disabled]="quote.status_id.id !== 9"
@@ -205,6 +206,7 @@
             </ion-label>
 
             <ion-toggle
+              *ngIf="toggleItem"
               slot="end"
               [checked]="part.is_approved === 1"
               [disabled]="quote.status_id.id !== 9"
@@ -262,6 +264,7 @@
     >
 
       <ion-button
+        *ngIf="approve"
         expand="block"
         color="success"
         (click)="approveQuote()"
@@ -276,6 +279,7 @@
 
 
       <ion-button
+        *ngIf="reject"
         expand="block"
         color="danger"
         fill="outline"

@@ -10,6 +10,10 @@ import { AppointmentServices, DetailAppointment } from "src/app/services/appoint
 import { FormPage } from "../form/form.page";
 import { ConfirmPage } from "../confirm/confirm.page";
 import { firstValueFrom } from 'rxjs';
+import { ROLE_ACTIONS } from "src/app/constants/role_actions";
+import { AuthService } from "src/app/services/auth/auth";
+
+
 
 @Component({
   selector: "app-appointments-detail",
@@ -21,6 +25,10 @@ export class DetailPage implements OnInit {
   appointment: DetailAppointment | null = null;
 
   messageError: string = "";
+  canUpdate = false;
+  canAccept = false;
+  canCancel = false;
+
 
   constructor(
     private route: ActivatedRoute,
@@ -28,10 +36,25 @@ export class DetailPage implements OnInit {
     private modalController: ModalController,
     private alertController: AlertController,
     private appointmentServices: AppointmentServices,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
+    this.canUpdate = this.authService.canByRole(
+      ROLE_ACTIONS.appointments.update
+    );
+
+    this.canAccept = this.authService.canByRole(
+      ROLE_ACTIONS.appointments.accept
+    );
+
+    this.canCancel = this.authService.canByRole(
+      ROLE_ACTIONS.appointments.cancel
+    );
+    
     this.loadAppointment();
+    
+    
   }
 
   async loadAppointment(): Promise<void> {

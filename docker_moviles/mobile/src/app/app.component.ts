@@ -22,6 +22,7 @@ export class AppComponent {
     { path: "/payment/list", text: "Pagos" },
     { path: "/methods/list", text: "Metodos de pago" },
     { path: "/diagnoses/list", text: "Diagnosticos" },
+    { path: "/evidences/list", text: "Evidencias" },
 
 
 
