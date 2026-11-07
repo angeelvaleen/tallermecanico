@@ -706,20 +706,18 @@ export class FormPage implements OnInit {
       ) {
 
         this.workorders =
-          responses[
-            index
-          ].data.data;
+          responses[0];
 
         index++;
       }
 
       this.services =
-        responses[0];
+        responses[1];
 
       index++;
 
       this.parts =
-        responses[1];
+        responses[2];
 
     } catch (error) {
 

@@ -4,6 +4,8 @@ import { firstValueFrom } from 'rxjs';
 import { AppointmentServices } from '../../../services/appointments/appointments';
 import { FormPage } from "../form/form.page";
 import { ConfirmPage } from "../confirm/confirm.page";
+import { ROLE_ACTIONS } from "src/app/constants/role_actions";
+import { AuthService } from "src/app/services/auth/auth";
 
 interface Appointment {
   id: number;
@@ -21,21 +23,44 @@ interface Appointment {
   styleUrls: ["./list.page.scss"],
   standalone: false,
 })
-export class ListPage  {
+export class ListPage implements OnInit {
   appointments: Appointment[] = [];
   total: number = 0;
   currentPage: number = 1;
   perPage: number = 15;
   search: string = "";
   selectedDate: string | null = null;
+  canCreate = false;
+  canUpdate = false;
+  canAccept = false;
+  canCancel = false;
 
   constructor(
     private modalController: ModalController,
     private alertController: AlertController,
     private appointmentServices: AppointmentServices,
+    private authService: AuthService,
   ) {}
 
+  ngOnInit(): void {
+    this.canCreate = this.authService.canByRole(
+      ROLE_ACTIONS.appointments.create
+    );
+    this.canUpdate = this.authService.canByRole(
+      ROLE_ACTIONS.appointments.update
+    );
+
+    this.canAccept = this.authService.canByRole(
+      ROLE_ACTIONS.appointments.accept
+    );
+
+    this.canCancel = this.authService.canByRole(
+      ROLE_ACTIONS.appointments.cancel
+    );
+  }
+
   ionViewWillEnter(): void {
+    
     void this.chargerData();
   }
 

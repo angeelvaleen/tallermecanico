@@ -144,7 +144,7 @@ export class ConfirmPage
     try {
   
 
-      this.mechanics = await firstValueFrom(this.authService.listUsers());
+      this.mechanics = await firstValueFrom(this.authService.getMechanicList());
         
     } catch (error) {
       console.error(
@@ -163,8 +163,8 @@ export class ConfirmPage
     mechanic: User
   ): string {
 
-    if (mechanic.name) {
-      return mechanic.name;
+    if (mechanic.first_name) {
+      return mechanic.first_name;
     }
 
     if (mechanic.email) {

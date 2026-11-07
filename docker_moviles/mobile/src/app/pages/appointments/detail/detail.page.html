@@ -70,6 +70,7 @@
 
       <!-- Editar -->
       <ion-button
+        *ngIf="canUpdate"
         expand="block"
         color="warning"
         class="ion-margin-top"
@@ -85,6 +86,7 @@
 
       <!-- Confirmar -->
       <ion-button
+        *ngIf="canAccept"
         expand="block"
         color="success"
         class="ion-margin-top"
@@ -100,6 +102,7 @@
 
       <!-- Cancelar -->
       <ion-button
+        *ngIf="canCancel"
         expand="block"
         color="danger"
         class="ion-margin-top"

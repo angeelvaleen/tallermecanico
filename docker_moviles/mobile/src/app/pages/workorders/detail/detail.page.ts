@@ -16,7 +16,8 @@ import { Diagnosis,DiagnosisServices } from "src/app/services/diagnoses/diagnose
 import { Evidence,EvidenceServices } from "src/app/services/evidences/evidences";
 import { QuoteWorkorder, QuoteServices } from "src/app/services/quotes/quotes";
 
-
+import { ROLE_ACTIONS } from "src/app/constants/role_actions";
+import { AuthService } from "src/app/services/auth/auth";
 
 
 @Component({
@@ -36,6 +37,10 @@ export class DetailPage implements OnInit {
 
   messageError: string = "";
 
+  canAddDiagnostic: boolean = false;
+  canAddEvidence: boolean = false;
+  canAddQuote: boolean = false;
+
   constructor(
     private route: ActivatedRoute,
     private loading: LoadingController,
@@ -45,9 +50,19 @@ export class DetailPage implements OnInit {
     private quoteServices: QuoteServices,
     private diagnosisServices: DiagnosisServices,
     private evidenceServices: EvidenceServices,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
+    this.canAddDiagnostic = this.authService.canByRole(
+      ROLE_ACTIONS.workorders.addDiagnostic
+    );
+    this.canAddEvidence = this.authService.canByRole(
+      ROLE_ACTIONS.workorders.addEvidence,
+    );
+    this.canAddQuote = this.authService.canByRole(
+      ROLE_ACTIONS.workorders.addQuote,
+    );
     this.chargerWorkorder();
   }
 

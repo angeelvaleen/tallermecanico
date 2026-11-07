@@ -51,7 +51,7 @@
 
         <p>
           <strong>Mecánico:</strong>
-          {{ workorder.mechanic_id.name }}
+          {{ workorder.mechanic_id.first_name }}
         </p>
 
         <p>
@@ -102,6 +102,7 @@
           </ion-card-title>
 
           <ion-button
+            *ngIf="canAddDiagnostic"
             size="small"
             (click)="addDiagnosis()"
           >
@@ -157,6 +158,7 @@
 
 
             <ion-button
+              *ngIf="canAddDiagnostic"
               fill="clear"
               (click)="editDiagnosis(diagnosis)"
             >
@@ -201,6 +203,7 @@
           </ion-card-title>
 
           <ion-button
+            *ngIf="canAddEvidence"
             size="small"
             (click)="addEvidence()"
           >
@@ -285,7 +288,7 @@
           <ion-button
             size="small"
             (click)="createQuote()"
-            *ngIf="canCreateQuote()"
+            *ngIf="canCreateQuote() && canAddQuote"
           >
 
             <ion-icon

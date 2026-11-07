@@ -7,6 +7,8 @@ import {
 import { FormPage } from "../form/form.page";
 import { firstValueFrom } from 'rxjs';
 import { WorkorderServices , Workorder} from "src/app/services/workorders/workorders";
+import { ROLE_ACTIONS } from "src/app/constants/role_actions";
+import { AuthService } from "src/app/services/auth/auth";
 
 @Component({
   selector: "app-workorders-list",
@@ -14,18 +16,27 @@ import { WorkorderServices , Workorder} from "src/app/services/workorders/workor
   styleUrls: ["./list.page.scss"],
   standalone: false,
 })
-export class ListPage {
+export class ListPage implements OnInit {
   workorders: Workorder[] = [];
   total: number = 0;
   currentPage: number = 1;
   perPage: number = 15;
   search: string = "";
+  canCreate: boolean = false;
+  canUpdate: boolean = false;
+
 
   constructor(
     private modalController: ModalController,
     private alertController: AlertController,
     private workorderServices: WorkorderServices,
+    private authService: AuthService
   ) {}
+
+  ngOnInit(): void {
+    this.canCreate = this.authService.canByRole(ROLE_ACTIONS.workorders.create);
+    this.canUpdate = this.authService.canByRole(ROLE_ACTIONS.workorders.update);
+  }
 
   async ionViewWillEnter(): Promise<void> {
     await this.chargerData();

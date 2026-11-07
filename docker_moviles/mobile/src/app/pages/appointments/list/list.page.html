@@ -1,6 +1,6 @@
 <app-toolbar name="Citas" color="primary">
   <ion-buttons slot="end">
-    <ion-button fill="primary" (click)="createAppointment()" aria-label="Nueva cita">
+    <ion-button *ngIf="canCreate"  fill="primary" (click)="createAppointment()" aria-label="Nueva cita">
       <ion-icon slot="icon-only" name="add"></ion-icon>
     </ion-button>
   </ion-buttons>
@@ -41,7 +41,7 @@
 
       <!-- Editar -->
       <ion-button
-        *ngIf="canEditAppointment(item)"
+        *ngIf="canEditAppointment(item) && canUpdate"
         slot="end"
         fill="clear"
         color="warning"
@@ -52,7 +52,8 @@
 
       <!-- Confirmar -->
       <ion-button
-        *ngIf="canConfirmAppointment(item)"
+     
+        *ngIf="canConfirmAppointment(item) && canAccept"
         slot="end"
         fill="clear"
         color="success"
@@ -63,7 +64,8 @@
 
       <!-- Cancelar -->
       <ion-button
-        *ngIf="canCancelAppointment(item)"
+        
+        *ngIf="canCancelAppointment(item) && canCancel"
         slot="end"
         fill="clear"
         color="danger"

@@ -6,6 +6,9 @@ import { QuoteDetail, QuoteServices } from "src/app/services/quotes/quotes";
 import { QuoteItem ,QuoteitemServices } from "src/app/services/quoteitems/quoteitems";
 import { QuotePart ,QuotepartServices } from "src/app/services/quoteparts/quoteparts";
 
+import { ROLE_ACTIONS } from "src/app/constants/role_actions";
+import { AuthService } from "src/app/services/auth/auth";
+
 @Component({
   selector: "app-quotes-detail",
   templateUrl: "./detail.page.html",
@@ -15,6 +18,9 @@ import { QuotePart ,QuotepartServices } from "src/app/services/quoteparts/quotep
 export class DetailPage implements OnInit {
   quote: QuoteDetail | null = null;
   messageError: string = "";
+  toggleItem = false;
+  approve = false;
+  reject = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -23,10 +29,14 @@ export class DetailPage implements OnInit {
     private router: Router,
     private quoteServices: QuoteServices,
     private quoteitemServices: QuoteitemServices,
-    private quotepartServices: QuotepartServices
+    private quotepartServices: QuotepartServices,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
+    this.approve = this.authService.canByRole(ROLE_ACTIONS.quotes.approve);
+    this.reject = this.authService.canByRole(ROLE_ACTIONS.quotes.reject);
+    this.toggleItem = this.authService.canByRole(ROLE_ACTIONS.quotes.toggleItem);
     this.chargerQuote();
   }
 
