@@ -1,0 +1,41 @@
+{
+  "collection": "directus_roles",
+  "primaryKey": "id",
+  "records": [
+    {
+      "description": null,
+      "icon": "supervised_user_circle",
+      "id": "24d0bcbb-c316-45fe-98a1-beab4f06b3cd",
+      "name": "assistant",
+      "parent": null
+    },
+    {
+      "description": "$t:admin_description",
+      "icon": "verified",
+      "id": "3823f47a-27ae-40dc-9b0b-b446f31449b1",
+      "name": "Administrator",
+      "parent": null
+    },
+    {
+      "description": null,
+      "icon": "supervised_user_circle",
+      "id": "625eab29-7a2b-41cc-9086-0f9f235abc9b",
+      "name": "mechanic",
+      "parent": null
+    },
+    {
+      "description": "$t:admin_description",
+      "icon": "verified",
+      "id": "87547614-33d5-4d6b-b79b-5d3890687f65",
+      "name": "Administrator",
+      "parent": null
+    },
+    {
+      "description": null,
+      "icon": "supervised_user_circle",
+      "id": "9fd2c60e-1197-4ca0-84e9-46ef57c3995d",
+      "name": "client",
+      "parent": null
+    }
+  ]
+}

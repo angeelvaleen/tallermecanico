@@ -1,0 +1,15 @@
+{
+  "collection": "directus_collections",
+  "definition": null,
+  "fields": [],
+  "relations": [],
+  "systemFields": [
+    {
+      "collection": "directus_collections",
+      "field": "group",
+      "schema": {
+        "is_indexed": true
+      }
+    }
+  ]
+}

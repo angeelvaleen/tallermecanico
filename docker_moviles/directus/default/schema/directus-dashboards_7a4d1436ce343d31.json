@@ -1,0 +1,15 @@
+{
+  "collection": "directus_dashboards",
+  "definition": null,
+  "fields": [],
+  "relations": [],
+  "systemFields": [
+    {
+      "collection": "directus_dashboards",
+      "field": "user_created",
+      "schema": {
+        "is_indexed": true
+      }
+    }
+  ]
+}

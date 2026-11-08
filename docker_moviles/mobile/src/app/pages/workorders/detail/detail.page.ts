@@ -72,10 +72,12 @@ export class DetailPage implements OnInit {
     }
 
     await Promise.all([
+      this.chargerWorkorder(),
       this.chargerDiagnoses(),
       this.chargerEvidences(),
       this.chargerQuotes(),
     ]);
+    console.log(this.workorder);
   }
 
   async chargerWorkorder(): Promise<void> {

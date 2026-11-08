@@ -1,0 +1,29 @@
+{
+  "collection": "directus_versions",
+  "definition": null,
+  "fields": [],
+  "relations": [],
+  "systemFields": [
+    {
+      "collection": "directus_versions",
+      "field": "collection",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_versions",
+      "field": "user_created",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_versions",
+      "field": "user_updated",
+      "schema": {
+        "is_indexed": true
+      }
+    }
+  ]
+}

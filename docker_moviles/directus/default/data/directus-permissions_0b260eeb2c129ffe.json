@@ -1,0 +1,954 @@
+{
+  "collection": "directus_permissions",
+  "primaryKey": "id",
+  "records": [
+    {
+      "action": "create",
+      "collection": "appointments",
+      "fields": [
+        "*"
+      ],
+      "id": 100,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "diagnoses",
+      "fields": [
+        "*"
+      ],
+      "id": 101,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "evidence",
+      "fields": [
+        "*"
+      ],
+      "id": 102,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "fuels",
+      "fields": [
+        "*"
+      ],
+      "id": 103,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "history",
+      "fields": [
+        "*"
+      ],
+      "id": 104,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "methods",
+      "fields": [
+        "*"
+      ],
+      "id": 105,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "models",
+      "fields": [
+        "*"
+      ],
+      "id": 106,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "payment",
+      "fields": [
+        "*"
+      ],
+      "id": 107,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "parts",
+      "fields": [
+        "*"
+      ],
+      "id": 108,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "quoteitems",
+      "fields": [
+        "*"
+      ],
+      "id": 109,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "quoteparts",
+      "fields": [
+        "*"
+      ],
+      "id": 110,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "quotes",
+      "fields": [
+        "*"
+      ],
+      "id": 111,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "services",
+      "fields": [
+        "*"
+      ],
+      "id": 112,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "status",
+      "fields": [
+        "*"
+      ],
+      "id": 113,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "vehicles",
+      "fields": [
+        "*"
+      ],
+      "id": 114,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "workorders",
+      "fields": [
+        "*"
+      ],
+      "id": 115,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "update",
+      "collection": "payment",
+      "fields": [
+        "*"
+      ],
+      "id": 116,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "update",
+      "collection": "quoteitems",
+      "fields": [
+        "*"
+      ],
+      "id": 117,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "update",
+      "collection": "quoteparts",
+      "fields": [
+        "*"
+      ],
+      "id": 118,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "update",
+      "collection": "quotes",
+      "fields": [
+        "*"
+      ],
+      "id": 119,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "update",
+      "collection": "vehicles",
+      "fields": [
+        "*"
+      ],
+      "id": 120,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "create",
+      "collection": "vehicles",
+      "fields": [
+        "*"
+      ],
+      "id": 121,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "brands",
+      "fields": [
+        "*"
+      ],
+      "id": 122,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "colors",
+      "fields": [
+        "*"
+      ],
+      "id": 123,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "diagnoses",
+      "fields": [
+        "*"
+      ],
+      "id": 124,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "evidence",
+      "fields": [
+        "*"
+      ],
+      "id": 125,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "create",
+      "collection": "diagnoses",
+      "fields": [
+        "*"
+      ],
+      "id": 126,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "update",
+      "collection": "diagnoses",
+      "fields": [
+        "*"
+      ],
+      "id": 127,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "create",
+      "collection": "evidence",
+      "fields": [
+        "*"
+      ],
+      "id": 128,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "update",
+      "collection": "evidence",
+      "fields": [
+        "*"
+      ],
+      "id": 129,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "fuels",
+      "fields": [
+        "*"
+      ],
+      "id": 130,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "history",
+      "fields": [
+        "*"
+      ],
+      "id": 131,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "models",
+      "fields": [
+        "*"
+      ],
+      "id": 132,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "parts",
+      "fields": [
+        "*"
+      ],
+      "id": 133,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "quoteitems",
+      "fields": [
+        "*"
+      ],
+      "id": 134,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "quoteparts",
+      "fields": [
+        "*"
+      ],
+      "id": 135,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "quotes",
+      "fields": [
+        "*"
+      ],
+      "id": 136,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "create",
+      "collection": "quotes",
+      "fields": [
+        "*"
+      ],
+      "id": 137,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "update",
+      "collection": "quotes",
+      "fields": [
+        "*"
+      ],
+      "id": 138,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "create",
+      "collection": "quoteparts",
+      "fields": [
+        "*"
+      ],
+      "id": 139,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "create",
+      "collection": "quoteitems",
+      "fields": [
+        "*"
+      ],
+      "id": 140,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "update",
+      "collection": "quoteitems",
+      "fields": [
+        "*"
+      ],
+      "id": 141,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "update",
+      "collection": "quoteparts",
+      "fields": [
+        "*"
+      ],
+      "id": 142,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "services",
+      "fields": [
+        "*"
+      ],
+      "id": 143,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "status",
+      "fields": [
+        "*"
+      ],
+      "id": 144,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "vehicles",
+      "fields": [
+        "*"
+      ],
+      "id": 145,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "workorders",
+      "fields": [
+        "*"
+      ],
+      "id": 146,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "update",
+      "collection": "workorders",
+      "fields": [
+        "*"
+      ],
+      "id": 147,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "brands",
+      "fields": [
+        "*"
+      ],
+      "id": 148,
+      "permissions": null,
+      "policy": "b90f5e38-cb4b-4664-8af7-607b96340b18",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "colors",
+      "fields": [
+        "*"
+      ],
+      "id": 149,
+      "permissions": null,
+      "policy": "b90f5e38-cb4b-4664-8af7-607b96340b18",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "diagnoses",
+      "fields": [
+        "*"
+      ],
+      "id": 150,
+      "permissions": null,
+      "policy": "b90f5e38-cb4b-4664-8af7-607b96340b18",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "evidence",
+      "fields": [
+        "*"
+      ],
+      "id": 151,
+      "permissions": null,
+      "policy": "b90f5e38-cb4b-4664-8af7-607b96340b18",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "create",
+      "collection": "evidence",
+      "fields": [
+        "*"
+      ],
+      "id": 152,
+      "permissions": null,
+      "policy": "b90f5e38-cb4b-4664-8af7-607b96340b18",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "update",
+      "collection": "evidence",
+      "fields": [
+        "*"
+      ],
+      "id": 153,
+      "permissions": null,
+      "policy": "b90f5e38-cb4b-4664-8af7-607b96340b18",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "create",
+      "collection": "diagnoses",
+      "fields": [
+        "*"
+      ],
+      "id": 154,
+      "permissions": null,
+      "policy": "b90f5e38-cb4b-4664-8af7-607b96340b18",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "update",
+      "collection": "diagnoses",
+      "fields": [
+        "*"
+      ],
+      "id": 155,
+      "permissions": null,
+      "policy": "b90f5e38-cb4b-4664-8af7-607b96340b18",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "fuels",
+      "fields": [
+        "*"
+      ],
+      "id": 156,
+      "permissions": null,
+      "policy": "b90f5e38-cb4b-4664-8af7-607b96340b18",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "history",
+      "fields": [
+        "*"
+      ],
+      "id": 157,
+      "permissions": null,
+      "policy": "b90f5e38-cb4b-4664-8af7-607b96340b18",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "models",
+      "fields": [
+        "*"
+      ],
+      "id": 158,
+      "permissions": null,
+      "policy": "b90f5e38-cb4b-4664-8af7-607b96340b18",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "parts",
+      "fields": [
+        "*"
+      ],
+      "id": 159,
+      "permissions": null,
+      "policy": "b90f5e38-cb4b-4664-8af7-607b96340b18",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "quoteitems",
+      "fields": [
+        "*"
+      ],
+      "id": 160,
+      "permissions": null,
+      "policy": "b90f5e38-cb4b-4664-8af7-607b96340b18",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "quoteparts",
+      "fields": [
+        "*"
+      ],
+      "id": 161,
+      "permissions": null,
+      "policy": "b90f5e38-cb4b-4664-8af7-607b96340b18",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "quotes",
+      "fields": [
+        "*"
+      ],
+      "id": 162,
+      "permissions": null,
+      "policy": "b90f5e38-cb4b-4664-8af7-607b96340b18",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "services",
+      "fields": [
+        "*"
+      ],
+      "id": 163,
+      "permissions": null,
+      "policy": "b90f5e38-cb4b-4664-8af7-607b96340b18",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "status",
+      "fields": [
+        "*"
+      ],
+      "id": 164,
+      "permissions": null,
+      "policy": "b90f5e38-cb4b-4664-8af7-607b96340b18",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "vehicles",
+      "fields": [
+        "*"
+      ],
+      "id": 165,
+      "permissions": null,
+      "policy": "b90f5e38-cb4b-4664-8af7-607b96340b18",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "workorders",
+      "fields": [
+        "*"
+      ],
+      "id": 166,
+      "permissions": null,
+      "policy": "b90f5e38-cb4b-4664-8af7-607b96340b18",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "directus_permissions",
+      "fields": [
+        "*"
+      ],
+      "id": 167,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "directus_users",
+      "fields": [
+        "*"
+      ],
+      "id": 168,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "directus_roles",
+      "fields": [
+        "*"
+      ],
+      "id": 169,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "directus_users",
+      "fields": [
+        "*"
+      ],
+      "id": 182,
+      "permissions": null,
+      "policy": "b90f5e38-cb4b-4664-8af7-607b96340b18",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "directus_roles",
+      "fields": [
+        "*"
+      ],
+      "id": 183,
+      "permissions": null,
+      "policy": "b90f5e38-cb4b-4664-8af7-607b96340b18",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "directus_roles",
+      "fields": [
+        "*"
+      ],
+      "id": 184,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "directus_users",
+      "fields": [
+        "*"
+      ],
+      "id": 185,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "directus_policies",
+      "fields": [
+        "*"
+      ],
+      "id": 188,
+      "permissions": null,
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "appointments",
+      "fields": [
+        "*"
+      ],
+      "id": 96,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "brands",
+      "fields": [
+        "*"
+      ],
+      "id": 97,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "colors",
+      "fields": [
+        "*"
+      ],
+      "id": 98,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "update",
+      "collection": "appointments",
+      "fields": [
+        "*"
+      ],
+      "id": 99,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    }
+  ]
+}

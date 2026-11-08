@@ -3,6 +3,7 @@ import { defer, map, Observable } from 'rxjs';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
 import { Brand } from '../brands/brands';
+import { AuthService } from '../auth/auth';
 
 export interface Model {
   id: number;
@@ -29,6 +30,17 @@ export interface ModelCreate {
 export class ModelServices {
   private url = environment.apiUrl + '/models';
 
+  constructor(private authService: AuthService) {}
+
+  private getAuthConfig() {
+    const token = this.authService.getAccessToken();
+    return {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+  }
+
   private filter(search: string): Record<string, string> {
     const text = search.trim();
     return text ? { filter: JSON.stringify({ _or: [
@@ -43,35 +55,36 @@ export class ModelServices {
 
   list(page = 1, perPage = 3, search = ''): Observable<ModelList[]> {
     return defer(() => axios.get<{ data: ModelList[] }>(`${this.url}?fields=*,brand_id.*`, {
+      ...this.getAuthConfig(),
       params: { page: page, limit: perPage, sort: 'id', ...this.filter(search) }
     })).pipe(map(response => response.data.data));
   }
 
   listWithOutFilters(): Observable<ModelList[]> {
-    return defer(() => axios.get<{ data: ModelList[] }>(`${this.url}?fields=*,brand_id.*`)).pipe(map(response => response.data.data));
+    return defer(() => axios.get<{ data: ModelList[] }>(`${this.url}?fields=*,brand_id.*`, this.getAuthConfig())).pipe(map(response => response.data.data));
   }
 
   detail(id: number): Observable<Model> {
-    return defer(() => axios.get<{ data: Model }>(this.url + '/' + id))
+    return defer(() => axios.get<{ data: Model }>(this.url + '/' + id, this.getAuthConfig()))
       .pipe(map(response => response.data.data));
   }
 
   create(model: ModelCreate): Observable<Model> {
-    return defer(() => axios.post<{ data: Model }>(this.url, model))
+    return defer(() => axios.post<{ data: Model }>(this.url, model, this.getAuthConfig()))
       .pipe(map(response => response.data.data));
   }
 
   update(id: number, model: ModelCreate): Observable<Model> {
-    return defer(() => axios.patch<{ data: Model }>(this.url + '/' + id, model))
+    return defer(() => axios.patch<{ data: Model }>(this.url + '/' + id, model, this.getAuthConfig()))
       .pipe(map(response => response.data.data));
   }
 
   delete(id: number): Observable<void> {
-    return defer(() => axios.delete(this.url + '/' + id)).pipe(map(() => undefined));
+    return defer(() => axios.delete(this.url + '/' + id, this.getAuthConfig())).pipe(map(() => undefined));
   }
 
   total(search = ''): Observable<number> {
-    return defer(() => axios.get<{ data: { count: string | number }[] }>(this.url, {
+    return defer(() => axios.get<{ data: { count: string | number }[] }>(this.url, {...this.getAuthConfig(),
       params: { 'aggregate[count]': '*', ...this.filter(search) }
     })).pipe(map(response => Number(response.data.data[0]?.count ?? 0)));
   }

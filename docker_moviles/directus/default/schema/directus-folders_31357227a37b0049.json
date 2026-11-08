@@ -1,0 +1,15 @@
+{
+  "collection": "directus_folders",
+  "definition": null,
+  "fields": [],
+  "relations": [],
+  "systemFields": [
+    {
+      "collection": "directus_folders",
+      "field": "parent",
+      "schema": {
+        "is_indexed": true
+      }
+    }
+  ]
+}

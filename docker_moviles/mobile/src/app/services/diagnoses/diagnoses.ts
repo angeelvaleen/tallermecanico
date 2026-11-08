@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { defer, map, Observable } from 'rxjs';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
+import { AuthService } from '../auth/auth';
 
 export interface Diagnosis {
   id: number;
@@ -21,6 +22,17 @@ export interface DiagnosisCreate {
 export class DiagnosisServices {
   private url = environment.apiUrl + '/diagnoses';
 
+  constructor(private authService:AuthService){}
+
+  private getAuthConfig() {
+    const token = this.authService.getAccessToken();
+    return {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+  }
+
   private filter(search: string): Record<string, string> {
     const text = search.trim();
     return text ? { filter: JSON.stringify({ _or: [
@@ -29,42 +41,43 @@ export class DiagnosisServices {
   }
 
   list(page = 1, perPage = 3, search = ''): Observable<Diagnosis[]> {
-    return defer(() => axios.get<{ data: Diagnosis[] }>(this.url, {
+    return defer(() => axios.get<{ data: Diagnosis[] }>(this.url, {...this.getAuthConfig(),
       params: { page: page, limit: perPage, sort: 'id', ...this.filter(search) }
     })).pipe(map(response => response.data.data));
   }
 
   listWithOutFilters(): Observable<Diagnosis[]> {
-    return defer(() => axios.get<{ data: Diagnosis[] }>(this.url)).pipe(map(response => response.data.data));
+    return defer(() => axios.get<{ data: Diagnosis[] }>(this.url,this.getAuthConfig())).pipe(map(response => response.data.data));
   }
 
   detail(id: number): Observable<Diagnosis> {
-    return defer(() => axios.get<{ data: Diagnosis }>(this.url + '/' + id))
+    return defer(() => axios.get<{ data: Diagnosis }>(this.url + '/' + id,this.getAuthConfig()))
       .pipe(map(response => response.data.data));
   }
 
   create(diagnosis: DiagnosisCreate): Observable<Diagnosis> {
-    return defer(() => axios.post<{ data: Diagnosis }>(this.url, diagnosis))
+    return defer(() => axios.post<{ data: Diagnosis }>(this.url, diagnosis,this.getAuthConfig()))
       .pipe(map(response => response.data.data));
   }
 
   update(id: number, diagnosis: DiagnosisCreate): Observable<Diagnosis> {
-    return defer(() => axios.patch<{ data: Diagnosis }>(this.url + '/' + id, diagnosis))
+    return defer(() => axios.patch<{ data: Diagnosis }>(this.url + '/' + id, diagnosis,this.getAuthConfig()))
       .pipe(map(response => response.data.data));
   }
 
   delete(id: number): Observable<void> {
-    return defer(() => axios.delete(this.url + '/' + id)).pipe(map(() => undefined));
+    return defer(() => axios.delete(this.url + '/' + id,this.getAuthConfig())).pipe(map(() => undefined));
   }
 
   total(search = ''): Observable<number> {
     return defer(() => axios.get<{ data: { count: string | number }[] }>(this.url, {
+      ...this.getAuthConfig(),
       params: { 'aggregate[count]': '*', ...this.filter(search) }
     })).pipe(map(response => Number(response.data.data[0]?.count ?? 0)));
   }
 
   ofWorkorder(id:number): Observable<Diagnosis[]>{
-    return defer(() => axios.get<{ data: Diagnosis[] }>(`${this.url}?filter[workorder_id][_eq]=${id}`))
+    return defer(() => axios.get<{ data: Diagnosis[] }>(`${this.url}?filter[workorder_id][_eq]=${id}`,this.getAuthConfig()))
       .pipe(map(response => response.data.data));
   }
 }

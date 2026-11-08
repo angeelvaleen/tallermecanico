@@ -6,6 +6,7 @@ import { ModelList } from '../models/models';
 import { Brand } from '../brands/brands';
 import { Fuel } from '../fuels/fuels';
 import { Color } from '../colors/colors';
+import { AuthService } from '../auth/auth';
 
 interface User {
   name:string;
@@ -43,7 +44,7 @@ export interface VehicleDetail {
 
 export interface VehicleCreate {
   model_id: number;
-  user_id: number;
+  user_id: string;
   fuel_id: number;
   color_id: number;
   plate: string;
@@ -56,6 +57,18 @@ export interface VehicleCreate {
 export class VehicleServices {
   private url = environment.apiUrl + '/vehicles';
 
+  constructor(private authService: AuthService) {}
+
+  private getAuthConfig() {
+  const token = this.authService.getAccessToken();
+
+  return {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  };
+  }
+
   private filter(search: string): Record<string, string> {
     const text = search.trim();
     return text ? { filter: JSON.stringify({ _or: [
@@ -66,12 +79,13 @@ export class VehicleServices {
 
   list(page = 1, perPage = 3, search = ''): Observable<Vehicle[]> {
     return defer(() => axios.get<{ data: Vehicle[] }>(this.url, {
+      ...this.getAuthConfig(),
       params: { page: page, limit: perPage, sort: 'id', ...this.filter(search) }
     })).pipe(map(response => response.data.data));
   }
 
   listWithOutFilters(): Observable<Vehicle[]> {
-    return defer(() => axios.get<{ data:Vehicle[] }>(this.url)).pipe(map(response => response.data.data));
+    return defer(() => axios.get<{ data:Vehicle[] }>(this.url, this.getAuthConfig())).pipe(map(response => response.data.data));
   }
 
   detail(id: number): Observable<VehicleDetail> {
@@ -80,22 +94,22 @@ export class VehicleServices {
   }
 
   create(vehicle: VehicleCreate): Observable<Vehicle> {
-    return defer(() => axios.post<{ data: Vehicle }>(this.url, vehicle))
+    return defer(() => axios.post<{ data: Vehicle }>(this.url,vehicle, this.getAuthConfig()))
       .pipe(map(response => response.data.data));
   }
 
   update(id: number, vehicle: VehicleCreate): Observable<Vehicle> {
-    return defer(() => axios.patch<{ data: Vehicle }>(this.url + '/' + id, vehicle))
+    return defer(() => axios.patch<{ data: Vehicle }>(this.url + '/' + id, vehicle,this.getAuthConfig()))
       .pipe(map(response => response.data.data));
   }
 
   delete(id: number): Observable<void> {
-    return defer(() => axios.delete(this.url + '/' + id)).pipe(map(() => undefined));
+    return defer(() => axios.delete(this.url + '/' + id,this.getAuthConfig())).pipe(map(() => undefined));
   }
 
   total(search = ''): Observable<number> {
     return defer(() => axios.get<{ data: { count: string | number }[] }>(this.url, {
-      params: { 'aggregate[count]': '*', ...this.filter(search) }
+      ...this.getAuthConfig(),params: { 'aggregate[count]': '*', ...this.filter(search) }
     })).pipe(map(response => Number(response.data.data[0]?.count ?? 0)));
   }
 }

@@ -1,0 +1,66 @@
+{
+  "collection": "directus_policies",
+  "primaryKey": "id",
+  "records": [
+    {
+      "admin_access": false,
+      "app_access": false,
+      "description": null,
+      "enforce_tfa": false,
+      "icon": "badge",
+      "id": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "ip_access": null,
+      "name": "mechanic"
+    },
+    {
+      "admin_access": false,
+      "app_access": false,
+      "description": "$t:public_description",
+      "enforce_tfa": false,
+      "icon": "public",
+      "id": "abf8a154-5b1c-4a46-ac9c-7300570f4f17",
+      "ip_access": null,
+      "name": "$t:public_label"
+    },
+    {
+      "admin_access": false,
+      "app_access": true,
+      "description": null,
+      "enforce_tfa": false,
+      "icon": "badge",
+      "id": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "ip_access": null,
+      "name": "client"
+    },
+    {
+      "admin_access": false,
+      "app_access": false,
+      "description": null,
+      "enforce_tfa": false,
+      "icon": "badge",
+      "id": "b90f5e38-cb4b-4664-8af7-607b96340b18",
+      "ip_access": null,
+      "name": "assistant"
+    },
+    {
+      "admin_access": true,
+      "app_access": true,
+      "description": "$t:admin_description",
+      "enforce_tfa": false,
+      "icon": "verified",
+      "id": "cf63ea41-96d3-4b55-bde3-cc27fc4346d6",
+      "ip_access": null,
+      "name": "Administrator"
+    },
+    {
+      "admin_access": true,
+      "app_access": true,
+      "description": "$t:admin_description",
+      "enforce_tfa": false,
+      "icon": "verified",
+      "id": "eb9c9106-0ac5-431d-a7c5-aa16a8dbb91e",
+      "ip_access": null,
+      "name": "Administrator"
+    }
+  ]
+}

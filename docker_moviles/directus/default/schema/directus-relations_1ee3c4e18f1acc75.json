@@ -1,0 +1,22 @@
+{
+  "collection": "directus_relations",
+  "definition": null,
+  "fields": [],
+  "relations": [],
+  "systemFields": [
+    {
+      "collection": "directus_relations",
+      "field": "many_collection",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_relations",
+      "field": "one_collection",
+      "schema": {
+        "is_indexed": true
+      }
+    }
+  ]
+}

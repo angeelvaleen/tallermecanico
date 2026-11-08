@@ -1,0 +1,15 @@
+{
+  "collection": "directus_roles",
+  "definition": null,
+  "fields": [],
+  "relations": [],
+  "systemFields": [
+    {
+      "collection": "directus_roles",
+      "field": "parent",
+      "schema": {
+        "is_indexed": true
+      }
+    }
+  ]
+}

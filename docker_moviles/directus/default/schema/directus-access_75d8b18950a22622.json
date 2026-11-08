@@ -1,0 +1,29 @@
+{
+  "collection": "directus_access",
+  "definition": null,
+  "fields": [],
+  "relations": [],
+  "systemFields": [
+    {
+      "collection": "directus_access",
+      "field": "policy",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_access",
+      "field": "role",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_access",
+      "field": "user",
+      "schema": {
+        "is_indexed": true
+      }
+    }
+  ]
+}

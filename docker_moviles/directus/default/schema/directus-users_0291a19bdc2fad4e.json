@@ -1,0 +1,15 @@
+{
+  "collection": "directus_users",
+  "definition": null,
+  "fields": [],
+  "relations": [],
+  "systemFields": [
+    {
+      "collection": "directus_users",
+      "field": "role",
+      "schema": {
+        "is_indexed": true
+      }
+    }
+  ]
+}

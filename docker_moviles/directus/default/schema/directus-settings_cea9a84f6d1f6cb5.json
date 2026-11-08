@@ -1,0 +1,57 @@
+{
+  "collection": "directus_settings",
+  "definition": null,
+  "fields": [],
+  "relations": [],
+  "systemFields": [
+    {
+      "collection": "directus_settings",
+      "field": "default_exports_folder",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_settings",
+      "field": "project_logo",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_settings",
+      "field": "public_background",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_settings",
+      "field": "public_favicon",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_settings",
+      "field": "public_foreground",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_settings",
+      "field": "public_registration_role",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_settings",
+      "field": "storage_default_folder",
+      "schema": {
+        "is_indexed": true
+      }
+    }
+  ]
+}

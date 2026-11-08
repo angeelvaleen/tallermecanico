@@ -1,0 +1,22 @@
+{
+  "collection": "directus_flows",
+  "definition": null,
+  "fields": [],
+  "relations": [],
+  "systemFields": [
+    {
+      "collection": "directus_flows",
+      "field": "folder",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_flows",
+      "field": "user_created",
+      "schema": {
+        "is_indexed": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "collection": "directus_panels",
+  "definition": null,
+  "fields": [],
+  "relations": [],
+  "systemFields": [
+    {
+      "collection": "directus_panels",
+      "field": "dashboard",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_panels",
+      "field": "user_created",
+      "schema": {
+        "is_indexed": true
+      }
+    }
+  ]
+}

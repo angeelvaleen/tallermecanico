@@ -1,0 +1,22 @@
+{
+  "collection": "directus_permissions",
+  "definition": null,
+  "fields": [],
+  "relations": [],
+  "systemFields": [
+    {
+      "collection": "directus_permissions",
+      "field": "collection",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_permissions",
+      "field": "policy",
+      "schema": {
+        "is_indexed": true
+      }
+    }
+  ]
+}

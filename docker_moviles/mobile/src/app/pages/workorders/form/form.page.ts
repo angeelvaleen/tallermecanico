@@ -301,7 +301,7 @@ export class FormPage
         Number(values.vehicle_id),
 
       mechanic_id:
-        Number(values.mechanic_id),
+        values.mechanic_id,
 
       status_id:
         Number(values.status_id),

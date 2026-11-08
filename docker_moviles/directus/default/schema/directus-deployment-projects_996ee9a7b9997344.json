@@ -1,0 +1,15 @@
+{
+  "collection": "directus_deployment_projects",
+  "definition": null,
+  "fields": [],
+  "relations": [],
+  "systemFields": [
+    {
+      "collection": "directus_deployment_projects",
+      "field": "user_created",
+      "schema": {
+        "is_indexed": true
+      }
+    }
+  ]
+}

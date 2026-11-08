@@ -4,7 +4,7 @@ import axios from 'axios';
 import { environment } from 'src/environments/environment';
 
 import { Vehicle } from '../vehicles/vehicles';
-import { User } from '../auth/auth';
+import { User,  AuthService } from '../auth/auth';
 
 interface Status {
   id: number;
@@ -34,7 +34,7 @@ export interface WorkorderDetail {
 
 export interface WorkorderCreate{
   vehicle_id: number;
-  mechanic_id: number;
+  mechanic_id: string;
   status_id: number;
   mileage: number;
   delivery: string|null;
@@ -43,6 +43,18 @@ export interface WorkorderCreate{
 @Injectable({ providedIn: 'root' })
 export class WorkorderServices {
   private url = environment.apiUrl + '/workorders';
+
+  constructor(private authService: AuthService) {}
+
+  private getAuthConfig() {
+  const token = this.authService.getAccessToken();
+
+  return {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  };
+  }
 
   private filter(search: string): Record<string, string> {
     const text = search.trim();
@@ -68,38 +80,40 @@ export class WorkorderServices {
 
   list(page = 1, perPage = 3, search = ''): Observable<Workorder[]> {
     return defer(() => axios.get<{ data: Workorder[] }>(this.url, {
-      params: { page: page, limit: perPage, sort: 'id', ...this.filter(search) }
+      ...this.getAuthConfig(),params: { page: page, limit: perPage, sort: 'id', ...this.filter(search) }
     })).pipe(map(response => response.data.data));
   }
 
   listWithOutFilter(): Observable<Workorder[]> {
     return defer(() => axios.get<{ data: Workorder[] }>(this.url, {
-      params: { sort: 'id' }
+      ...this.getAuthConfig(),params: { sort: 'id' }
     })).pipe(map(response => response.data.data));
   }
 
   detail(id: number): Observable<WorkorderDetail> {
-    return defer(() => axios.get<{ data: WorkorderDetail }>(`${this.url}/${id}?fields=*,mechanic_id.name,status_id.name,status_id.id,vehicle_id.plate`))
+    return defer(() => axios.get<{ data: WorkorderDetail }>(`${this.url}/${id}?fields=*,mechanic_id.first_name,mechanic_id.last_name,status_id.name,status_id.id,vehicle_id.plate`,
+      this.getAuthConfig()
+    ))
       .pipe(map(response => response.data.data));
   }
 
   create(workorder: WorkorderCreate): Observable<Workorder> {
-    return defer(() => axios.post<{ data: Workorder }>(this.url, workorder))
+    return defer(() => axios.post<{ data: Workorder }>(this.url, workorder,this.getAuthConfig()))
       .pipe(map(response => response.data.data));
   }
 
   update(id: number, workorder: WorkorderCreate): Observable<Workorder> {
-    return defer(() => axios.patch<{ data: Workorder }>(this.url + '/' + id, workorder))
+    return defer(() => axios.patch<{ data: Workorder }>(this.url + '/' + id, workorder,this.getAuthConfig()))
       .pipe(map(response => response.data.data));
   }
 
   delete(id: number): Observable<void> {
-    return defer(() => axios.delete(this.url + '/' + id)).pipe(map(() => undefined));
+    return defer(() => axios.delete(this.url + '/' + id,this.getAuthConfig())).pipe(map(() => undefined));
   }
 
   total(search = ''): Observable<number> {
     return defer(() => axios.get<{ data: { count: string | number }[] }>(this.url, {
-      params: { 'aggregate[count]': '*', ...this.filter(search) }
+      ...this.getAuthConfig(),params: { 'aggregate[count]': '*', ...this.filter(search) }
     })).pipe(map(response => Number(response.data.data[0]?.count ?? 0)));
   }
 }

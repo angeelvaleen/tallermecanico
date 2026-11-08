@@ -1,0 +1,29 @@
+{
+  "collection": "directus_sessions",
+  "definition": null,
+  "fields": [],
+  "relations": [],
+  "systemFields": [
+    {
+      "collection": "directus_sessions",
+      "field": "oauth_client",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_sessions",
+      "field": "share",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_sessions",
+      "field": "user",
+      "schema": {
+        "is_indexed": true
+      }
+    }
+  ]
+}

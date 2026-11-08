@@ -3,6 +3,7 @@ import { defer, map, Observable } from "rxjs";
 import axios from "axios";
 import { environment } from "src/environments/environment";
 import { Vehicle } from "../vehicles/vehicles";
+import { AuthService } from "../auth/auth";
 
 export interface Appointment {
   id: number;
@@ -35,6 +36,16 @@ export interface AppointmentCreate {
 @Injectable({ providedIn: "root" })
 export class AppointmentServices {
   private url = environment.apiUrl + "/appointments";
+
+  constructor(private authService:AuthService){}
+  private getAuthConfig() {
+    const token = this.authService.getAccessToken();
+    return {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+  }
 
   private filter(search: string): Record<string, string> {
     const text = search.trim();
@@ -75,6 +86,7 @@ export class AppointmentServices {
   list(page = 1, perPage = 3, search = ""): Observable<Appointment[]> {
     return defer(() =>
       axios.get<{ data: Appointment[] }>(this.url, {
+        ...this.getAuthConfig(),
         params: {
           page: page,
           limit: perPage,
@@ -87,37 +99,37 @@ export class AppointmentServices {
 
   get(id: number): Observable<Appointment> {
     return defer(() =>
-      axios.get<{ data: Appointment }>(this.url + "/" + id),
+      axios.get<{ data: Appointment }>(this.url + "/" + id,this.getAuthConfig()),
     ).pipe(map((response) => response.data.data));
   }
 
   detail(id: number): Observable<DetailAppointment> {
-    return defer(() => axios.get<{ data: DetailAppointment }>(`${this.url}/${id}?fields=*,vehicle_id.*`)).pipe(
+    return defer(() => axios.get<{ data: DetailAppointment }>(`${this.url}/${id}?fields=*,vehicle_id.*`,this.getAuthConfig())).pipe(
       map((response) => response.data.data),
     );
   }
 
   create(appointment: AppointmentCreate): Observable<Appointment> {
-    return defer(() => axios.post<{ data: Appointment }>(this.url, appointment)).pipe(
+    return defer(() => axios.post<{ data: Appointment }>(this.url, appointment,this.getAuthConfig())).pipe(
       map((response) => response.data.data),
     );
   }
 
   update(id: number, appointment: AppointmentCreate): Observable<Appointment> {
     return defer(() =>
-      axios.patch<{ data: Appointment }>(this.url + "/" + id, appointment),
+      axios.patch<{ data: Appointment }>(this.url + "/" + id, appointment,this.getAuthConfig()),
     ).pipe(map((response) => response.data.data));
   }
 
   delete(id: number): Observable<void> {
-    return defer(() => axios.delete(this.url + "/" + id)).pipe(
+    return defer(() => axios.delete(this.url + "/" + id,this.getAuthConfig())).pipe(
       map(() => undefined),
     );
   }
 
   total(search = ""): Observable<number> {
     return defer(() =>
-      axios.get<{ data: { count: string | number }[] }>(this.url, {
+      axios.get<{ data: { count: string | number }[] }>(this.url, {...this.getAuthConfig(),
         params: { "aggregate[count]": "*", ...this.filter(search) },
       }),
     ).pipe(map((response) => Number(response.data.data[0]?.count ?? 0)));
@@ -126,7 +138,7 @@ export class AppointmentServices {
   executeCancelAppointment(id:number): Observable<void>{
     return defer(()=> axios.patch(`${this.url}/${id}`,{
       status_id:3,
-    })).pipe(
+    },this.getAuthConfig())).pipe(
       map(() => undefined),
     );
   }
@@ -134,7 +146,7 @@ export class AppointmentServices {
   acceptedAppointment(id:number): Observable<void>{
     return defer(()=> axios.patch(`${this.url}/${id}`,{
       status_id:2,
-    })).pipe(
+    },this.getAuthConfig())).pipe(
       map(() => undefined),
     );
   }

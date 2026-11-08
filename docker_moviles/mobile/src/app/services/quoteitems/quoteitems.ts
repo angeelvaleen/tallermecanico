@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { defer, map, Observable } from "rxjs";
 import axios from "axios";
 import { environment } from "src/environments/environment";
+import { AuthService } from "../auth/auth";
 
 export interface QuoteItem {
   id: number;
@@ -24,6 +25,17 @@ export interface QuoteItemCreate {
 @Injectable({ providedIn: "root" })
 export class QuoteitemServices {
   private url = environment.apiUrl + "/quoteitems";
+
+  constructor(private authService: AuthService) {}
+
+  private getAuthConfig() {
+    const token = this.authService.getAccessToken();
+    return {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+  }
 
   private filter(search: string): Record<string, string> {
     const text = search.trim();
@@ -48,6 +60,7 @@ export class QuoteitemServices {
           sort: "id",
           ...this.filter(search),
         },
+        ...this.getAuthConfig(),
       }),
     ).pipe(map((response) => response.data.data));
   }
@@ -56,30 +69,31 @@ export class QuoteitemServices {
     return defer(() =>
       axios.get<{ data: QuoteItem[] }>(
         `${this.url}?filter[quote_id][_eq]=${id}&fields=*,service_id.*`,
+        this.getAuthConfig()
       ),
     ).pipe(map((response) => response.data.data));
   }
 
   detail(id: number): Observable<QuoteItem> {
     return defer(() =>
-      axios.get<{ data: QuoteItem }>(this.url + "/" + id),
+      axios.get<{ data: QuoteItem }>(this.url + "/" + id, this.getAuthConfig()),
     ).pipe(map((response) => response.data.data));
   }
 
   create(quoteitem: QuoteItemCreate): Observable<QuoteItem> {
     return defer(() =>
-      axios.post<{ data: QuoteItem }>(this.url, quoteitem),
+      axios.post<{ data: QuoteItem }>(this.url, quoteitem, this.getAuthConfig()),
     ).pipe(map((response) => response.data.data));
   }
 
   update(id: number, quoteitem: QuoteItemCreate): Observable<QuoteItem> {
     return defer(() =>
-      axios.patch<{ data: QuoteItem }>(this.url + "/" + id, quoteitem),
+      axios.patch<{ data: QuoteItem }>(this.url + "/" + id, quoteitem, this.getAuthConfig()),
     ).pipe(map((response) => response.data.data));
   }
 
   delete(id: number): Observable<void> {
-    return defer(() => axios.delete(this.url + "/" + id)).pipe(
+    return defer(() => axios.delete(this.url + "/" + id, this.getAuthConfig())).pipe(
       map(() => undefined),
     );
   }
@@ -88,6 +102,7 @@ export class QuoteitemServices {
     return defer(() =>
       axios.get<{ data: { count: string | number }[] }>(this.url, {
         params: { "aggregate[count]": "*", ...this.filter(search) },
+        ...this.getAuthConfig(),
       }),
     ).pipe(map((response) => Number(response.data.data[0]?.count ?? 0)));
   }
@@ -96,7 +111,7 @@ export class QuoteitemServices {
     return defer(() =>
       axios.patch(`${environment.apiUrl}/quoteitems/${id}`, {
         is_approved: option,
-      }),
+      }, this.getAuthConfig()),
     ).pipe(map(() => undefined));
   }
 }
