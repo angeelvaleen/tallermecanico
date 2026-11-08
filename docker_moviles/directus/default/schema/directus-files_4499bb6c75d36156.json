@@ -1,0 +1,29 @@
+{
+  "collection": "directus_files",
+  "definition": null,
+  "fields": [],
+  "relations": [],
+  "systemFields": [
+    {
+      "collection": "directus_files",
+      "field": "folder",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_files",
+      "field": "modified_by",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_files",
+      "field": "uploaded_by",
+      "schema": {
+        "is_indexed": true
+      }
+    }
+  ]
+}

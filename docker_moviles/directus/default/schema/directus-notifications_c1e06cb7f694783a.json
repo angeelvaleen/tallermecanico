@@ -1,0 +1,22 @@
+{
+  "collection": "directus_notifications",
+  "definition": null,
+  "fields": [],
+  "relations": [],
+  "systemFields": [
+    {
+      "collection": "directus_notifications",
+      "field": "recipient",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_notifications",
+      "field": "sender",
+      "schema": {
+        "is_indexed": true
+      }
+    }
+  ]
+}

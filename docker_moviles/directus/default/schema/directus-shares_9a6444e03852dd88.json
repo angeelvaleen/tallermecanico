@@ -1,0 +1,29 @@
+{
+  "collection": "directus_shares",
+  "definition": null,
+  "fields": [],
+  "relations": [],
+  "systemFields": [
+    {
+      "collection": "directus_shares",
+      "field": "collection",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_shares",
+      "field": "role",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_shares",
+      "field": "user_created",
+      "schema": {
+        "is_indexed": true
+      }
+    }
+  ]
+}

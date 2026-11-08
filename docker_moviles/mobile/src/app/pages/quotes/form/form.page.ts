@@ -24,6 +24,7 @@ import { QuotePartCreate, QuotepartServices } from "src/app/services/quoteparts/
 import { Service,ServiceServices } from "src/app/services/services/services";
 import { Part,PartServices } from "src/app/services/parts/parts";
 import { Workorder, WorkorderServices } from "src/app/services/workorders/workorders";
+import { AuthService } from "src/app/services/auth/auth";
 
 @Component({
   selector: "app-quotes-form",
@@ -73,6 +74,7 @@ export class FormPage implements OnInit {
     private workorderServices: WorkorderServices,
     private serviceServices: ServiceServices,
     private partServices: PartServices,
+    private authService: AuthService,
   ) {}
 
   ngOnInit() {
@@ -706,18 +708,34 @@ export class FormPage implements OnInit {
       ) {
 
         this.workorders =
+          responses[index];
+
+        index++;
+
+        this.services =
+          responses[index];
+
+        index++;
+
+        this.parts =
+          responses[index];
+      }else{
+
+        this.workorders =
+          responses[this.workorderId];
+
+        index++;
+
+        this.services =
           responses[0];
 
         index++;
+
+        this.parts =
+          responses[1];
       }
 
-      this.services =
-        responses[1];
-
-      index++;
-
-      this.parts =
-        responses[2];
+      
 
     } catch (error) {
 
@@ -792,7 +810,7 @@ export class FormPage implements OnInit {
           values.workorder_id,
         ),
 
-      user_id: 1,
+      user_id: this.authService.getID() ?? '' ,
 
       status_id: 9,
 

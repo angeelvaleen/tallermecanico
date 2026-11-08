@@ -1,0 +1,81 @@
+{
+  "collection": "vehicles",
+  "definition": {
+    "collection": "vehicles",
+    "meta": {
+      "accountability": "all",
+      "archive_app_filter": true,
+      "archive_field": null,
+      "archive_value": null,
+      "autosave_revision_interval": null,
+      "collapse": "open",
+      "collection": "vehicles",
+      "color": null,
+      "display_template": null,
+      "group": null,
+      "hidden": false,
+      "icon": null,
+      "item_duplication_fields": null,
+      "note": null,
+      "preview_url": null,
+      "singleton": false,
+      "sort": null,
+      "sort_field": null,
+      "status": "active",
+      "translations": null,
+      "unarchive_value": null,
+      "versioning": false
+    },
+    "schema": {
+      "name": "vehicles"
+    }
+  },
+  "fields": [
+    {
+      "collection": "vehicles",
+      "field": "user_id",
+      "meta": {
+        "collection": "vehicles",
+        "conditions": null,
+        "display": null,
+        "display_options": null,
+        "field": "user_id",
+        "group": null,
+        "hidden": false,
+        "interface": null,
+        "note": null,
+        "options": null,
+        "readonly": false,
+        "required": false,
+        "searchable": true,
+        "sort": null,
+        "special": null,
+        "translations": null,
+        "validation": null,
+        "validation_message": null,
+        "width": "full"
+      },
+      "schema": {
+        "data_type": "char",
+        "default_value": null,
+        "foreign_key_column": "id",
+        "foreign_key_table": "directus_users",
+        "generation_expression": null,
+        "has_auto_increment": false,
+        "is_generated": false,
+        "is_indexed": true,
+        "is_nullable": false,
+        "is_primary_key": false,
+        "is_unique": false,
+        "max_length": 36,
+        "name": "user_id",
+        "numeric_precision": null,
+        "numeric_scale": null,
+        "table": "vehicles"
+      },
+      "type": "string"
+    }
+  ],
+  "relations": [],
+  "systemFields": []
+}

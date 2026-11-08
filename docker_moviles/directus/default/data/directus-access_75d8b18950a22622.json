@@ -1,0 +1,41 @@
+{
+  "collection": "directus_access",
+  "primaryKey": "id",
+  "records": [
+    {
+      "id": "0ad87cf9-e612-4172-b731-b43f9d510d77",
+      "policy": "eb9c9106-0ac5-431d-a7c5-aa16a8dbb91e",
+      "role": "3823f47a-27ae-40dc-9b0b-b446f31449b1",
+      "sort": null,
+      "user": null
+    },
+    {
+      "id": "2b1c6fe5-e6e8-42de-bae4-54306e8a4e14",
+      "policy": "cf63ea41-96d3-4b55-bde3-cc27fc4346d6",
+      "role": "87547614-33d5-4d6b-b79b-5d3890687f65",
+      "sort": null,
+      "user": null
+    },
+    {
+      "id": "87d34524-d95f-4a67-ad7b-0d9015fa8e72",
+      "policy": "b90f5e38-cb4b-4664-8af7-607b96340b18",
+      "role": "24d0bcbb-c316-45fe-98a1-beab4f06b3cd",
+      "sort": 1,
+      "user": null
+    },
+    {
+      "id": "bdd6d7a1-20ff-49f8-8873-15a19a836256",
+      "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "role": "625eab29-7a2b-41cc-9086-0f9f235abc9b",
+      "sort": 1,
+      "user": null
+    },
+    {
+      "id": "f8e355e0-9b9d-4f13-8bd3-88498118b71e",
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "role": "9fd2c60e-1197-4ca0-84e9-46ef57c3995d",
+      "sort": 1,
+      "user": null
+    }
+  ]
+}

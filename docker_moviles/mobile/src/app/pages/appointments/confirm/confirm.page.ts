@@ -229,10 +229,8 @@ export class ConfirmPage
               this.appointment.vehicle_id,
 
             mechanic_id:
-              Number(
                 this.confirmForm.value
-                  .mechanic_id
-              ),
+                  .mechanic_id,
 
             status_id: 4,
 

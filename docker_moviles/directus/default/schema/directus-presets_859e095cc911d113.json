@@ -1,0 +1,29 @@
+{
+  "collection": "directus_presets",
+  "definition": null,
+  "fields": [],
+  "relations": [],
+  "systemFields": [
+    {
+      "collection": "directus_presets",
+      "field": "collection",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_presets",
+      "field": "role",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_presets",
+      "field": "user",
+      "schema": {
+        "is_indexed": true
+      }
+    }
+  ]
+}

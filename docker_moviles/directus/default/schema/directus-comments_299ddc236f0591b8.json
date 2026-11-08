@@ -1,0 +1,22 @@
+{
+  "collection": "directus_comments",
+  "definition": null,
+  "fields": [],
+  "relations": [],
+  "systemFields": [
+    {
+      "collection": "directus_comments",
+      "field": "user_created",
+      "schema": {
+        "is_indexed": true
+      }
+    },
+    {
+      "collection": "directus_comments",
+      "field": "user_updated",
+      "schema": {
+        "is_indexed": true
+      }
+    }
+  ]
+}

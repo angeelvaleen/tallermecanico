@@ -8,6 +8,7 @@ import { Model,ModelList,ModelServices } from "src/app/services/models/models";
 import { Brand,BrandServices } from "src/app/services/brands/brands";
 import { Fuel,FuelServices } from "src/app/services/fuels/fuels";
 import { Color,ColorServices } from "src/app/services/colors/colors";
+import { AuthService } from "src/app/services/auth/auth";
 
 
 
@@ -77,6 +78,7 @@ export class FormPage implements OnInit {
     private fuelServices: FuelServices,
     private colorServices: ColorServices,
     private modelServices: ModelServices,
+    private authService: AuthService,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -266,7 +268,7 @@ export class FormPage implements OnInit {
     const values = this.vehicleForm.value;
 
     const vehicle: VehicleCreate = {
-      user_id: 1,
+      user_id: this.authService.getID() ?? "",
       model_id: Number(values.model_id),
       fuel_id: Number(values.fuel_id),
       color_id: Number(values.color_id),

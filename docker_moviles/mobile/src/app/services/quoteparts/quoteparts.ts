@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { defer, map, Observable } from 'rxjs';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
+import { AuthService } from '../auth/auth';
 
 
 export interface QuotePartCreate {
@@ -28,6 +29,8 @@ export interface QuotePart {
 export class QuotepartServices {
   private url = environment.apiUrl + '/quoteparts';
 
+  constructor(private authService: AuthService) { }
+
   private filter(search: string): Record<string, string> {
     const text = search.trim();
     return text ? { filter: JSON.stringify({ _or: [
@@ -36,8 +39,18 @@ export class QuotepartServices {
     ] }) } : {};
   }
 
+  private getAuthConfig() {
+    const token = this.authService.getAccessToken();
+    return {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+  }
+
   list(page = 1, perPage = 3, search = ''): Observable<QuotePart[]> {
     return defer(() => axios.get<{ data: QuotePart[] }>(this.url, {
+      ...this.getAuthConfig(),
       params: { page: page, limit: perPage, sort: 'id', ...this.filter(search) }
     })).pipe(map(response => response.data.data));
   }
@@ -46,31 +59,33 @@ export class QuotepartServices {
       return defer(() =>
         axios.get<{ data: QuotePart[] }>(
           `${this.url}?filter[quote_id][_eq]=${id}&fields=*,part_id.*`,
+          this.getAuthConfig()
         ),
       ).pipe(map((response) => response.data.data));
     }
 
   detail(id: number): Observable<QuotePart> {
-    return defer(() => axios.get<{ data: QuotePart }>(this.url + '/' + id))
+    return defer(() => axios.get<{ data: QuotePart }>(this.url + '/' + id, this.getAuthConfig()))
       .pipe(map(response => response.data.data));
   }
 
   create(quotepart: QuotePartCreate): Observable<QuotePart> {
-    return defer(() => axios.post<{ data: QuotePart }>(this.url, quotepart))
+    return defer(() => axios.post<{ data: QuotePart }>(this.url, quotepart, this.getAuthConfig()))
       .pipe(map(response => response.data.data));
   }
 
   update(id: number, quotepart: QuotePartCreate): Observable<QuotePart> {
-    return defer(() => axios.patch<{ data: QuotePart }>(this.url + '/' + id, quotepart))
+    return defer(() => axios.patch<{ data: QuotePart }>(this.url + '/' + id, quotepart, this.getAuthConfig()))
       .pipe(map(response => response.data.data));
   }
 
   delete(id: number): Observable<void> {
-    return defer(() => axios.delete(this.url + '/' + id)).pipe(map(() => undefined));
+    return defer(() => axios.delete(this.url + '/' + id, this.getAuthConfig())).pipe(map(() => undefined));
   }
 
   total(search = ''): Observable<number> {
     return defer(() => axios.get<{ data: { count: string | number }[] }>(this.url, {
+      ...this.getAuthConfig(),
       params: { 'aggregate[count]': '*', ...this.filter(search) }
     })).pipe(map(response => Number(response.data.data[0]?.count ?? 0)));
   }
@@ -79,7 +94,7 @@ export class QuotepartServices {
     return defer(() =>
       axios.patch(`${environment.apiUrl}/quoteparts/${id}`, {
         is_approved: option,
-      }),
+      }, this.getAuthConfig()),
     ).pipe(map(() => undefined));
   }
 }

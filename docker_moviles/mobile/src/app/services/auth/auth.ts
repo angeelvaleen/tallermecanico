@@ -224,6 +224,14 @@ export class AuthService {
     return this.profile?.role?.name ?? null;
   }
 
+  getID(): string | null {
+    return this.profile?.id ?? null;
+  }
+
+  getAccessToken(): string {
+    return this.token;
+  }
+
   // Comprobar rol
   hasRole(role: string): boolean {
     return this.getRole() === role;

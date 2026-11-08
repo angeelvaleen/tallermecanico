@@ -6,7 +6,8 @@ import { environment } from "src/environments/environment";
 import { QuoteItem } from "../quoteitems/quoteitems";
 import { QuotePart } from "../quoteparts/quoteparts";
 import { Workorder } from "../workorders/workorders";
-import { User } from "../auth/auth";
+import { AuthService } from "../auth/auth";
+
 
 
 interface Status {
@@ -54,7 +55,7 @@ export interface QuoteWorkorder {
 
 export interface QuoteCreate {
   workorder_id: number;
-  user_id: number;
+  user_id: string;
   status_id: number;
   subtotal: number;
   tax: number;
@@ -66,6 +67,17 @@ export interface QuoteCreate {
 export class QuoteServices {
   private url = environment.apiUrl + "/quotes";
 
+  constructor(private authService: AuthService) {}
+
+  private getAuthConfig() {
+    const token = this.authService.getAccessToken();
+    return {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+  }
+
   private filter(search: string): Record<string, string> {
     const text = search.trim();
     return text
@@ -75,7 +87,8 @@ export class QuoteServices {
 
   list(page = 1, perPage = 3, search = ""): Observable<Quote[]> {
     return defer(() =>
-      axios.get<{ data: Quote[] }>(this.url, {
+      axios.get<{ data: Quote[] }>(this.url,{
+        ...this.getAuthConfig(),
         params: {
           page: page,
           limit: perPage,
@@ -88,24 +101,24 @@ export class QuoteServices {
 
   detail(id: number): Observable<QuoteDetail> {
     return defer(() =>
-      axios.get<{ data: QuoteDetail }>(`${this.url}/${id}?fields=*,workorder_id.*,status_id.*`),
+      axios.get<{ data: QuoteDetail }>(`${this.url}/${id}?fields=*,workorder_id.*,status_id.*`, this.getAuthConfig()),
     ).pipe(map((response) => response.data.data));
   }
 
   create(quote: QuoteCreate): Observable<Quote> {
-    return defer(() => axios.post<{ data: Quote }>(this.url, quote)).pipe(
+    return defer(() => axios.post<{ data: Quote }>(this.url, quote, this.getAuthConfig())).pipe(
       map((response) => response.data.data),
     );
   }
 
   update(id: number, quote: QuoteCreate): Observable<Quote> {
     return defer(() =>
-      axios.patch<{ data: Quote }>(this.url + "/" + id, quote),
+      axios.patch<{ data: Quote }>(this.url + "/" + id, quote, this.getAuthConfig()),
     ).pipe(map((response) => response.data.data));
   }
 
   delete(id: number): Observable<void> {
-    return defer(() => axios.delete(this.url + "/" + id)).pipe(
+    return defer(() => axios.delete(this.url + "/" + id, this.getAuthConfig())).pipe(
       map(() => undefined),
     );
   }
@@ -113,6 +126,7 @@ export class QuoteServices {
   total(search = ""): Observable<number> {
     return defer(() =>
       axios.get<{ data: { count: string | number }[] }>(this.url, {
+        ...this.getAuthConfig(),
         params: { "aggregate[count]": "*", ...this.filter(search) },
       }),
     ).pipe(map((response) => Number(response.data.data[0]?.count ?? 0)));
@@ -122,7 +136,7 @@ export class QuoteServices {
     return defer(() =>
       axios.patch(`${environment.apiUrl}/quotes/${id}`, {
         status_id: 11,
-      }),
+      }, this.getAuthConfig()),
     ).pipe(map(() => undefined));
   }
 
@@ -130,7 +144,7 @@ export class QuoteServices {
     return defer(() =>
       axios.patch(`${environment.apiUrl}/quotes/${id}`, {
         status_id: 10,
-      }),
+      }, this.getAuthConfig()),
     ).pipe(map(() => undefined));
   }
 
@@ -143,12 +157,12 @@ export class QuoteServices {
           subtotal: subtotal,
           tax: tax,
           total: total,
-        },),
+        }, this.getAuthConfig()),
     ).pipe(map(() => undefined));
   } 
 
   ofWorkorder(id:number): Observable<QuoteWorkorder[]>{
-      return defer(() => axios.get<{ data: QuoteWorkorder[] }>(`${this.url}?filter[workorder_id][_eq]=${id}&fields=*,status_id.*`))
+      return defer(() => axios.get<{ data: QuoteWorkorder[] }>(`${this.url}?filter[workorder_id][_eq]=${id}&fields=*,status_id.*`, this.getAuthConfig()))
         .pipe(map(response => response.data.data));
     }
 }
