@@ -24,6 +24,7 @@ export class ListPage implements OnInit {
   search: string = "";
   canCreate: boolean = false;
   canUpdate: boolean = false;
+  userRole: string | null  = null;
 
 
   constructor(
@@ -36,6 +37,7 @@ export class ListPage implements OnInit {
   ngOnInit(): void {
     this.canCreate = this.authService.canByRole(ROLE_ACTIONS.workorders.create);
     this.canUpdate = this.authService.canByRole(ROLE_ACTIONS.workorders.update);
+    this.userRole = this.authService.getRole();
   }
 
   async ionViewWillEnter(): Promise<void> {
@@ -44,7 +46,20 @@ export class ListPage implements OnInit {
 
   async loadWorkorders(): Promise<void> {
     try {
-      this.workorders = await firstValueFrom(this.workorderServices.list(this.currentPage,this.perPage,this.search));
+      switch(this.userRole){
+        case 'Administrator':
+            this.workorders = await firstValueFrom(this.workorderServices.list(this.currentPage,this.perPage,this.search));
+          break;
+        case 'client':
+          this.workorders = await firstValueFrom(this.workorderServices.getMyWorkOrders(this.currentPage,this.perPage,this.search));
+          break;
+        case 'mechanic':
+          this.workorders = await firstValueFrom(this.workorderServices.getWorkOrdersMechanic(this.currentPage,this.perPage,this.search));
+          break;
+        case 'assistant':
+          this.workorders = await firstValueFrom(this.workorderServices.getWorkOrdersInProgress(this.currentPage,this.perPage,this.search));
+          break;
+      }
     } catch (error) {
       console.error(
         "Error al cargar órdenes de trabajo:",

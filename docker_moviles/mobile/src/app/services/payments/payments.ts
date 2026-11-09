@@ -15,7 +15,7 @@ interface PaymentUser {
 export interface Payment {
   id: number;
   quote_id: number;
-  user_id: number;
+  user_id: string;
   method_id:number;
   amount: number;
   reference: string;
@@ -34,7 +34,7 @@ export interface PaymentDetail {
 
 export interface PaymentCreate {
   quote_id: number;
-  user_id: number;
+  user_id: string;
   method_id:number;
   amount: number;
   reference: string;
@@ -100,4 +100,25 @@ export class PaymentServices {
       ,params: { 'aggregate[count]': '*', ...this.filter(search) }
     })).pipe(map(response => Number(response.data.data[0]?.count ?? 0)));
   }
+
+  getMyPayments(
+      page = 1,
+      perPage = 3,
+      search = "",
+    ): Observable<Payment[]> {
+      return defer(() =>
+        axios.get<{ data: Payment[] }>(
+          `${this.url}?filter[user_id][id][_eq]=${this.authService.getID()}`,
+          {
+            ...this.getAuthConfig(),
+            params: {
+              page: page,
+              limit: perPage,
+              sort: ["-paid_at"],
+              ...this.filter(search),
+            },
+          },
+        ),
+      ).pipe(map((response) => response.data.data));
+    }
 }

@@ -90,7 +90,7 @@ export class AppointmentServices {
         params: {
           page: page,
           limit: perPage,
-          sort: "id",
+          sort: ["-status_id","-created_at"],
           ...this.filter(search),
         },
       }),
@@ -149,5 +149,35 @@ export class AppointmentServices {
     },this.getAuthConfig())).pipe(
       map(() => undefined),
     );
+  }
+
+  getMyAppointments(page = 1, perPage = 3, search = ""): Observable<Appointment[]> {
+    return defer(() =>
+      axios.get<{ data: Appointment[] }>(
+        `${this.url}?filter[vehicle_id][user_id][id][_eq]=${this.authService.getID()}`,{
+        ...this.getAuthConfig(),
+        params: {
+          page: page,
+          limit: perPage,
+          sort: ["-status_id","-created_at"],
+          ...this.filter(search),
+        },
+      }),
+    ).pipe(map((response) => response.data.data));
+  }
+
+  getAppointmentActive(page = 1, perPage = 3, search = ""):Observable<Appointment[]>{
+    return defer(() =>
+      axios.get<{ data: Appointment[] }>(
+        `${this.url}?filter[status_id][id][_eq]=2}`,{
+        ...this.getAuthConfig(),
+        params: {
+          page: page,
+          limit: perPage,
+          sort: ["-created_at"],
+          ...this.filter(search),
+        },
+      }),
+    ).pipe(map((response) => response.data.data));
   }
 }

@@ -122,7 +122,7 @@ CREATE TABLE
         CONSTRAINT uk_vehicle_plate UNIQUE (plate),
         CONSTRAINT uk_vehicle_vin UNIQUE (vin),
         CONSTRAINT pk_vehicle PRIMARY KEY (id),
-        CONSTRAINT fk_vehicle_user FOREIGN KEY (user_id) REFERENCES users (id),
+        CONSTRAINT fk_vehicle_user FOREIGN KEY (user_id) REFERENCES users (id), -- Usuaurio del vehiculo
         CONSTRAINT fk_vehicle_model FOREIGN KEY (model_id) REFERENCES models (id),
         CONSTRAINT fk_vehicle_fuel FOREIGN KEY (fuel_id) REFERENCES fuels (id),
         CONSTRAINT fk_vehicle_color FOREIGN KEY (color_id) REFERENCES colors (id)
@@ -138,7 +138,7 @@ CREATE TABLE
         reason TEXT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         CONSTRAINT pk_appointment PRIMARY KEY (id),
-        CONSTRAINT fk_appointment_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicles (id),
+        CONSTRAINT fk_appointment_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicles (id), -- Usuario que solicito la cita  por medio del vehiculo id
         CONSTRAINT fk_appointment_status FOREIGN KEY (status_id) REFERENCES status (id)
     );
 
@@ -154,7 +154,7 @@ CREATE TABLE
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         CONSTRAINT chk_workorder_mileage CHECK (mileage >= 0),
         CONSTRAINT pk_workorder PRIMARY KEY (id),
-        CONSTRAINT fk_workorder_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicles (id),
+        CONSTRAINT fk_workorder_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicles (id),-- Vehiculo perteneciente al usuario 
         CONSTRAINT fk_workorder_status FOREIGN KEY (status_id) REFERENCES status (id),
         CONSTRAINT fk_workorder_mechanic FOREIGN KEY (mechanic_id) REFERENCES users (id)
     );

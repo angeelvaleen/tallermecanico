@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { PaymentServices, Payment } from 'src/app/services/payments/payments';
-
+import { AuthService } from 'src/app/services/auth/auth';
 
 
 @Component({
@@ -16,10 +16,16 @@ export class ListPage{
   currentPage: number = 1;
   perPage: number = 15;
   search: string = "";
+  userRole:string | null = null;
 
   constructor(
     private paymentServices: PaymentServices,
+    private authService: AuthService,
   ) {}
+
+  ngOnInit():void{
+    this.userRole = this.authService.getRole();
+  }
 
   ionViewWillEnter() {
    void this.chargerData();
@@ -27,7 +33,15 @@ export class ListPage{
 
   async loadPayments(): Promise<void> {
     try {
-      this.payments = await firstValueFrom(this.paymentServices.list(this.currentPage,this.perPage,this.search));
+      switch(this.userRole){
+        case 'Administrator':
+            this.payments = await firstValueFrom(this.paymentServices.list(this.currentPage,this.perPage,this.search));
+          break;
+        case 'client':
+          this.payments = await firstValueFrom(this.paymentServices.getMyPayments(this.currentPage,this.perPage,this.search));
+          break;
+        
+      }
     } catch (error) {
       console.log('Error al cargar pagos', error);
     }

@@ -34,6 +34,7 @@ export class ListPage implements OnInit {
   canUpdate = false;
   canAccept = false;
   canCancel = false;
+  userRole: string | null = null;
 
   constructor(
     private modalController: ModalController,
@@ -57,6 +58,7 @@ export class ListPage implements OnInit {
     this.canCancel = this.authService.canByRole(
       ROLE_ACTIONS.appointments.cancel
     );
+    this.userRole = this.authService.getRole();
   }
 
   ionViewWillEnter(): void {
@@ -66,7 +68,14 @@ export class ListPage implements OnInit {
 
   async loadAppointments(): Promise<void> {
     try {
-      this.appointments = await firstValueFrom(this.appointmentServices.list(this.currentPage,this.perPage,this.search));
+      switch(this.userRole){
+        case 'Administrator':
+          this.appointments = await firstValueFrom(this.appointmentServices.list(this.currentPage,this.perPage,this.search));
+          break;
+        case 'client':
+          this.appointments = await firstValueFrom(this.appointmentServices.getMyAppointments(this.currentPage,this.perPage,this.search));
+          break;
+      }
     } catch (error) {
       console.error("Error al cargar citas:", error);
 
