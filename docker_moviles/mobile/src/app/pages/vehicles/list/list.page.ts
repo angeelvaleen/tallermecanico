@@ -23,6 +23,7 @@ export class ListPage implements OnInit {
   search: string = "";
   canCreate = false;
   canUpdate = false;
+  userRole: string | null = null ;
 
   constructor(
     private modalController: ModalController,
@@ -37,6 +38,7 @@ export class ListPage implements OnInit {
     this.canUpdate = this.authService.canByRole(
       ROLE_ACTIONS.vehicles.update
     );
+    this.userRole = this.authService.getRole();
   }
 
   ionViewWillEnter(): void {
@@ -46,7 +48,15 @@ export class ListPage implements OnInit {
   async loadVehicles(): Promise<void> {
 
     try {
-      this.vehicles = await firstValueFrom(this.vehicleServices.list(this.currentPage,this.perPage,this.search));
+      switch(this.userRole){
+        case 'Administrator':
+          this.vehicles = await firstValueFrom(this.vehicleServices.list(this.currentPage,this.perPage,this.search));
+          break;
+        case 'client':
+          this.vehicles = await firstValueFrom(this.vehicleServices.getMyVehicles(this.currentPage,this.perPage,this.search));
+          break;
+      }
+      
     } catch (error) {
 
       console.log(

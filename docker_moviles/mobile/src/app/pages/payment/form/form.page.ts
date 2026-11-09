@@ -7,7 +7,7 @@ import { firstValueFrom } from "rxjs";
 import { PaymentServices,PaymentCreate } from "src/app/services/payments/payments";
 import { QuoteDetail,QuoteServices } from "src/app/services/quotes/quotes";
 import { Method,MethodServices } from "src/app/services/methods/methods";
-
+import { AuthService } from "src/app/services/auth/auth";
 
 
 @Component({
@@ -43,6 +43,7 @@ export class FormPage implements OnInit {
     private paymentServices: PaymentServices,
     private quoteServices: QuoteServices,
     private methodServices: MethodServices,
+    private authService: AuthService,
   ) {}
 
   ngOnInit(): void {
@@ -184,7 +185,7 @@ export class FormPage implements OnInit {
 
     return {
       quote_id: this.quote!.id,
-      user_id: this.quote!.user_id,
+      user_id: this.authService.getID() ?? "",
       amount: Number(this.quote!.total),
       method_id: Number(values.method_id),
       reference: values.reference?.trim() || null,
