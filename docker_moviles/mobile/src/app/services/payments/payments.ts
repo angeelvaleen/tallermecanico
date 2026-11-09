@@ -5,12 +5,7 @@ import axios from 'axios';
 import { environment } from 'src/environments/environment';
 import { Quote } from '../quotes/quotes';
 import { Method } from '../methods/methods';
-import { AuthService } from '../auth/auth';
-
-interface PaymentUser {
-  id: string;
-  name: string;
-}
+import { AuthService,User } from '../auth/auth';
 
 export interface Payment {
   id: number;
@@ -29,7 +24,7 @@ export interface PaymentDetail {
   paid_at: string | null;
   quote_id: Quote;
   method_id: Method;
-  user_id: PaymentUser;
+  user_id: User;
 }
 
 export interface PaymentCreate {

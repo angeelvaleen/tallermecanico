@@ -166,26 +166,27 @@ export class FormPage
     if (!this.id) {
       return;
     }
-
+    
     try {
       
 
       const workorder = await firstValueFrom(
         this.workorderServices.detail(this.id)
       );
+      console.log(workorder);
 
       this.workorderForm.patchValue({
         vehicle_id:
-          workorder.vehicle_id,
+          workorder.vehicle_id.id,
 
         mechanic_id:
-          workorder.mechanic_id,
+          workorder.mechanic_id.id,
 
         mileage:
           workorder.mileage,
 
         status_id:
-          workorder.status_id,
+          workorder.status_id.id,
 
         delivery:
           workorder.delivery || "",
@@ -210,15 +211,7 @@ export class FormPage
       `${mechanic.first_name || ""} 
       `.trim();
 
-    if (name) {
-      return name;
-    }
-
-    if (mechanic.email) {
-      return mechanic.email;
-    }
-
-    return `Mecánico #${mechanic.id}`;
+    return name;
   }
 
   getStatusName(

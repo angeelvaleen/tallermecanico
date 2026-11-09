@@ -113,7 +113,7 @@ export class WorkorderServices {
   detail(id: number): Observable<WorkorderDetail> {
     return defer(() =>
       axios.get<{ data: WorkorderDetail }>(
-        `${this.url}/${id}?fields=*,mechanic_id.first_name,mechanic_id.last_name,status_id.name,status_id.id,vehicle_id.plate`,
+        `${this.url}/${id}?fields=*,mechanic_id.id,mechanic_id.first_name,mechanic_id.last_name,status_id.name,status_id.id,vehicle_id.plate,vehicle_id.id`,
         this.getAuthConfig(),
       ),
     ).pipe(map((response) => response.data.data));

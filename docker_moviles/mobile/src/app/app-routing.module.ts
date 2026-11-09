@@ -479,6 +479,14 @@ const routes: Routes = [
     path: '**',
     redirectTo: ''
   },
+  {
+    path: 'detail',
+    loadChildren: () => import('./pages/profile/detail/detail.module').then( m => m.DetailPageModule)
+  },
+  {
+    path: 'form',
+    loadChildren: () => import('./pages/profile/form/form.module').then( m => m.FormPageModule)
+  },
 
 ];
 

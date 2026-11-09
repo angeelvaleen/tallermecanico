@@ -77,7 +77,7 @@
             *ngFor="let mechanic of mechanics"
             [value]="mechanic.id"
           >
-            {{ getMechanicName(mechanic) }}
+            {{ mechanic.first_name }} {{ mechanic.last_name }}
           </ion-select-option>
 
         </ion-select>
@@ -86,7 +86,7 @@
 
       <ion-note
         color="danger"
-        *ngIf="getError('mechanic_id') as error"
+        *ngIf="getError('mechanic') as error"
       >
         {{ error }}
       </ion-note>
