@@ -23,5 +23,13 @@ export const ROLE_ACTIONS = {
     toggleItem: ['client'],
     approve: ['client'],
     reject: ['client']
+  },
+
+  profile: {
+    create: ['Administrator'],
+    update: ['Administrator', 'mechanic', 'assistant', 'client'],
+    toggleActive: ['Administrator'],
+    changePassword: ['Administrator', 'mechanic', 'assistant', 'client'],
+
   }
 } as const;

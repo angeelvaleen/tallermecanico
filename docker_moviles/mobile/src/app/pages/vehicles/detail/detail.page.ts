@@ -45,6 +45,7 @@ export class DetailPage implements OnInit {
     try {
 
       this.vehicle = await firstValueFrom(this.vehicleService.detail(Number(id)));
+      console.log(this.vehicle);
       
       
     } catch (error) {

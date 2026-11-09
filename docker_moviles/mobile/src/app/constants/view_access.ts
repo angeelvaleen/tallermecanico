@@ -87,5 +87,12 @@ export const VIEW_ACCESS = {
     list: ['Administrator'],
     detail: ['Administrator'],
     form: ['Administrator']
+  },
+
+  profile: {
+    list : ['Administrator'],
+    detail: ['Administrator', 'mechanic', 'assistant', 'client'],
+    form: ['Administrator', 'mechanic', 'assistant', 'client'],
   }
+
 } as const;
