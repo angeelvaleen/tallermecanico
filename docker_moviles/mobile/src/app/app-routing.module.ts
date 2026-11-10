@@ -46,6 +46,23 @@ const routes: Routes = [
   },
 
   // ==========================================
+  // USUARIOS
+  // ==========================================
+
+  {
+    path: 'users/list',
+    loadChildren: () => import('./pages/users/list/list.module').then( m => m.ListPageModule)
+  },
+  {
+    path: 'users/form',
+    loadChildren: () => import('./pages/users/form/form.module').then( m => m.FormPageModule)
+  },
+  {
+    path: 'users/detail/:id',
+    loadChildren: () => import('./pages/users/detail/detail.module').then( m => m.DetailPageModule)
+  },
+
+  // ==========================================
   // BRANDS
   // ==========================================
 
@@ -458,6 +475,16 @@ const routes: Routes = [
         .then(m => m.RegisterPageModule)
   },
 
+
+  // ==========================================
+  // PERFIL
+  // ==========================================
+
+  {
+    path: 'profile',
+    loadChildren: () => import('./pages/profile/profile.module').then( m => m.ProfilePageModule)
+  },
+
   // ==========================================
   // ACCESO DENEGADO
   // Crear esta página antes de habilitarla.
@@ -478,14 +505,6 @@ const routes: Routes = [
   {
     path: '**',
     redirectTo: ''
-  },
-  {
-    path: 'detail',
-    loadChildren: () => import('./pages/profile/detail/detail.module').then( m => m.DetailPageModule)
-  },
-  {
-    path: 'form',
-    loadChildren: () => import('./pages/profile/form/form.module').then( m => m.FormPageModule)
   },
 
 ];

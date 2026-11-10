@@ -4,7 +4,7 @@ import { Component, OnInit } from '@angular/core';
   selector: 'app-form',
   templateUrl: './form.page.html',
   styleUrls: ['./form.page.scss'],
-  standalone:false,
+  standalone:false
 })
 export class FormPage implements OnInit {
 

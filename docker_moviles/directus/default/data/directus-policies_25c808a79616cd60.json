@@ -24,7 +24,7 @@
     },
     {
       "admin_access": false,
-      "app_access": true,
+      "app_access": false,
       "description": null,
       "enforce_tfa": false,
       "icon": "badge",

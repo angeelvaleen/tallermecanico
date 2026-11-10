@@ -196,18 +196,6 @@
     },
     {
       "action": "update",
-      "collection": "payment",
-      "fields": [
-        "*"
-      ],
-      "id": 116,
-      "permissions": null,
-      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
-      "presets": null,
-      "validation": null
-    },
-    {
-      "action": "update",
       "collection": "quoteitems",
       "fields": [
         "*"
@@ -899,6 +887,78 @@
       "id": 188,
       "permissions": null,
       "policy": "7ac29d7a-5c9f-4dfc-999a-1a16cad9be38",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "directus_policies",
+      "fields": [
+        "*"
+      ],
+      "id": 191,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "appointments",
+      "fields": [
+        "*"
+      ],
+      "id": 192,
+      "permissions": null,
+      "policy": "abf8a154-5b1c-4a46-ac9c-7300570f4f17",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "payment",
+      "fields": [
+        "*"
+      ],
+      "id": 193,
+      "permissions": null,
+      "policy": "abf8a154-5b1c-4a46-ac9c-7300570f4f17",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "vehicles",
+      "fields": [
+        "*"
+      ],
+      "id": 194,
+      "permissions": null,
+      "policy": "abf8a154-5b1c-4a46-ac9c-7300570f4f17",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "read",
+      "collection": "workorders",
+      "fields": [
+        "*"
+      ],
+      "id": 195,
+      "permissions": null,
+      "policy": "abf8a154-5b1c-4a46-ac9c-7300570f4f17",
+      "presets": null,
+      "validation": null
+    },
+    {
+      "action": "create",
+      "collection": "payment",
+      "fields": [
+        "*"
+      ],
+      "id": 196,
+      "permissions": null,
+      "policy": "b809c4a1-b19d-4553-a3d4-cb98592fd8ad",
       "presets": null,
       "validation": null
     },
