@@ -30,6 +30,5 @@ export const ROLE_ACTIONS = {
     update: ['Administrator', 'mechanic', 'assistant', 'client'],
     toggleActive: ['Administrator'],
     changePassword: ['Administrator', 'mechanic', 'assistant', 'client'],
-
   }
 } as const;

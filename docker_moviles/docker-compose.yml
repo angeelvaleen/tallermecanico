@@ -15,8 +15,6 @@ services:
 
     volumes:
       - mariadb_data:/var/lib/mysql
-      - ./database/init:/docker-entrypoint-initdb.d
-
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 5s
@@ -45,7 +43,7 @@ services:
       - moviles
 
   api:
-    image: directus/directus:latest
+    image: directus/directus:12.6.0
     container_name: moviles-api
     restart: unless-stopped
 
