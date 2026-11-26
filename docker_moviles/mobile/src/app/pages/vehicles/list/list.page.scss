@@ -1,0 +1,24 @@
+/* Estados del listado: carga, error y vacio */
+.list-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 40px 24px;
+  text-align: center;
+}
+
+.list-state ion-icon {
+  font-size: 36px;
+  color: #94a3b8;
+}
+
+.list-state p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.list-state ion-button {
+  margin-top: 4px;
+}

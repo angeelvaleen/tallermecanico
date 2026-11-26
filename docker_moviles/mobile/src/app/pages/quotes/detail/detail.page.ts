@@ -70,11 +70,9 @@ export class DetailPage implements OnInit {
 
       this.quote = quote;
 
-      console.log("Cotización:", this.quote);
     } catch (error) {
       this.messageError = "Revisar id, conexion a base de datos o permisos";
 
-      console.log("Error al cargar detalle de cotizacion", error);
     } finally {
       await loading.dismiss();
     }
@@ -127,7 +125,6 @@ export class DetailPage implements OnInit {
     } catch (error) {
       this.messageError = "No fue posible aprobar la cotización.";
 
-      console.log("Error al aprobar cotización", error);
     } finally {
       await loading.dismiss();
     }
@@ -155,7 +152,6 @@ export class DetailPage implements OnInit {
     } catch (error) {
       this.messageError = "No fue posible rechazar la cotización.";
 
-      console.log("Error al rechazar cotización", error);
     } finally {
       await loading.dismiss();
     }
@@ -172,7 +168,6 @@ export class DetailPage implements OnInit {
       await this.recalculateQuote();
     } catch (error) {
       this.messageError = "No fue posible actualizar el servicio.";
-      console.log("Error al actualizar servicio", error);
     }
   }
 
@@ -187,7 +182,6 @@ export class DetailPage implements OnInit {
       await this.recalculateQuote();
     } catch (error) {
       this.messageError = "No fue posible actualizar la refacción.";
-      console.log("Error al actualizar refacción", error);
     }
   }
 
@@ -218,7 +212,6 @@ export class DetailPage implements OnInit {
       this.quote.total = total;
     } catch (error) {
       this.messageError = "No fue posible actualizar los totales.";
-      console.log("Error al actualizar totales", error);
     }
   }
 

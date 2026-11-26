@@ -1,6 +1,21 @@
 <ion-header [translucent]="true">
   <ion-toolbar [color]="color">
-    <ion-buttons slot="start"><ion-menu-button menu="principal" aria-label="Abrir menú"></ion-menu-button></ion-buttons>
+    <ion-buttons slot="start">
+      <ion-menu-button
+        *ngIf="showMenu && isAdmin"
+        menu="principal"
+        aria-label="Abrir menú"
+      ></ion-menu-button>
+      <ion-button
+        *ngIf="showBackToWorkorders"
+        fill="clear"
+        color="light"
+        (click)="goToWorkorders()"
+        aria-label="Volver a órdenes de trabajo"
+      >
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
     <ion-title>{{ name }}</ion-title>
     <ng-content></ng-content>
   </ion-toolbar>

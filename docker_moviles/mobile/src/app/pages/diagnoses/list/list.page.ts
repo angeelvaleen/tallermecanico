@@ -15,6 +15,9 @@ import { FormPage } from "../form/form.page";
 export class ListPage implements OnInit {
   diagnoses: Diagnosis[] = [];
 
+  loading: boolean = false;
+  loadError: boolean = false;
+
   constructor(
     private modalController: ModalController,
     private diagnosesServices: DiagnosisServices,
@@ -29,12 +32,22 @@ export class ListPage implements OnInit {
   }
 
   async chargerDiagnoses(): Promise<void> {
+    this.loading = true;
+    this.loadError = false;
+
     try {
       
       this.diagnoses = await firstValueFrom(this.diagnosesServices.listWithOutFilters());
     } catch (error) {
-      console.log("Error al cargar diagnósticos", error);
+
+      this.loadError = true;
+    } finally {
+      this.loading = false;
     }
+  }
+
+  async retry(): Promise<void> {
+    await this.chargerDiagnoses();
   }
 
   async createDiagnosis(): Promise<void> {

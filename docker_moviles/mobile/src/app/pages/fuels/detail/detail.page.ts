@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
+import { AuthService } from 'src/app/services/auth/auth';
 
 interface Fuel {
   id: number;
@@ -24,6 +25,7 @@ export class DetailPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private loading: LoadingController,
+    private authService: AuthService,
   ) {}
 
   ngOnInit() {
@@ -47,11 +49,15 @@ export class DetailPage implements OnInit {
 
     try {
       const response = await axios.get<{ data: Fuel }>(
-        `${environment.apiUrl}/fuels/${encodeURIComponent(id)}`
+        `${environment.apiUrl}/fuels/${encodeURIComponent(id)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${this.authService.getAccessToken()}`,
+          },
+        }
       );
       this.fuel = response.data.data;
     } catch (error) {
-      console.log('Error al cargar detalle de combustible', error);
       this.messageError = "No se pudo cargar el producto. Revisa el ID, la conexión y los permisos de lectura.";
     }finally{
       await loading.dismiss();

@@ -17,6 +17,9 @@ export class ListPage {
   colors: Color[] = [];
   search: string = "";
 
+  loading: boolean = false;
+  loadError: boolean = false;
+
   constructor(
     private modalController: ModalController,
     private colorServices: ColorServices,
@@ -31,6 +34,8 @@ export class ListPage {
       this.colors = await firstValueFrom(this.colorServices.list(this.currentPage, this.perPage, this.search));
     } catch (error) {
       console.error("Error al cargar colores:", error);
+
+      this.loadError = true;
     }
   }
 
@@ -76,6 +81,7 @@ export class ListPage {
       console.error("Error al obtener el total de colores:", error);
 
       this.total = 0;
+      this.loadError = true;
     }
   }
 
@@ -94,20 +100,38 @@ export class ListPage {
 
 
   async chargerData(): Promise<void> {
-    await this.chargerTotal();
-    this.adjustCurrentPage();
-    await this.loadColors();
+    this.loading = true;
+    this.loadError = false;
+
+    try {
+      await this.chargerTotal();
+      this.adjustCurrentPage();
+      await this.loadColors();
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  async retry(): Promise<void> {
+    await this.chargerData();
   }
 
 
   async changePage(page: number): Promise<void> {
     this.currentPage = page;
-    await this.loadColors();
+    this.loading = true;
+    this.loadError = false;
+
+    try {
+      await this.loadColors();
+    } finally {
+      this.loading = false;
+    }
   }
 
 
-  async handleInput(event: CustomEvent<{ value?: string | null }>): Promise<void> {
-    this.search = event.detail.value ?? '';
+  async handleInput(text: string): Promise<void> {
+    this.search = text;
     this.currentPage = 1;
     await this.chargerData();
   }

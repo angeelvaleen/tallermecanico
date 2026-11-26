@@ -1,13 +1,33 @@
-<app-toolbar name="Historial" color="dark"></app-toolbar>
+<app-toolbar name="Historial" color="primary"></app-toolbar>
 
 <ion-content>
-  <ion-list>
+  <div class="list-state" *ngIf="loading">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Cargando historial...</p>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && loadError">
+    <ion-icon name="cloud-offline-outline"></ion-icon>
+    <p>No se pudo cargar el historial.</p>
+    <ion-button fill="outline" (click)="retry()">Reintentar</ion-button>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && !loadError && history.length === 0">
+    <ion-icon name="time-outline"></ion-icon>
+    <p>No hay registros de historial.</p>
+  </div>
+
+  <ion-list *ngIf="!loading && !loadError">
     <ion-item *ngFor="let h of history">
-      <ion-label>
-        <h2>Vehiculo ID: {{ h.vehicle_id }}</h2>
+      <ion-label class="ion-text-wrap">
+        <h2>Vehículo ID: {{ h.vehicle_id }}</h2>
         <p>Orden ID: {{ h.workorder_id }}</p>
       </ion-label>
-      <ion-button [routerLink]="['/history/detail', h.id]">
+      <ion-button
+        slot="end"
+        fill="clear"
+        [routerLink]="['/history/detail', h.id]"
+      >
         <ion-icon name="eye-outline" ></ion-icon>
       </ion-button>
     </ion-item>

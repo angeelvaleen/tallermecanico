@@ -15,7 +15,26 @@
     [debounce]="300"
     (changeText)="handleInput($event)">
   </app-searchbar>
-  <ion-list>
+
+  <div class="list-state" *ngIf="loading">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Cargando modelos...</p>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && loadError">
+    <ion-icon name="cloud-offline-outline"></ion-icon>
+    <p>No se pudieron cargar los modelos.</p>
+    <ion-button fill="outline" (click)="retry()">Reintentar</ion-button>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && !loadError && models.length === 0">
+    <ion-icon name="car-sport-outline"></ion-icon>
+    <p>
+      {{ search ? 'No se encontraron modelos para "' + search + '".' : 'No hay modelos registrados.' }}
+    </p>
+  </div>
+
+  <ion-list *ngIf="!loading && !loadError">
     <ion-item *ngFor="let model of models">
       <ion-label class="ion-text-wrap">
         <h2>{{ model.name }}</h2>
@@ -41,6 +60,7 @@
       
       <ion-button
         slot="end"
+        fill="clear"
         color="warning"
         (click)="editModel(model.id)"
       >
@@ -49,6 +69,7 @@
     </ion-item>
   </ion-list>
   <app-pagination
+  *ngIf="!loading && !loadError && models.length > 0"
   [total]="total"
   [perPage]="perPage"
   [currentPage]="currentPage"

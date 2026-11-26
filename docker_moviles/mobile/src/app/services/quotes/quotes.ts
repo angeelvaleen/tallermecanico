@@ -79,10 +79,24 @@ export class QuoteServices {
   }
 
   private filter(search: string): Record<string, string> {
-    const text = search.trim();
-    return text
-      ? { filter: JSON.stringify({ _or: [{ workorder_id: { _eq: text } }] }) }
-      : {};
+    const text = search.trim().replace(/^#/, "");
+
+    if (!text) {
+      return {};
+    }
+
+    const value = Number(text);
+
+    // Solo se busca por ID de cotización o de orden de trabajo.
+    if (!Number.isFinite(value)) {
+      return { filter: JSON.stringify({ id: { _eq: -1 } }) };
+    }
+
+    return {
+      filter: JSON.stringify({
+        _or: [{ id: { _eq: value } }, { workorder_id: { _eq: value } }],
+      }),
+    };
   }
 
   list(page = 1, perPage = 3, search = ""): Observable<Quote[]> {

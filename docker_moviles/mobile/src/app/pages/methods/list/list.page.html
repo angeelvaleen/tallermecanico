@@ -1,6 +1,6 @@
-<app-toolbar name="Metodos de pago" color="primary">
+<app-toolbar name="Métodos de pago" color="primary">
   <ion-buttons slot="end">
-    <ion-button fill="primary" (click)="createMethod()" aria-label="Nuevo metodo">
+    <ion-button fill="primary" (click)="createMethod()" aria-label="Nuevo método">
       <ion-icon slot="icon-only" name="add"></ion-icon>
     </ion-button>
   </ion-buttons>
@@ -8,7 +8,32 @@
 
 
 <ion-content>
-  <ion-list>
+  <app-searchbar
+    [value]="search"
+    placeholder="Buscar método de pago"
+    [debounce]="300"
+    (changeText)="handleInput($event)">
+  </app-searchbar>
+
+  <div class="list-state" *ngIf="loading">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Cargando métodos de pago...</p>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && loadError">
+    <ion-icon name="cloud-offline-outline"></ion-icon>
+    <p>No se pudieron cargar los métodos de pago.</p>
+    <ion-button fill="outline" (click)="retry()">Reintentar</ion-button>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && !loadError && methods.length === 0">
+    <ion-icon name="card-outline"></ion-icon>
+    <p>
+      {{ search ? 'No se encontraron métodos de pago para "' + search + '".' : 'No hay métodos de pago registrados.' }}
+    </p>
+  </div>
+
+  <ion-list *ngIf="!loading && !loadError">
     <ion-item *ngFor="let method of methods">
       <ion-label class="ion-text-wrap">
         <h2>{{ method.name }}</h2>
@@ -26,6 +51,7 @@
 
       <ion-button
         slot="end"
+        fill="clear"
         color="warning"
         (click)="editMethod(method.id)"
       >
@@ -33,4 +59,12 @@
       </ion-button>
     </ion-item>
   </ion-list>
+  <app-pagination
+  *ngIf="!loading && !loadError && methods.length > 0"
+  [total]="total"
+  [perPage]="perPage"
+  [currentPage]="currentPage"
+  [maxVisiblePage]="5"
+  (changePage)="changePage($event)"
+  ></app-pagination>
 </ion-content>

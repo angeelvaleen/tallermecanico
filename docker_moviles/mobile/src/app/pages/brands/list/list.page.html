@@ -1,6 +1,6 @@
 <app-toolbar name="Marcas" color="primary">
   <ion-buttons slot="end">
-    <ion-button fill="primary" (click)="createBrand()" aria-label="Nuevo couta">
+    <ion-button fill="primary" (click)="createBrand()" aria-label="Nueva marca">
       <ion-icon slot="icon-only" name="add"></ion-icon>
     </ion-button>
   </ion-buttons>
@@ -8,7 +8,32 @@
 
 
 <ion-content>
-  <ion-list>
+  <app-searchbar
+    [value]="search"
+    placeholder="Buscar marca"
+    [debounce]="300"
+    (changeText)="handleInput($event)">
+  </app-searchbar>
+
+  <div class="list-state" *ngIf="loading">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Cargando marcas...</p>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && loadError">
+    <ion-icon name="cloud-offline-outline"></ion-icon>
+    <p>No se pudieron cargar las marcas.</p>
+    <ion-button fill="outline" (click)="retry()">Reintentar</ion-button>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && !loadError && brands.length === 0">
+    <ion-icon name="car-outline"></ion-icon>
+    <p>
+      {{ search ? 'No se encontraron marcas para "' + search + '".' : 'No hay marcas registradas.' }}
+    </p>
+  </div>
+
+  <ion-list *ngIf="!loading && !loadError">
     <ion-item *ngFor="let brand of brands">
       <ion-label class="ion-text-wrap">
         <h2>{{ brand.name }}</h2>
@@ -22,6 +47,7 @@
 
       <ion-button
         slot="end"
+        fill="clear"
         color="warning"
         (click)="editBrand(brand.id)"
       >
@@ -29,4 +55,12 @@
       </ion-button>
     </ion-item>
   </ion-list>
+  <app-pagination
+  *ngIf="!loading && !loadError && brands.length > 0"
+  [total]="total"
+  [perPage]="perPage"
+  [currentPage]="currentPage"
+  [maxVisiblePage]="5"
+  (changePage)="changePage($event)"
+  ></app-pagination>
 </ion-content>

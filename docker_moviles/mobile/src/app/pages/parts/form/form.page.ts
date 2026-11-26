@@ -23,7 +23,7 @@ export class FormPage implements OnInit {
   validatorsMessage: Record<string, Record<string, string>> = {
     name: {
       required: 'El nombre es requerido',
-      maxlength: 'El nombre no puede tener más de 100 caracteres',
+      maxlength: 'El nombre no puede tener más de 100 caracteres.',
     },
     price: {
       required: 'El precio es requerido',
@@ -87,7 +87,6 @@ export class FormPage implements OnInit {
       });
 
     } catch (error) {
-      console.log('Error al cargar la refacción', error);
 
       await this.showAlert(
         'Error',
@@ -162,7 +161,6 @@ export class FormPage implements OnInit {
       });
 
     } catch (error) {
-      console.log('Error al guardar la refacción', error);
 
       await this.showAlert(
         'Error',

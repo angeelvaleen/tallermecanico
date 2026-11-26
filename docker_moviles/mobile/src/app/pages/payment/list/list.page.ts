@@ -18,6 +18,9 @@ export class ListPage{
   search: string = "";
   userRole:string | null = null;
 
+  loading: boolean = false;
+  loadError: boolean = false;
+
   constructor(
     private paymentServices: PaymentServices,
     private authService: AuthService,
@@ -43,18 +46,24 @@ export class ListPage{
         
       }
     } catch (error) {
-      console.log('Error al cargar pagos', error);
+
+      this.loadError = true;
     }
   }
 
 
   async chargerTotal(): Promise<void> {
     try {
-      this.total = await firstValueFrom(this.paymentServices.total(this.search)); 
+      this.total =
+        this.userRole === 'client'
+          ? await firstValueFrom(this.paymentServices.totalMy(this.search))
+          : await firstValueFrom(this.paymentServices.total(this.search));
+
     } catch (error) {
       console.error("Error al obtener el total de pagos:", error);
 
       this.total = 0;
+      this.loadError = true;
     }
   }
 
@@ -73,15 +82,33 @@ export class ListPage{
 
 
   async chargerData(): Promise<void> {
-    await this.chargerTotal();
-    this.adjustCurrentPage();
-    await this.loadPayments();
+    this.loading = true;
+    this.loadError = false;
+
+    try {
+      await this.chargerTotal();
+      this.adjustCurrentPage();
+      await this.loadPayments();
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  async retry(): Promise<void> {
+    await this.chargerData();
   }
 
  
   async changePage(page: number): Promise<void> {
     this.currentPage = page;
-    await this.loadPayments();
+    this.loading = true;
+    this.loadError = false;
+
+    try {
+      await this.loadPayments();
+    } finally {
+      this.loading = false;
+    }
   }
 
 

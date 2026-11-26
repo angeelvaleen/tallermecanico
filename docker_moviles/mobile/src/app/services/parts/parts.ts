@@ -36,7 +36,7 @@ export class PartServices {
   }
 
   private filter(search: string): Record<string, string> {
-    const text = search.trim
+    const text = search.trim();
     return text ? { filter: JSON.stringify({ _or: [
       { name: { _icontains: text } },
       { description: { _icontains:text } },

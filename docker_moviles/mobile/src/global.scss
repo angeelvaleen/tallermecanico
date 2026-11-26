@@ -52,6 +52,9 @@
   --ion-color-warning: #F59E0B; /* Pendiente / Alerta */
   --ion-color-danger: #EF4444;  /* Requiere aprobacion */
   --ion-color-tertiary: #0EA5E9; /* En proceso / En taller */
+
+  /* Tipografia unica de la aplicacion */
+  --ion-font-family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
 }
 
 
@@ -97,20 +100,41 @@ ion-button {
   letter-spacing: 0.3px;
 }
 
+/* Acciones principales en naranja (botones solid sin color explicito) */
+ion-button.button-solid:not([color]) {
+  --background: var(--ion-color-secondary);
+  --background-hover: #EA580C;
+  --color: var(--ion-color-secondary-contrast);
+}
+
+/* Acciones del encabezado: los botones "+" usan fill="primary" y quedan sin fill valido */
+ion-button[fill="primary"]:not([color]) {
+  --background: var(--ion-color-secondary);
+  --background-hover: #EA580C;
+  --color: var(--ion-color-secondary-contrast);
+}
+
 
 /* Items de listas adaptados para lectura comoda en movil */
 
 ion-item {
   --background: #ffffff;
-  --border-radius: 8px;
-  margin: 6px 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  --border-radius: 10px;
+  margin: 6px 12px;
+  border: 1px solid #E2E8F0;
+  box-shadow: none;
+}
+
+/* Ionic fija el radio del host en 0: se refuerza solo la forma del borde */
+ion-item.item {
+  border-radius: 10px;
 }
 
 
-/* Titulo dentro de los items */
-
-ion-item h2 {
+/* Titulo dentro de los items (ion-label fija normal: se refuerza con la clase del item) */
+ion-item h2,
+ion-item ion-label h2,
+ion-item.item ion-label h2 {
   color: var(--ion-color-primary);
   font-weight: 700;
 }

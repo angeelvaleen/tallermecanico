@@ -17,3 +17,19 @@
 .quote-message {
   margin-top: 16px;
 }
+/* Miniatura de evidencia: conserva la proporcion de la fotografia. */
+.evidence-thumb {
+  --size: 72px;
+  --border-radius: 8px;
+  margin: 8px 12px 8px 0;
+}
+
+.evidence-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.evidence-error {
+  color: var(--ion-color-danger, #eb445a);
+}

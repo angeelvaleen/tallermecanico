@@ -1,14 +1,10 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
+<app-toolbar name="Detalle de diagnóstico" color="primary">
+<ion-buttons slot="start">
       <ion-back-button
         defaultHref="/diagnoses/list"
       ></ion-back-button>
     </ion-buttons>
-
-    <ion-title>Detalle de Diagnóstico</ion-title>
-  </ion-toolbar>
-</ion-header>
+</app-toolbar>
 
 <ion-content class="ion-padding">
 
@@ -27,7 +23,7 @@
       <ion-card-content>
 
         <h2>
-          Orden de Trabajo #{{ diagnosis.workorder_id }}
+          Orden de trabajo #{{ diagnosis.workorder_id }}
         </h2>
 
         <p>

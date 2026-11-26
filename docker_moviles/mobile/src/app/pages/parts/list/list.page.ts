@@ -18,6 +18,9 @@ export class ListPage {
   perPage: number = 5;
   search: string = "";
 
+  loading: boolean = false;
+  loadError: boolean = false;
+
   constructor(
     private modalController: ModalController,
     private partServices: PartServices,
@@ -31,7 +34,8 @@ export class ListPage {
     try {
       this.parts = await firstValueFrom(this.partServices.list(this.currentPage,this.perPage,this.search));
     } catch (error) {
-      console.log('Error al cargar refacciones', error);
+
+      this.loadError = true;
     }
   }
 
@@ -77,6 +81,7 @@ export class ListPage {
       console.error("Error al obtener el total de partes:", error);
 
       this.total = 0;
+      this.loadError = true;
     }
   }
 
@@ -95,15 +100,33 @@ export class ListPage {
 
 
   async chargerData(): Promise<void> {
-    await this.chargerTotal();
-    this.adjustCurrentPage();
-    await this.loadParts();
+    this.loading = true;
+    this.loadError = false;
+
+    try {
+      await this.chargerTotal();
+      this.adjustCurrentPage();
+      await this.loadParts();
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  async retry(): Promise<void> {
+    await this.chargerData();
   }
 
 
   async changePage(page: number): Promise<void> {
     this.currentPage = page;
-    await this.loadParts();
+    this.loading = true;
+    this.loadError = false;
+
+    try {
+      await this.loadParts();
+    } finally {
+      this.loading = false;
+    }
   }
 
 

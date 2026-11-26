@@ -721,28 +721,21 @@ export class FormPage implements OnInit {
           responses[index];
       }else{
 
-        this.workorders =
-          responses[this.workorderId];
-
-        index++;
-
+        // Con la orden preasignada no se consulta la lista de ordenes:
+        // el indice debe empezar en 0 (antes usaba this.workorderId).
         this.services =
-          responses[0];
+          responses[index];
 
         index++;
 
         this.parts =
-          responses[1];
+          responses[index];
       }
 
       
 
     } catch (error) {
 
-      console.log(
-        "Error al cargar datos de la cotización",
-        error,
-      );
 
       const alert =
         await this.alertController.create({
@@ -766,6 +759,232 @@ export class FormPage implements OnInit {
     await this.modalController.dismiss({
       saved: false,
     });
+  }
+
+  // Recalcula el importe de cada concepto y los totales con los valores
+  // actuales del formulario. Se ejecuta antes de guardar para no enviar
+  // cifras desfasadas si el usuario edito sin disparar el recalculo.
+  private recalculateConcepts(): void {
+
+    for (
+      const item of
+      this.items.controls
+    ) {
+
+      const price =
+        Number(
+          item.get(
+            "price",
+          )?.value ?? 0,
+        );
+
+      const discount =
+        Number(
+          item.get(
+            "discount",
+          )?.value ?? 0,
+        );
+
+      item.patchValue(
+        {
+          amount:
+            Number(
+              this.calculateDiscount(
+                price,
+                discount,
+              ).toFixed(2),
+            ),
+        },
+        {
+          emitEvent: false,
+        },
+      );
+    }
+
+    for (
+      const part of
+      this.partsArray.controls
+    ) {
+
+      const quantity =
+        Number(
+          part.get(
+            "quantity",
+          )?.value ?? 1,
+        );
+
+      const price =
+        Number(
+          part.get(
+            "price",
+          )?.value ?? 0,
+        );
+
+      const discount =
+        Number(
+          part.get(
+            "discount",
+          )?.value ?? 0,
+        );
+
+      const amount =
+        this.calculateDiscount(
+          price * quantity,
+          discount,
+        );
+
+      part.patchValue(
+        {
+          amount:
+            Number(
+              amount.toFixed(2),
+            ),
+        },
+        {
+          emitEvent: false,
+        },
+      );
+    }
+
+    this.calculateTotals();
+  }
+
+  // Valida los conceptos antes de escribir en Directus: evita crear una
+  // cotizacion sin conceptos o con referencias que ya no existen.
+  private validateConcepts(): string {
+
+    if (
+      !this.items.length &&
+      !this.partsArray.length
+    ) {
+
+      return "Agrega al menos un servicio o una refaccion antes de guardar la cotizacion.";
+    }
+
+    for (
+      const item of
+      this.items.controls
+    ) {
+
+      const serviceId =
+        Number(
+          item.get(
+            "service_id",
+          )?.value,
+        );
+
+      if (
+        !this.services.some(
+          (service) =>
+            service.id === serviceId,
+        )
+      ) {
+
+        return "Uno de los servicios seleccionados ya no esta disponible. Actualiza la cotizacion.";
+      }
+
+      const price =
+        Number(
+          item.get(
+            "price",
+          )?.value ?? 0,
+        );
+
+      const discount =
+        Number(
+          item.get(
+            "discount",
+          )?.value ?? 0,
+        );
+
+      if (
+        !Number.isFinite(price) ||
+        price < 0
+      ) {
+
+        return "El precio de un servicio no es valido.";
+      }
+
+      if (
+        !Number.isFinite(discount) ||
+        discount < 0 ||
+        discount > 100
+      ) {
+
+        return "El descuento de un servicio debe estar entre 0 y 100.";
+      }
+    }
+
+    for (
+      const part of
+      this.partsArray.controls
+    ) {
+
+      const partId =
+        Number(
+          part.get(
+            "part_id",
+          )?.value,
+        );
+
+      if (
+        !this.parts.some(
+          (item) =>
+            item.id === partId,
+        )
+      ) {
+
+        return "Una de las refacciones seleccionadas ya no esta disponible. Actualiza la cotizacion.";
+      }
+
+      const quantity =
+        Number(
+          part.get(
+            "quantity",
+          )?.value ?? 0,
+        );
+
+      const price =
+        Number(
+          part.get(
+            "price",
+          )?.value ?? 0,
+        );
+
+      const discount =
+        Number(
+          part.get(
+            "discount",
+          )?.value ?? 0,
+        );
+
+      if (
+        !Number.isInteger(quantity) ||
+        quantity < 1
+      ) {
+
+        return "La cantidad de una refaccion debe ser un entero mayor o igual a 1.";
+      }
+
+      if (
+        !Number.isFinite(price) ||
+        price < 0
+      ) {
+
+        return "El precio de una refaccion no es valido.";
+      }
+
+      if (
+        !Number.isFinite(discount) ||
+        discount < 0 ||
+        discount > 100
+      ) {
+
+        return "El descuento de una refaccion debe estar entre 0 y 100.";
+      }
+    }
+
+    return "";
   }
 
   async saveQuote(): Promise<void> {
@@ -794,9 +1013,29 @@ export class FormPage implements OnInit {
       return;
     }
 
-    this.saved = true;
+    this.recalculateConcepts();
 
-    this.calculateTotals();
+    const validation =
+      this.validateConcepts();
+
+    if (validation) {
+
+      const alert =
+        await this.alertController.create({
+
+          header: "Cotizacion incompleta",
+
+          message: validation,
+
+          buttons: ["Aceptar"],
+        });
+
+      await alert.present();
+
+      return;
+    }
+
+    this.saved = true;
 
     const values =
       this.quoteForm
@@ -833,6 +1072,9 @@ export class FormPage implements OnInit {
         values.validity,
     };
 
+    let createdQuoteId:
+      number | undefined;
+
     try {
 
       const quoteResponse =
@@ -844,6 +1086,8 @@ export class FormPage implements OnInit {
 
       const quoteId =
         quoteResponse.id;
+
+      createdQuoteId = quoteId;
 
       for (
         const item of values.items
@@ -956,10 +1200,6 @@ export class FormPage implements OnInit {
 
     } catch (error) {
 
-      console.log(
-        "Error al guardar la cotización",
-        error,
-      );
 
       const alert =
         await this.alertController.create({
@@ -967,7 +1207,9 @@ export class FormPage implements OnInit {
           header: "Error",
 
           message:
-            "No fue posible guardar la cotización. Revisar los datos, la conexión o los permisos de Directus.",
+            createdQuoteId
+              ? `La cotización #${createdQuoteId} se creó, pero no fue posible guardar todos sus conceptos. Revísala antes de continuar: no se eliminó nada y puede quedar incompleta.`
+              : "No fue posible guardar la cotización. Revisar los datos, la conexión o los permisos de Directus.",
 
           buttons: [
             "Aceptar",

@@ -4,6 +4,8 @@ import axios from 'axios';
 import { environment } from 'src/environments/environment';
 import { AuthService } from '../auth/auth';
 
+export const EVIDENCE_FORMATS = ["jpeg", "jpg", "png", "heic", "heif"] as const;
+
 
 export interface Evidence {
   id: number;
@@ -38,7 +40,8 @@ export class EvidenceServices {
   private filter(search: string): Record<string, string> {
     const text = search.trim();
     return text ? { filter: JSON.stringify({ _or: [
-      { name: { _icontains: text } },
+      { path: { _icontains: text } },
+      { format: { _icontains: text } },
     ] }) } : {};
   }
 
@@ -81,4 +84,132 @@ export class EvidenceServices {
       return defer(() => axios.get<{ data: Evidence[] }>(`${this.url}?filter[workorder_id][_eq]=${id}`,this.getAuthConfig()))
         .pipe(map(response => response.data.data));
     }
+
+  // Sube la imagen a Directus (/files) y la asocia a la orden como evidencia.
+  // `path` guarda el UUID del archivo; el nombre original no se persiste
+  // porque la colección no tiene columna para ello.
+  //
+  // Si la fila de evidencia no se puede crear despues de subir el archivo, se
+  // borra SOLO el archivo creado por esta misma operacion para no dejar un
+  // huerfano. Nunca se toca un archivo anterior; si el borrado no esta
+  // permitido, el mensaje de error incluye el UUID para poder limpiarlo.
+  upload(workorderId: number, file: File): Observable<Evidence> {
+    const format = EvidenceServices.resolveFormat(file);
+
+    if (!format) {
+      return defer(() => {
+        throw new Error("Formato no permitido. Usa JPEG, JPG, PNG, HEIC o HEIF.");
+      });
+    }
+
+    if (!workorderId) {
+      return defer(() => {
+        throw new Error("La orden de trabajo es requerida.");
+      });
+    }
+
+    const token = this.authService.getAccessToken();
+
+    if (!token) {
+      return defer(() => {
+        throw new Error("La sesión expiró. Vuelve a iniciar sesión.");
+      });
+    }
+
+    return defer(async () => {
+      const body = new FormData();
+
+      body.append("file", file);
+
+      const uploaded = await axios.post<{ data: { id: string } }>(
+        environment.authUrl + "/files",
+        body,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const fileId = uploaded.data.data.id;
+
+      try {
+        const evidence = await axios.post<{ data: Evidence }>(
+          this.url,
+          {
+            workorder_id: workorderId,
+            path: fileId,
+            format: format,
+            size: file.size,
+          },
+          this.getAuthConfig(),
+        );
+
+        return evidence.data.data;
+      } catch (error: any) {
+        // Solo se limpia cuando Directus respondio rechazando la fila. Ante un
+        // error de red la evidencia pudo haberse creado y borrar el archivo
+        // dejaria una evidencia sin imagen.
+        if (error?.response) {
+          await this.removeUploadedFile(fileId, token);
+        }
+
+        const detail =
+          error?.response?.data?.errors?.[0]?.message ??
+          "No se pudo registrar la evidencia.";
+
+        throw new Error(
+          `La imagen se subió, pero no se pudo registrar como evidencia ` +
+          `(archivo ${fileId}). ${detail}`,
+        );
+      }
+    });
+  }
+
+  // Borra unicamente el archivo creado por esta misma operacion fallida.
+  // Nunca se llama con ids anteriores. Es best-effort: si el rol no tiene
+  // permiso de borrado, el archivo queda identificado en el mensaje de error.
+  private async removeUploadedFile(fileId: string, token: string): Promise<void> {
+    try {
+      await axios.delete(environment.authUrl + "/files/" + fileId, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch {
+      // Sin permiso de borrado o sin conexion: se conserva el error original.
+    }
+  }
+
+  // URL del archivo original almacenado en Directus.
+  assetUrl(fileId: string): string {
+    return `${environment.authUrl}/assets/${fileId}`;
+  }
+
+  // Descarga el archivo como blob autenticado y devuelve un object URL
+  // utilizable en <img src>.
+  assetObjectUrl(fileId: string): Observable<string> {
+    return defer(async () => {
+      const response = await axios.get(this.assetUrl(fileId), {
+        ...this.getAuthConfig(),
+        responseType: "blob",
+      });
+
+      return URL.createObjectURL(response.data as Blob);
+    });
+  }
+
+  static isFileReference(path: string | null | undefined): boolean {
+    return !!path && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(path);
+  }
+
+  static resolveFormat(file: File): string | null {
+    const extension = (file.name.split(".").pop() ?? "").toLowerCase();
+
+    if (EVIDENCE_FORMATS.includes(extension as (typeof EVIDENCE_FORMATS)[number])) {
+      return extension;
+    }
+
+    return null;
+  }
 }

@@ -36,6 +36,9 @@ export class ListPage implements OnInit {
   canCancel = false;
   userRole: string | null = null;
 
+  loading: boolean = false;
+  loadError: boolean = false;
+
   constructor(
     private modalController: ModalController,
     private alertController: AlertController,
@@ -79,13 +82,7 @@ export class ListPage implements OnInit {
     } catch (error) {
       console.error("Error al cargar citas:", error);
 
-      const alert = await this.alertController.create({
-        header: "Error",
-        message: "No se pudieron cargar las citas.",
-        buttons: ["Aceptar"],
-      });
-
-      await alert.present();
+      this.loadError = true;
     }
   }
 
@@ -257,7 +254,11 @@ export class ListPage implements OnInit {
 
   async chargerTotal(): Promise<void> {
     try {
-      this.total = await firstValueFrom(this.appointmentServices.total(this.search)); 
+      this.total =
+        this.userRole === 'client'
+          ? await firstValueFrom(this.appointmentServices.totalMy(this.search))
+          : await firstValueFrom(this.appointmentServices.total(this.search));
+
     } catch (error) {
       console.error("Error al obtener el total de citas:", error);
 
@@ -280,15 +281,32 @@ export class ListPage implements OnInit {
 
 
   async chargerData(): Promise<void> {
-    await this.chargerTotal();
-    this.adjustCurrentPage();
-    await this.loadAppointments();
+    this.loading = true;
+    this.loadError = false;
+
+    try {
+      await this.chargerTotal();
+      this.adjustCurrentPage();
+      await this.loadAppointments();
+    } finally {
+      this.loading = false;
+    }
   }
 
- 
+  async retry(): Promise<void> {
+    await this.chargerData();
+  }
+
   async changePage(page: number): Promise<void> {
     this.currentPage = page;
-    await this.loadAppointments();
+    this.loading = true;
+    this.loadError = false;
+
+    try {
+      await this.loadAppointments();
+    } finally {
+      this.loading = false;
+    }
   }
 
 

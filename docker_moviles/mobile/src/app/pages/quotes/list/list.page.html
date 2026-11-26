@@ -1,6 +1,6 @@
 <app-toolbar name="Cotizaciones" color="primary">
    <ion-buttons slot="end">
-    <ion-button fill="primary" (click)="createQuote()" aria-label="Nuevo couta">
+    <ion-button fill="primary" (click)="createQuote()" aria-label="Nueva cotización">
       <ion-icon slot="icon-only" name="add"></ion-icon>
     </ion-button>
   </ion-buttons>
@@ -9,22 +9,46 @@
 <ion-content>
   <app-searchbar
     [value]="search"
-    placeholder="Buscar couta"
+    placeholder="Buscar por ID de cotización o de orden"
     [debounce]="300"
     (changeText)="handleInput($event)">
   </app-searchbar>
-  <ion-list>
+
+  <div class="list-state" *ngIf="loading">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Cargando cotizaciones...</p>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && loadError">
+    <ion-icon name="cloud-offline-outline"></ion-icon>
+    <p>No se pudieron cargar las cotizaciones.</p>
+    <ion-button fill="outline" (click)="retry()">Reintentar</ion-button>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && !loadError && quotes.length === 0">
+    <ion-icon name="document-text-outline"></ion-icon>
+    <p>
+      {{ search ? 'No se encontraron cotizaciones para "' + search + '".' : 'No hay cotizaciones registradas.' }}
+    </p>
+  </div>
+
+  <ion-list *ngIf="!loading && !loadError">
     <ion-item *ngFor="let quote of quotes">
-      <ion-label>
-        <h2>Cotizacion #{{ quote.id }}</h2>
+      <ion-label class="ion-text-wrap">
+        <h2>Cotización #{{ quote.id }}</h2>
         <p>Total: ${{ quote.total }}</p>
       </ion-label>
-      <ion-button [routerLink]="['/quotes/detail',quote.id]">
+      <ion-button
+        slot="end"
+        fill="clear"
+        [routerLink]="['/quotes/detail',quote.id]"
+      >
         <ion-icon name="eye-outline" ></ion-icon>
       </ion-button>
     </ion-item>
   </ion-list>
   <app-pagination
+  *ngIf="!loading && !loadError && quotes.length > 0"
   [total]="total"
   [perPage]="perPage"
   [currentPage]="currentPage"

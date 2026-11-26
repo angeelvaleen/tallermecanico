@@ -1,6 +1,6 @@
-<app-toolbar name="Vehiculos" color="primary">
+<app-toolbar name="Vehículos" color="primary">
   <ion-buttons slot="end">
-    <ion-button *ngIf="canCreate" fill="primary" (click)="createVehicle()" aria-label="Nuevo vehiculo">
+    <ion-button *ngIf="canCreate" fill="primary" (click)="createVehicle()" aria-label="Nuevo vehículo">
       <ion-icon slot="icon-only" name="add"></ion-icon>
     </ion-button>
   </ion-buttons>
@@ -10,21 +10,41 @@
 <ion-content>
   <app-searchbar
     [value]="search"
-    placeholder="Buscar servicio"
+    placeholder="Buscar por placa o VIN"
     [debounce]="300"
     (changeText)="handleInput($event)">
   </app-searchbar>
-  <ion-list>
+
+  <div class="list-state" *ngIf="loading">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Cargando vehículos...</p>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && loadError">
+    <ion-icon name="cloud-offline-outline"></ion-icon>
+    <p>No se pudieron cargar los vehículos.</p>
+    <ion-button fill="outline" (click)="retry()">Reintentar</ion-button>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && !loadError && vehicles.length === 0">
+    <ion-icon name="car-outline"></ion-icon>
+    <p>
+      {{ search ? 'No se encontraron vehículos para "' + search + '".' : 'No hay vehículos registrados.' }}
+    </p>
+  </div>
+
+  <ion-list *ngIf="!loading && !loadError">
 
     <ion-item *ngFor="let vehicle of vehicles">
 
-      <ion-label>
+      <ion-label class="ion-text-wrap">
         <h2>{{ vehicle.plate }}</h2>
       </ion-label>
 
       <!-- Detalle -->
       <ion-button
         slot="end"
+        fill="clear"
         [routerLink]="['/vehicles/detail', vehicle.id]"
       >
         <ion-icon name="eye-outline"></ion-icon>
@@ -33,6 +53,7 @@
       <!-- Editar -->
       <ion-button
         slot="end"
+        fill="clear"
         color="warning"
         *ngIf="canUpdate"
         (click)="editVehicle(vehicle.id)"
@@ -44,6 +65,7 @@
 
   </ion-list>
   <app-pagination
+  *ngIf="!loading && !loadError && vehicles.length > 0"
   [total]="total"
   [perPage]="perPage"
   [currentPage]="currentPage"

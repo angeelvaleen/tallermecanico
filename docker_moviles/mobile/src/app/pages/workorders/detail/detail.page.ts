@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import {
   AlertController,
@@ -26,12 +26,17 @@ import { AuthService } from "src/app/services/auth/auth";
   styleUrls: ["./detail.page.scss"],
   standalone: false,
 })
-export class DetailPage implements OnInit {
+export class DetailPage implements OnInit, OnDestroy {
   workorder: WorkorderDetail | null = null;
 
   diagnoses: Diagnosis[] = [];
 
   evidences: Evidence[] = [];
+
+  // Miniaturas autenticadas: evidence.path guarda el UUID del archivo.
+  evidenceThumbs: Record<number, string> = {};
+
+  evidenceThumbErrors: Record<number, string> = {};
 
   quotes: QuoteWorkorder[] = [];
 
@@ -66,6 +71,34 @@ export class DetailPage implements OnInit {
     this.chargerWorkorder();
   }
 
+  ngOnDestroy(): void {
+    this.releaseEvidenceThumbs();
+  }
+
+  private releaseEvidenceThumbs(): void {
+    Object.values(this.evidenceThumbs).forEach((url) =>
+      URL.revokeObjectURL(url),
+    );
+
+    this.evidenceThumbs = {};
+    this.evidenceThumbErrors = {};
+  }
+
+  hasEvidenceFile(evidence: Evidence): boolean {
+    return EvidenceServices.isFileReference(evidence.path);
+  }
+
+  // El navegador no puede decodificar HEIC/HEIF: se avisa y se ofrece la
+  // descarga del archivo original.
+  onEvidenceThumbError(evidence: Evidence): void {
+    this.evidenceThumbErrors[evidence.id] =
+      'El navegador no puede mostrar este formato (HEIC/HEIF). Descarga el archivo para verlo.';
+  }
+
+  evidenceFileName(evidence: Evidence): string {
+    return `evidencia-${evidence.id}.${evidence.format}`;
+  }
+
   async ionViewWillEnter(): Promise<void> {
     if (!this.workorder) {
       return;
@@ -77,7 +110,6 @@ export class DetailPage implements OnInit {
       this.chargerEvidences(),
       this.chargerQuotes(),
     ]);
-    console.log(this.workorder);
   }
 
   async chargerWorkorder(): Promise<void> {
@@ -98,7 +130,6 @@ export class DetailPage implements OnInit {
     try {
 
       this.workorder = await firstValueFrom(this.workorderServices.detail(Number(id)));
-      console.log(this.workorder);
 
       await Promise.all([
         this.chargerDiagnoses(),
@@ -106,15 +137,16 @@ export class DetailPage implements OnInit {
         this.chargerQuotes(),
       ]);
 
-      console.log(this.workorder);
-    } catch (error) {
-      this.messageError =
-        "Revisar ID, conexión a la base de datos o permisos";
+    } catch (error: any) {
+      const status = error?.response?.status;
 
-      console.log(
-        "Error al cargar detalle de orden de trabajo",
-        error,
-      );
+      this.messageError =
+        status === 403
+          ? "No tienes acceso a esta orden. Verifica que esté asignada a tu usuario."
+          : status === 404
+            ? "La orden no existe o fue eliminada."
+            : "Revisar ID, conexión a la base de datos o permisos";
+
     } finally {
       await loading.dismiss();
     }
@@ -128,10 +160,6 @@ export class DetailPage implements OnInit {
     try {
       this.diagnoses = await firstValueFrom(this.diagnosisServices.ofWorkorder(Number(this.workorder.id)));
     } catch (error) {
-      console.log(
-        "Error al cargar diagnósticos",
-        error,
-      );
 
       this.diagnoses = [];
     }
@@ -144,13 +172,31 @@ export class DetailPage implements OnInit {
 
     try {
       this.evidences = await firstValueFrom(this.evidenceServices.ofWorkorder(Number(this.workorder.id)));
+
+      await this.chargerEvidenceThumbs();
     } catch (error) {
-      console.log(
-        "Error al cargar evidencias",
-        error,
-      );
 
       this.evidences = [];
+    }
+  }
+
+  private async chargerEvidenceThumbs(): Promise<void> {
+    this.releaseEvidenceThumbs();
+
+    for (const evidence of this.evidences) {
+      if (!EvidenceServices.isFileReference(evidence.path)) {
+        continue;
+      }
+
+      try {
+        this.evidenceThumbs[evidence.id] = await firstValueFrom(
+          this.evidenceServices.assetObjectUrl(evidence.path),
+        );
+      } catch (error) {
+
+        this.evidenceThumbErrors[evidence.id] =
+          "No fue posible mostrar la vista previa de este archivo.";
+      }
     }
   }
 
@@ -162,10 +208,6 @@ export class DetailPage implements OnInit {
     try {
       this.quotes = await firstValueFrom(this.quoteServices.ofWorkorder(Number(this.workorder.id)));
     } catch (error) {
-      console.log(
-        "Error al cargar cotizaciones",
-        error,
-      );
 
       this.quotes = [];
     }
@@ -319,6 +361,9 @@ export class DetailPage implements OnInit {
       breakpoints: [0, 0.95, 1],
       initialBreakpoint: 0.95,
       handle: true,
+      // El formulario es largo: permite desplazar el contenido desde el
+      // breakpoint inicial sin expandir la hoja a pantalla completa.
+      expandToScroll: false,
     });
 
     await modal.present();

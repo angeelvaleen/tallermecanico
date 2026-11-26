@@ -4,6 +4,7 @@ import { LoadingController } from "@ionic/angular";
 import axios from "axios";
 
 import { environment } from "src/environments/environment";
+import { AuthService } from "src/app/services/auth/auth";
 
 interface Color {
   id: number;
@@ -25,6 +26,7 @@ export class DetailPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private loading: LoadingController,
+    private authService: AuthService,
   ) {}
 
   ngOnInit() {
@@ -52,6 +54,11 @@ export class DetailPage implements OnInit {
     try {
       const response = await axios.get<{ data: Color }>(
         `${environment.apiUrl}/colors/${encodeURIComponent(id)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${this.authService.getAccessToken()}`,
+          },
+        },
       );
 
       this.color = response.data.data;

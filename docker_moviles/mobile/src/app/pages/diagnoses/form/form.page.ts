@@ -154,10 +154,6 @@ export class FormPage implements OnInit {
 
     } catch (error) {
 
-      console.log(
-        "Error al cargar diagnóstico",
-        error,
-      );
 
       const alert =
         await this.alertController.create({
@@ -293,10 +289,6 @@ export class FormPage implements OnInit {
 
     } catch (error) {
 
-      console.log(
-        "Error al guardar diagnóstico",
-        error,
-      );
 
       const alert =
         await this.alertController.create({

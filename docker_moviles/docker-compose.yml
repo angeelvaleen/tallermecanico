@@ -1,3 +1,5 @@
+name: vexora
+
 services:
   db:
     image: mariadb:11.8
@@ -127,11 +129,17 @@ services:
 
 volumes:
   mariadb_data:
+    name: vexora_mariadb_data
   ionic_node_modules:
+    name: vexora_ionic_node_modules
   cloudbeaver_data:
+    name: vexora_cloudbeaver_data
   directus_uploads:
+    name: vexora_directus_uploads
   directus_extensions:
+    name: vexora_directus_extensions
 
 networks:
   moviles:
+    name: vexora_net
     driver: bridge

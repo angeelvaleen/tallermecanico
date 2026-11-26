@@ -1,13 +1,122 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>form</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-toolbar name="{{ isEdition ? 'Editar usuario' : 'Nuevo usuario' }}" color="primary" [showMenu]="false">
+<ion-buttons slot="start">
+      <ion-button
+        routerLink="/users/list"
+        routerDirection="back"
+        aria-label="Volver"
+      >
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+</app-toolbar>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">form</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-spinner
+    *ngIf="loading"
+    name="crescent"
+    class="ion-padding"
+  ></ion-spinner>
+
+  <form
+    *ngIf="userForm && !loading"
+    [formGroup]="userForm"
+    (ngSubmit)="saveUser()"
+  >
+    <ion-list>
+      <ion-item>
+        <ion-input
+          label="Correo"
+          labelPlacement="stacked"
+          type="email"
+          formControlName="email"
+        ></ion-input>
+      </ion-item>
+      <ion-note color="danger" *ngIf="getError('email') as error">
+        {{ error }}
+      </ion-note>
+
+      <ion-item>
+        <ion-input
+          label="Nombre"
+          labelPlacement="stacked"
+          type="text"
+          formControlName="first_name"
+        ></ion-input>
+      </ion-item>
+      <ion-note color="danger" *ngIf="getError('first_name') as error">
+        {{ error }}
+      </ion-note>
+
+      <ion-item>
+        <ion-input
+          label="Apellido"
+          labelPlacement="stacked"
+          type="text"
+          formControlName="last_name"
+        ></ion-input>
+      </ion-item>
+      <ion-note color="danger" *ngIf="getError('last_name') as error">
+        {{ error }}
+      </ion-note>
+
+      <ion-item>
+        <ion-select
+          label="Rol"
+          labelPlacement="stacked"
+          formControlName="role"
+          placeholder="Selecciona un rol"
+          interface="alert"
+        >
+          <ion-select-option *ngFor="let role of roles" [value]="role.id">
+            {{ role.name }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-note color="danger" *ngIf="getError('role') as error">
+        {{ error }}
+      </ion-note>
+
+      <ion-item>
+        <ion-select
+          label="Estado"
+          labelPlacement="stacked"
+          formControlName="status"
+          interface="alert"
+        >
+          <ion-select-option value="active">Activo</ion-select-option>
+          <ion-select-option value="inactive">Inactivo</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item *ngIf="!isEdition">
+        <ion-input
+          label="Contraseña (mínimo 8 caracteres)"
+          labelPlacement="stacked"
+          type="password"
+          formControlName="password"
+        ></ion-input>
+      </ion-item>
+      <ion-note color="danger" *ngIf="getError('password') as error">
+        {{ error }}
+      </ion-note>
+
+      <ion-item *ngIf="isEdition">
+        <ion-input
+          label="Nueva contraseña (opcional, mínimo 8 caracteres)"
+          labelPlacement="stacked"
+          type="password"
+          formControlName="password"
+        ></ion-input>
+      </ion-item>
+    </ion-list>
+
+    <ion-button
+      expand="block"
+      type="submit"
+      class="ion-margin"
+      [disabled]="saving || loading"
+    >
+      {{ saving ? 'Guardando...' : (isEdition ? 'Actualizar' : 'Guardar') }}
+    </ion-button>
+  </form>
 </ion-content>

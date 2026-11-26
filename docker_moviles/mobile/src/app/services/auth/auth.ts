@@ -4,16 +4,30 @@ import { environment } from 'src/environments/environment';
 import { Observable, defer } from "rxjs";
 import { map } from "rxjs/operators";
 
+// Rol de Directus
+export interface DirectusRole {
+  id: string;
+  name: string;
+}
+
 // Perfil del usuario
 export interface User {
   id: string;
   email: string;
   first_name: string | null;
   last_name: string | null;
-  role: {
-    id: string;
-    name: string;
-  } | null;
+  description?: string | null;
+  avatar?: string | null;
+  status?: string;
+  role: DirectusRole | null;
+}
+
+// Campos editables del perfil propio
+export interface ProfileUpdate {
+  first_name?: string | null;
+  last_name?: string | null;
+  description?: string | null;
+  avatar?: string | null;
 }
 
 // Acciones disponibles
@@ -153,12 +167,50 @@ export class AuthService {
       '/users/me',
       {
         params: {
-          fields: 'id,email,first_name,last_name,role.id,role.name'
+          fields: 'id,email,first_name,last_name,description,avatar,role.id,role.name'
         }
       }
     );
 
     return response.data.data;
+  }
+
+  // Actualizar el perfil propio (nombre, apellido, descripcion y avatar).
+  // Directus bloquea directus_users para estos roles, por eso el endpoint
+  // local valida el usuario autenticado y solo esos campos.
+  async updateProfile(payload: ProfileUpdate): Promise<User> {
+    const response = await this.client.patch<{ data: User }>(
+      '/vexora-profile/me',
+      payload
+    );
+
+    return response.data.data;
+  }
+
+  // Subir la fotografia de perfil a Directus y devolver el id del archivo
+  async uploadAvatar(file: File): Promise<string> {
+    const body = new FormData();
+
+    body.append('file', file);
+
+    const response = await this.client.post<{ data: { id: string } }>(
+      '/files',
+      body
+    );
+
+    return response.data.data.id;
+  }
+
+  // Descargar una imagen autenticada y devolver un object URL para <img>
+  async assetObjectUrl(fileId: string): Promise<string> {
+    const response = await this.client.get(
+      '/assets/' + fileId,
+      {
+        responseType: 'blob'
+      }
+    );
+
+    return URL.createObjectURL(response.data as Blob);
   }
 
   // Obtener permisos efectivos
@@ -279,7 +331,7 @@ export class AuthService {
     try {
       if (this.refreshToken) {
         await axios.post(
-          environment.apiUrl + '/auth/logout',
+          environment.authUrl + '/auth/logout',
           {
             refresh_token: this.refreshToken,
             mode: 'json'
@@ -297,8 +349,9 @@ export class AuthService {
     return defer(() =>
       this.client.get<{ data: User[] }>('/users', {
         params: {
-          fields: 'id,email,first_name,last_name',
-          sort: 'first_name'
+          fields: 'id,email,first_name,last_name,role.id,role.name,status',
+          sort: 'first_name',
+          limit: -1
         }
       })
     ).pipe(
@@ -334,5 +387,70 @@ export class AuthService {
     return !!role && roles.includes(role);
 }
 
+  // ==========================================
+  // GESTIÓN DE USUARIOS (solo Administrator)
+  // ==========================================
+
+  // Listar roles disponibles
+  listRoles(): Observable<DirectusRole[]> {
+    return defer(() =>
+      this.client.get<{ data: DirectusRole[] }>('/roles', {
+        params: {
+          fields: 'id,name',
+          sort: 'name',
+          limit: -1
+        }
+      })
+    ).pipe(
+      map(response => response.data.data)
+    );
+  }
+
+  // Obtener un usuario
+  getUser(id: string): Observable<User> {
+    return defer(() =>
+      this.client.get<{ data: User }>(`/users/${id}`, {
+        params: {
+          fields: 'id,email,first_name,last_name,role.id,role.name,status'
+        }
+      })
+    ).pipe(
+      map(response => response.data.data)
+    );
+  }
+
+  // Crear usuario (Administrator)
+  async createUser(payload: {
+    email: string;
+    password: string;
+    first_name: string;
+    last_name: string;
+    role: string;
+    status?: string;
+  }): Promise<User> {
+    const response = await this.client.post<{ data: User }>(
+      '/users',
+      payload
+    );
+
+    return response.data.data;
+  }
+
+  // Actualizar usuario (Administrator)
+  async updateUser(id: string, payload: {
+    email?: string;
+    first_name?: string;
+    last_name?: string;
+    role?: string;
+    status?: string;
+    password?: string;
+  }): Promise<User> {
+    const response = await this.client.patch<{ data: User }>(
+      `/users/${id}`,
+      payload
+    );
+
+    return response.data.data;
+  }
 }
 

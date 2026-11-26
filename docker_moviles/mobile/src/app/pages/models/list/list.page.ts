@@ -20,6 +20,9 @@ export class ListPage {
 
   models: ModelList[] = [];
 
+  loading: boolean = false;
+  loadError: boolean = false;
+
   constructor(
     private modalController: ModalController,
    
@@ -35,6 +38,8 @@ export class ListPage {
       this.models = await firstValueFrom(this.modelServices.list(this.currentPage,this.perPage,this.search))
     } catch (error) {
       console.error('Error al cargar modelos:', error);
+
+      this.loadError = true;
     }
   }
 
@@ -80,6 +85,7 @@ export class ListPage {
       console.error("Error al obtener el total de modelos:", error);
 
       this.total = 0;
+      this.loadError = true;
     }
   }
 
@@ -97,14 +103,32 @@ export class ListPage {
   }
 
   async chargerData(): Promise<void> {
-    await this.chargerTotal();
-    this.adjustCurrentPage();
-    await this.loadModels();
+    this.loading = true;
+    this.loadError = false;
+
+    try {
+      await this.chargerTotal();
+      this.adjustCurrentPage();
+      await this.loadModels();
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  async retry(): Promise<void> {
+    await this.chargerData();
   }
 
   async changePage(page: number): Promise<void> {
     this.currentPage = page;
-    await this.loadModels();
+    this.loading = true;
+    this.loadError = false;
+
+    try {
+      await this.loadModels();
+    } finally {
+      this.loading = false;
+    }
   }
 
   async handleInput(text:string): Promise<void> {

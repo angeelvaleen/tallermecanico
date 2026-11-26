@@ -243,7 +243,6 @@ export class ConfirmPage
             delivery: null,
         }
 
-        console.log("Workorder que se enviará:", workorderData);
       const workorderResponse =
         await firstValueFrom(this.workorderService.create(workorderData));
       

@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { Colors } from './colors';
+import { ColorServices } from './colors';
 
-describe('Colors', () => {
-  let service: Colors;
+describe('ColorServices', () => {
+  let service: ColorServices;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(Colors);
+    service = TestBed.inject(ColorServices);
   });
 
   it('should be created', () => {

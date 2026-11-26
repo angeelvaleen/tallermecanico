@@ -14,6 +14,8 @@ import { FormPageModule } from '../form/form.module';
 
 import { PaginationModule } from 'src/app/components/pagination/pagination.module';
 
+import { SearchbarModule } from 'src/app/components/searchbar/searchbar.module';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -22,7 +24,8 @@ import { PaginationModule } from 'src/app/components/pagination/pagination.modul
     ListPageRoutingModule,
     FormPageModule,
     ToolbarModule,
-    PaginationModule
+    PaginationModule,
+    SearchbarModule
   ],
   declarations: [ListPage]
 })

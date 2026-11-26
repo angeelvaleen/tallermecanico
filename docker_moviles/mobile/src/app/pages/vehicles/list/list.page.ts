@@ -25,6 +25,9 @@ export class ListPage implements OnInit {
   canUpdate = false;
   userRole: string | null = null ;
 
+  loading: boolean = false;
+  loadError: boolean = false;
+
   constructor(
     private modalController: ModalController,
     private vehicleServices: VehicleServices,
@@ -59,10 +62,8 @@ export class ListPage implements OnInit {
       
     } catch (error) {
 
-      console.log(
-        'Error al cargar vehículos',
-        error
-      );
+
+      this.loadError = true;
     }
   }
 
@@ -105,11 +106,16 @@ export class ListPage implements OnInit {
 
   async chargerTotal(): Promise<void> {
     try {
-      this.total = await firstValueFrom(this.vehicleServices.total(this.search)); 
+      this.total =
+        this.userRole === 'client'
+          ? await firstValueFrom(this.vehicleServices.totalMy(this.search))
+          : await firstValueFrom(this.vehicleServices.total(this.search));
+
     } catch (error) {
       console.error("Error al obtener el total de servicios:", error);
 
       this.total = 0;
+      this.loadError = true;
     }
   }
 
@@ -128,15 +134,33 @@ export class ListPage implements OnInit {
 
 
   async chargerData(): Promise<void> {
-    await this.chargerTotal();
-    this.adjustCurrentPage();
-    await this.loadVehicles();
+    this.loading = true;
+    this.loadError = false;
+
+    try {
+      await this.chargerTotal();
+      this.adjustCurrentPage();
+      await this.loadVehicles();
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  async retry(): Promise<void> {
+    await this.chargerData();
   }
 
 
   async changePage(page: number): Promise<void> {
     this.currentPage = page;
-    await this.loadVehicles();
+    this.loading = true;
+    this.loadError = false;
+
+    try {
+      await this.loadVehicles();
+    } finally {
+      this.loading = false;
+    }
   }
 
 

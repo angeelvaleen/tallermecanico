@@ -9,7 +9,32 @@
 
 
 <ion-content>
-  <ion-list>
+  <app-searchbar
+    [value]="search"
+    placeholder="Buscar combustible"
+    [debounce]="300"
+    (changeText)="handleInput($event)">
+  </app-searchbar>
+
+  <div class="list-state" *ngIf="loading">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Cargando combustibles...</p>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && loadError">
+    <ion-icon name="cloud-offline-outline"></ion-icon>
+    <p>No se pudieron cargar los combustibles.</p>
+    <ion-button fill="outline" (click)="retry()">Reintentar</ion-button>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && !loadError && fuels.length === 0">
+    <ion-icon name="flame-outline"></ion-icon>
+    <p>
+      {{ search ? 'No se encontraron combustibles para "' + search + '".' : 'No hay combustibles registrados.' }}
+    </p>
+  </div>
+
+  <ion-list *ngIf="!loading && !loadError">
     <ion-item *ngFor="let fuel of fuels">
       <ion-label class="ion-text-wrap">
         <h2>{{ fuel.name }}</h2>
@@ -23,6 +48,7 @@
 
       <ion-button
         slot="end"
+        fill="clear"
         color="warning"
         (click)="editFuel(fuel.id)"
       >
@@ -30,4 +56,12 @@
       </ion-button>
     </ion-item>
   </ion-list>
+  <app-pagination
+  *ngIf="!loading && !loadError && fuels.length > 0"
+  [total]="total"
+  [perPage]="perPage"
+  [currentPage]="currentPage"
+  [maxVisiblePage]="5"
+  (changePage)="changePage($event)"
+  ></app-pagination>
 </ion-content>

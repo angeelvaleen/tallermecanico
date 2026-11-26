@@ -1,6 +1,6 @@
 <app-toolbar name="Colores" color="primary">
   <ion-buttons slot="end">
-    <ion-button fill="primary" (click)="createColor()" aria-label="Nuevo couta">
+    <ion-button fill="primary" (click)="createColor()" aria-label="Nuevo color">
       <ion-icon slot="icon-only" name="add"></ion-icon>
     </ion-button>
   </ion-buttons>
@@ -8,9 +8,32 @@
 
 
 <ion-content>
-   <ion-searchbar [value]="search" [debounce]="300" (ionInput)="handleInput($event)" placeholder="Buscar colores" aria-label="Buscar colores"></ion-searchbar>
-    <p class="ion-padding" *ngIf="total === 0">No se encontraron colores.</p>
-  <ion-list>
+  <app-searchbar
+    [value]="search"
+    placeholder="Buscar colores"
+    [debounce]="300"
+    (changeText)="handleInput($event)">
+  </app-searchbar>
+
+  <div class="list-state" *ngIf="loading">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Cargando colores...</p>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && loadError">
+    <ion-icon name="cloud-offline-outline"></ion-icon>
+    <p>No se pudieron cargar los colores.</p>
+    <ion-button fill="outline" (click)="retry()">Reintentar</ion-button>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && !loadError && colors.length === 0">
+    <ion-icon name="color-palette-outline"></ion-icon>
+    <p>
+      {{ search ? 'No se encontraron colores para "' + search + '".' : 'No hay colores registrados.' }}
+    </p>
+  </div>
+
+  <ion-list *ngIf="!loading && !loadError">
     <ion-item *ngFor="let color of colors">
       <ion-label class="ion-text-wrap">
         <h2>{{ color.name }}</h2>
@@ -24,6 +47,7 @@
 
       <ion-button
         slot="end"
+        fill="clear"
         color="warning"
         (click)="editColor(color.id)"
       >
@@ -32,6 +56,7 @@
     </ion-item>
   </ion-list>
   <app-pagination
+  *ngIf="!loading && !loadError && colors.length > 0"
   [total]="total"
   [perPage]="perPage"
   [currentPage]="currentPage"

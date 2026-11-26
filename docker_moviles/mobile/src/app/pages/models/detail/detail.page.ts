@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
+import { AuthService } from 'src/app/services/auth/auth';
 
 interface Model {
   id: number;
@@ -33,6 +34,7 @@ export class DetailPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private loading: LoadingController,
+    private authService: AuthService,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -61,6 +63,11 @@ export class DetailPage implements OnInit {
     try {
       const response = await axios.get<{ data: Model }>(
         `${environment.apiUrl}/models/${encodeURIComponent(id)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${this.authService.getAccessToken()}`,
+          },
+        },
       );
 
       this.model = response.data.data;
@@ -80,6 +87,11 @@ export class DetailPage implements OnInit {
     try {
       const response = await axios.get<{ data: Brand }>(
         `${environment.apiUrl}/brands/${brandId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${this.authService.getAccessToken()}`,
+          },
+        },
       );
 
       this.brand = response.data.data;

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
+import { AuthService } from 'src/app/services/auth/auth';
 
 interface History {
   id: number;
@@ -18,20 +19,38 @@ interface History {
 export class ListPage implements OnInit {
   history: History[] = [];
 
-  constructor() {}
+  loading: boolean = false;
+  loadError: boolean = false;
+
+  constructor(private authService: AuthService) {}
 
   ngOnInit() {
     this.chargerHistory();
   }
 
   async chargerHistory(): Promise<void> {
+    this.loading = true;
+    this.loadError = false;
+
     try {
       const response = await axios.get<{ data: History[] }>(
-        `${environment.apiUrl}/history`
+        `${environment.apiUrl}/history`,
+        {
+          headers: {
+            Authorization: `Bearer ${this.authService.getAccessToken()}`,
+          },
+        }
       );
       this.history = response.data.data;
     } catch (error) {
-      console.log('Error al cargar historial', error);
+
+      this.loadError = true;
+    } finally {
+      this.loading = false;
     }
+  }
+
+  async retry(): Promise<void> {
+    await this.chargerHistory();
   }
 }

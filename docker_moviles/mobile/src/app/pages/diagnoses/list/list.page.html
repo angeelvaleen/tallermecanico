@@ -1,17 +1,33 @@
-<app-toolbar name="Diagnosticos" color="primary">
+<app-toolbar name="Diagnósticos" color="primary">
   <ion-buttons slot="end">
-    <ion-button fill="primary" (click)="createDiagnosis()" aria-label="Nuevo diagnostico">
+    <ion-button fill="primary" (click)="createDiagnosis()" aria-label="Nuevo diagnóstico">
       <ion-icon slot="icon-only" name="add"></ion-icon>
     </ion-button>
   </ion-buttons>
 </app-toolbar>
 
 <ion-content>
-  <ion-list>
+  <div class="list-state" *ngIf="loading">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Cargando diagnósticos...</p>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && loadError">
+    <ion-icon name="cloud-offline-outline"></ion-icon>
+    <p>No se pudieron cargar los diagnósticos.</p>
+    <ion-button fill="outline" (click)="retry()">Reintentar</ion-button>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && !loadError && diagnoses.length === 0">
+    <ion-icon name="medkit-outline"></ion-icon>
+    <p>No hay diagnósticos registrados.</p>
+  </div>
+
+  <ion-list *ngIf="!loading && !loadError">
 
     <ion-item *ngFor="let diagnosis of diagnoses">
 
-      <ion-label>
+      <ion-label class="ion-text-wrap">
         <h2>Orden #{{ diagnosis.workorder_id }}</h2>
 
         <p>
@@ -20,16 +36,20 @@
       </ion-label>
 
       <ion-button
+        slot="end"
+        fill="clear"
         [routerLink]="['/diagnoses/detail', diagnosis.id]"
       >
         <ion-icon name="eye-outline"></ion-icon>
       </ion-button>
 
       <ion-button
-        color="tertiary"
+        slot="end"
+        fill="clear"
+        color="warning"
         (click)="editDiagnosis(diagnosis.id)"
       >
-        <ion-icon name="create-outline"></ion-icon>
+        <ion-icon name="pencil"></ion-icon>
       </ion-button>
 
     </ion-item>

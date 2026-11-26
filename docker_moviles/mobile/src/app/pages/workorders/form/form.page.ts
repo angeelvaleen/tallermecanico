@@ -173,7 +173,6 @@ export class FormPage
       const workorder = await firstValueFrom(
         this.workorderServices.detail(this.id)
       );
-      console.log(workorder);
 
       this.workorderForm.patchValue({
         vehicle_id:

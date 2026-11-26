@@ -1,6 +1,6 @@
-<app-toolbar name="Ordenes de trabajo" color="primary">
+<app-toolbar name="Órdenes de trabajo" color="primary">
   <ion-buttons slot="end">
-    <ion-button *ngIf="canCreate" fill="primary" (click)="createWorkorder()" aria-label="Nuevo orden">
+    <ion-button *ngIf="canCreate" fill="primary" (click)="createWorkorder()" aria-label="Nueva orden de trabajo">
       <ion-icon slot="icon-only" name="add"></ion-icon>
     </ion-button>
   </ion-buttons>
@@ -9,12 +9,30 @@
 <ion-content>
   <app-searchbar
     [value]="search"
-    placeholder="Buscar servicio"
+    placeholder="Buscar por placa, VIN, mecánico o estado"
     [debounce]="300"
     (changeText)="handleInput($event)">
   </app-searchbar>
 
-  <ion-list>
+  <div class="list-state" *ngIf="loading">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Cargando órdenes de trabajo...</p>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && loadError">
+    <ion-icon name="cloud-offline-outline"></ion-icon>
+    <p>No se pudieron cargar las órdenes de trabajo.</p>
+    <ion-button fill="outline" (click)="retry()">Reintentar</ion-button>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && !loadError && workorders.length === 0">
+    <ion-icon name="clipboard-outline"></ion-icon>
+    <p>
+      {{ search ? 'No se encontraron órdenes para "' + search + '".' : 'No hay órdenes de trabajo registradas.' }}
+    </p>
+  </div>
+
+  <ion-list *ngIf="!loading && !loadError">
 
     <ion-item
       *ngFor="let workorder of workorders"
@@ -70,6 +88,7 @@
   </ion-list>
 
   <app-pagination
+  *ngIf="!loading && !loadError && workorders.length > 0"
   [total]="total"
   [perPage]="perPage"
   [currentPage]="currentPage"

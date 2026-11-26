@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
+import { AuthService } from 'src/app/services/auth/auth';
 
 interface History {
   id: number;
@@ -24,6 +25,7 @@ export class DetailPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private loading: LoadingController,
+    private authService: AuthService,
   ) {}
 
   ngOnInit() {
@@ -47,13 +49,17 @@ export class DetailPage implements OnInit {
 
     try {
       const response = await axios.get<{ data: History }>(
-        `${environment.apiUrl}/history/${encodeURIComponent(id)}`
+        `${environment.apiUrl}/history/${encodeURIComponent(id)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${this.authService.getAccessToken()}`,
+          },
+        }
       );
 
       this.history = response.data.data;
     } catch (error) {
       this.messageError="No se pudo cargar el producto. Revisa el ID, la conexión y los permisos de lectura.";
-      console.log('Error al cargar detalle de historial', error);
     }finally{
       await loading.dismiss();
     }

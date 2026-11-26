@@ -18,6 +18,9 @@ export class ListPage {
   perPage: number = 5;
   search: string = "";
 
+  loading: boolean = false;
+  loadError: boolean = false;
+
   constructor(
     private modalController: ModalController,
     private serviceServices: ServiceServices,
@@ -32,6 +35,8 @@ export class ListPage {
       this.services = await firstValueFrom(this.serviceServices.list(this.currentPage,this.perPage,this.search));
     } catch (error) {
       console.error('Error al cargar servicios:', error);
+
+      this.loadError = true;
     }
   }
 
@@ -77,6 +82,7 @@ export class ListPage {
       console.error("Error al obtener el total de servicios:", error);
 
       this.total = 0;
+      this.loadError = true;
     }
   }
 
@@ -95,15 +101,33 @@ export class ListPage {
 
 
   async chargerData(): Promise<void> {
-    await this.chargerTotal();
-    this.adjustCurrentPage();
-    await this.loadServices();
+    this.loading = true;
+    this.loadError = false;
+
+    try {
+      await this.chargerTotal();
+      this.adjustCurrentPage();
+      await this.loadServices();
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  async retry(): Promise<void> {
+    await this.chargerData();
   }
 
 
   async changePage(page: number): Promise<void> {
     this.currentPage = page;
-    await this.loadServices();
+    this.loading = true;
+    this.loadError = false;
+
+    try {
+      await this.loadServices();
+    } finally {
+      this.loading = false;
+    }
   }
 
 

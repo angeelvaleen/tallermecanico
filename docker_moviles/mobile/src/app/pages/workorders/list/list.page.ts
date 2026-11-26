@@ -1,8 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import {
-  AlertController,
-  ModalController,
-} from "@ionic/angular";
+import { ModalController } from "@ionic/angular";
 
 import { FormPage } from "../form/form.page";
 import { firstValueFrom } from 'rxjs';
@@ -26,10 +23,12 @@ export class ListPage implements OnInit {
   canUpdate: boolean = false;
   userRole: string | null  = null;
 
+  loading: boolean = false;
+  loadError: boolean = false;
+
 
   constructor(
     private modalController: ModalController,
-    private alertController: AlertController,
     private workorderServices: WorkorderServices,
     private authService: AuthService
   ) {}
@@ -66,15 +65,7 @@ export class ListPage implements OnInit {
         error
       );
 
-      const alert =
-        await this.alertController.create({
-          header: "Error",
-          message:
-            "No se pudieron cargar las órdenes de trabajo.",
-          buttons: ["Aceptar"],
-        });
-
-      await alert.present();
+      this.loadError = true;
     }
   }
 
@@ -143,7 +134,20 @@ export class ListPage implements OnInit {
 
   async chargerTotal(): Promise<void> {
     try {
-      this.total = await firstValueFrom(this.workorderServices.total(this.search)); 
+      switch (this.userRole) {
+        case 'client':
+          this.total = await firstValueFrom(this.workorderServices.totalMy(this.search));
+          break;
+        case 'mechanic':
+          this.total = await firstValueFrom(this.workorderServices.totalMechanic(this.search));
+          break;
+        case 'assistant':
+          this.total = await firstValueFrom(this.workorderServices.totalInProgress(this.search));
+          break;
+        default:
+          this.total = await firstValueFrom(this.workorderServices.total(this.search));
+      }
+
     } catch (error) {
       console.error("Error al obtener el total de servicios:", error);
 
@@ -166,15 +170,33 @@ export class ListPage implements OnInit {
 
 
   async chargerData(): Promise<void> {
-    await this.chargerTotal();
-    this.adjustCurrentPage();
-    await this.loadWorkorders();
+    this.loading = true;
+    this.loadError = false;
+
+    try {
+      await this.chargerTotal();
+      this.adjustCurrentPage();
+      await this.loadWorkorders();
+    } finally {
+      this.loading = false;
+    }
   }
 
 
+  async retry(): Promise<void> {
+    await this.chargerData();
+  }
+
   async changePage(page: number): Promise<void> {
     this.currentPage = page;
-    await this.loadWorkorders();
+    this.loading = true;
+    this.loadError = false;
+
+    try {
+      await this.loadWorkorders();
+    } finally {
+      this.loading = false;
+    }
   }
 
 

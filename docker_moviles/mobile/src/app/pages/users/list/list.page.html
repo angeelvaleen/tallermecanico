@@ -1,13 +1,47 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>list</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-toolbar name="Usuarios" color="primary">
+  <ion-buttons slot="end">
+    <ion-button
+      fill="primary"
+      routerLink="/users/form"
+      aria-label="Nuevo usuario"
+    >
+      <ion-icon slot="icon-only" name="add"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</app-toolbar>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">list</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
+  <div class="list-state" *ngIf="loading">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Cargando usuarios...</p>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && loadError">
+    <ion-icon name="cloud-offline-outline"></ion-icon>
+    <p>No se pudieron cargar los usuarios.</p>
+    <ion-button fill="outline" (click)="retry()">Reintentar</ion-button>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && !loadError && users.length === 0">
+    <ion-icon name="people-outline"></ion-icon>
+    <p>No hay usuarios registrados.</p>
+  </div>
+
+  <ion-list *ngIf="!loading && !loadError">
+    <ion-item
+      *ngFor="let user of users"
+      [routerLink]="['/users/detail', user.id]"
+      button
+      detail
+    >
+      <ion-label class="ion-text-wrap">
+        <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+        <p>{{ user.email }}</p>
+        <p>
+          Rol: {{ user.role?.name ?? 'Sin rol' }} ·
+          Estado: {{ user.status ?? '—' }}
+        </p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
 </ion-content>

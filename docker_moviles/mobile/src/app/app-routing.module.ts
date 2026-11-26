@@ -8,6 +8,7 @@ import {
 
 import { authGuard } from './guard/auth-guard';
 import { VIEW_ACCESS } from './constants/view_access';
+import { PermissionAction } from './services/auth/auth';
 
 // ==========================================
 // CONFIGURACIÓN REUTILIZABLE DE ACCESO
@@ -15,14 +16,21 @@ import { VIEW_ACCESS } from './constants/view_access';
 
 type ViewAction = 'list' | 'detail' | 'form';
 
+// `permission` es opcional: las vistas que lo declaran exigen ademas el
+// permiso real de Directus, no solo el nombre del rol (ver auth-guard).
 const viewRoute = (
   view: keyof typeof VIEW_ACCESS,
-  action: ViewAction
+  action: ViewAction,
+  permission?: {
+    collection: string;
+    action: PermissionAction;
+  }
 ) => ({
   canActivate: [authGuard],
   data: {
     access: {
-      roles: VIEW_ACCESS[view][action]
+      roles: VIEW_ACCESS[view][action],
+      ...(permission ? { permission } : {})
     }
   }
 });
@@ -51,15 +59,18 @@ const routes: Routes = [
 
   {
     path: 'users/list',
-    loadChildren: () => import('./pages/users/list/list.module').then( m => m.ListPageModule)
+    loadChildren: () => import('./pages/users/list/list.module').then( m => m.ListPageModule),
+    ...viewRoute('users', 'list')
   },
   {
     path: 'users/form',
-    loadChildren: () => import('./pages/users/form/form.module').then( m => m.FormPageModule)
+    loadChildren: () => import('./pages/users/form/form.module').then( m => m.FormPageModule),
+    ...viewRoute('users', 'form')
   },
   {
     path: 'users/detail/:id',
-    loadChildren: () => import('./pages/users/detail/detail.module').then( m => m.DetailPageModule)
+    loadChildren: () => import('./pages/users/detail/detail.module').then( m => m.DetailPageModule),
+    ...viewRoute('users', 'detail')
   },
 
   // ==========================================
@@ -183,7 +194,10 @@ const routes: Routes = [
     loadChildren: () =>
       import('./pages/evidence/form/form.module')
         .then(m => m.FormPageModule),
-    ...viewRoute('evidences', 'form')
+    ...viewRoute('evidences', 'form', {
+      collection: 'directus_files',
+      action: 'create'
+    })
   },
   {
     path: 'evidences/list',
@@ -443,7 +457,10 @@ const routes: Routes = [
     loadChildren: () =>
       import('./pages/workorders/form/form.module')
         .then(m => m.FormPageModule),
-    ...viewRoute('workorders', 'form')
+    ...viewRoute('workorders', 'form', {
+      collection: 'workorders',
+      action: 'update'
+    })
   },
   {
     path: 'workorders/list',
@@ -482,7 +499,8 @@ const routes: Routes = [
 
   {
     path: 'profile',
-    loadChildren: () => import('./pages/profile/profile.module').then( m => m.ProfilePageModule)
+    loadChildren: () => import('./pages/profile/profile.module').then( m => m.ProfilePageModule),
+    ...viewRoute('profile', 'detail')
   },
 
   // ==========================================

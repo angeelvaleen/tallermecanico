@@ -1,16 +1,26 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Iniciar sesión</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="login-page">
+  <div class="login-wrapper">
+    <div class="login-card">
 
-<ion-content class="ion-padding">
-  <form [formGroup]="form" (ngSubmit)="signin()">
-    <ion-input label="Correo" labelPlacement="stacked" type="email" autocomplete="username" formControlName="email"></ion-input>
-    <ion-input label="Contraseña" labelPlacement="stacked" type="password" autocomplete="current-password" formControlName="password"></ion-input>
-    <ion-note color="danger" *ngIf="form.touched && form.invalid">Escribe un correo válido y tu contraseña.</ion-note>
-    <p *ngIf="message" role="status">{{ message }}</p>
-    <ion-button fill="solid" expand="block" type="submit" [disabled]="sending">{{ sending ? 'Ingresando...' : 'Ingresar' }}</ion-button>
-  </form>
-  <p><a routerLink="/register">Crear cuenta</a></p>
+      <img
+        src="assets/images/vexora-logo.png"
+        alt="VEXORA"
+        class="login-logo"
+      />
+
+      <h1 class="login-title">Iniciar sesión</h1>
+      <p class="login-subtitle">Tu taller bajo control</p>
+
+      <form [formGroup]="form" (ngSubmit)="signin()">
+        <ion-input label="Correo" labelPlacement="stacked" type="email" autocomplete="username" formControlName="email"></ion-input>
+        <ion-input label="Contraseña" labelPlacement="stacked" type="password" autocomplete="current-password" formControlName="password"></ion-input>
+        <ion-note color="danger" *ngIf="form.touched && form.invalid">Escribe un correo válido y tu contraseña.</ion-note>
+        <p *ngIf="message" role="status">{{ message }}</p>
+        <ion-button fill="solid" expand="block" type="submit" [disabled]="sending">{{ sending ? 'Ingresando...' : 'Ingresar' }}</ion-button>
+      </form>
+
+      <p class="login-register"><a routerLink="/register">Crear cuenta</a></p>
+
+    </div>
+  </div>
 </ion-content>

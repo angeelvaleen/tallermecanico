@@ -50,10 +50,6 @@ export class DetailPage implements OnInit {
       this.messageError =
         'Revisar ID, conexión a base de datos o permisos';
 
-      console.log(
-        'Error al cargar detalle de refacción',
-        error
-      );
 
     } finally {
       await loading.dismiss();

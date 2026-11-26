@@ -1,13 +1,4 @@
-@font-face {
-  font-family: 'Young Serif';
-  src: url('/assets/font/YoungSerif-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
 :root {
-  --ion-font-family: 'Young Serif', serif;
   --ion-color-personalizado: #686090;
   --ion-color-personalizado-rgb: 104, 96, 144;
   --ion-color-personalizado-contrast: #ffffff;
@@ -26,3 +17,61 @@
 }
 
 ion-menu { --width: 260px; }
+
+// ==========================================
+// MENÚ DEL ADMINISTRATOR
+// ==========================================
+
+ion-menu ion-toolbar {
+  --background: #0f172a;
+  --color: #ffffff;
+}
+
+ion-menu ion-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+ion-menu ion-content {
+  --background: #ffffff;
+}
+
+ion-menu ion-list {
+  padding: 8px 0;
+  background: transparent;
+}
+
+// Encabezado del acordeón Catálogos
+ion-menu ion-accordion ion-item[slot="header"] {
+  --background: #ffffff;
+  --color: #334155;
+  --padding-start: 16px;
+
+  font-weight: 600;
+}
+
+// Enlaces del menú
+ion-menu ion-menu-toggle ion-item {
+  --background: #ffffff;
+  --color: #334155;
+  --padding-start: 16px;
+
+  font-weight: 500;
+}
+
+// Subnivel del acordeón Catálogos
+ion-menu ion-list[slot="content"] ion-item {
+  --padding-start: 28px;
+}
+
+// Enlace activo
+ion-menu ion-menu-toggle ion-item.menu-item-active {
+  --background: #f8fafc;
+  --color: #f97316;
+
+  font-weight: 600;
+}
+
+ion-menu ion-item.menu-item-active::part(native) {
+  border-left: 3px solid #f97316;
+}

@@ -1,93 +1,70 @@
-<ion-header>
-
-  <ion-toolbar>
-
-    <ion-buttons slot="start">
-
-      <ion-button
-        (click)="closeModal()"
-      >
-
-        <ion-icon
-          name="close-outline"
-        ></ion-icon>
-
+<app-toolbar name="Nueva Evidencia" color="primary" [showMenu]="false">
+<ion-buttons slot="start">
+      <ion-button (click)="closeModal()">
+        <ion-icon name="close-outline"></ion-icon>
       </ion-button>
-
     </ion-buttons>
-
-
-    <ion-title>
-      Nueva Evidencia
-    </ion-title>
-
-  </ion-toolbar>
-
-</ion-header>
-
+</app-toolbar>
 
 <ion-content class="ion-padding">
-
   <ion-card>
-
     <ion-card-header>
-
-      <ion-card-title>
-        Evidencia de la orden
-      </ion-card-title>
-
+      <ion-card-title>Evidencia de la orden</ion-card-title>
     </ion-card-header>
 
-
     <ion-card-content>
-
       <ion-item>
-
         <ion-input
           label="Orden de trabajo"
           labelPlacement="floating"
-          [value]="
-            workorderId !== undefined
-              ? 'Orden #' + workorderId
-              : ''
-          "
+          [value]="workorderId !== undefined ? 'Orden #' + workorderId : ''"
           readonly
         ></ion-input>
-
       </ion-item>
 
-
       <ion-text color="medium">
-
         <p class="information-message">
-          La evidencia corresponde a fotografías
-          o archivos asociados a esta orden de trabajo.
+          Fotografías o archivos asociados a esta orden de trabajo.
+          Formatos: JPEG, JPG, PNG, HEIC y HEIF (máximo 10 MB).
         </p>
-
       </ion-text>
 
+      <input
+        #fileInput
+        type="file"
+        accept="image/jpeg,image/jpg,image/png,image/heic,image/heif"
+        hidden
+        (change)="onFileSelected($event)"
+      />
 
       <ion-button
         expand="block"
+        fill="outline"
         class="ion-margin-top"
-        (click)="showPendingMessage()"
+        (click)="openFilePicker()"
       >
-
-        <ion-icon
-          slot="start"
-          name="camera-outline"
-        ></ion-icon>
-
-        Seleccionar evidencia
-
+        <ion-icon slot="start" name="camera-outline"></ion-icon>
+        {{ selectedFile ? 'Cambiar imagen' : 'Seleccionar imagen' }}
       </ion-button>
 
+      <ion-item lines="none" *ngIf="selectedFile">
+        <ion-label class="ion-text-wrap">
+          <h3>{{ selectedFile.name }}</h3>
+          <p>{{ selectedFile.size }} bytes</p>
+        </ion-label>
+      </ion-item>
     </ion-card-content>
-
   </ion-card>
 
-
   <div class="buttons-container">
+    <ion-button
+      expand="block"
+      color="primary"
+      [disabled]="!selectedFile || uploading"
+      (click)="saveEvidence()"
+    >
+      Guardar evidencia
+    </ion-button>
 
     <ion-button
       expand="block"
@@ -97,7 +74,5 @@
     >
       Cerrar
     </ion-button>
-
   </div>
-
 </ion-content>

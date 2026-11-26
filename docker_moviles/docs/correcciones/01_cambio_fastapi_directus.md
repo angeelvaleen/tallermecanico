@@ -17,9 +17,9 @@ En el archivo `docker-compose.yml`, sustituir la configuración actual del servi
       - "8000:8055"
 
     environment:
-      SECRET: "${SECRET}"
+      SECRET: "${DIRECTUS_SECRET}"
       ADMIN_EMAIL: "ADMIN_EMAIL_PROPIO"
-      ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
+      ADMIN_PASSWORD: "${DIRECTUS_ADMIN_PASSWORD}"
       DB_CLIENT: "mysql"
       DB_HOST: "db"
       DB_PORT: "3306"

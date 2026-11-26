@@ -1,6 +1,5 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
+<app-toolbar name="{{ isEdition ? 'Editar modelo' : 'Nuevo modelo' }}" color="primary" [showMenu]="false">
+<ion-buttons slot="start">
       <ion-button
         (click)="closeModal()"
         [disabled]="saved"
@@ -8,12 +7,7 @@
         <ion-icon name="close-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
-
-    <ion-title>
-      {{ isEdition ? 'Editar modelo' : 'Nuevo modelo' }}
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
+</app-toolbar>
 
 <ion-content class="ion-padding">
   <form

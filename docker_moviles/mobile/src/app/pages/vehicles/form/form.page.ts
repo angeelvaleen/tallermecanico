@@ -129,7 +129,6 @@ export class FormPage implements OnInit {
       
       this.brands = (await firstValueFrom(this.brandServices.listWithOutFilters())).filter((brand) => brand.is_active);
     } catch (error) {
-      console.log("Error al cargar marcas", error);
 
       await this.showAlert("Error", "No fue posible cargar las marcas");
     }
@@ -140,7 +139,6 @@ export class FormPage implements OnInit {
 
       this.fuels = (await firstValueFrom(this.fuelServices.listWithOutFilters())).filter((fuel) => fuel.is_active);
     } catch (error) {
-      console.log("Error al cargar combustibles", error);
 
       await this.showAlert("Error", "No fue posible cargar los combustibles");
     }
@@ -151,7 +149,6 @@ export class FormPage implements OnInit {
   
       this.colors = (await firstValueFrom(this.colorServices.listWithOutFilters())).filter((color) => color.is_active);
     } catch (error) {
-      console.log("Error al cargar colores", error);
 
       await this.showAlert("Error", "No fue posible cargar los colores");
     }
@@ -168,7 +165,6 @@ export class FormPage implements OnInit {
       this.filterModels();
 
     } catch (error) {
-      console.log("Error al cargar modelos", error);
 
       await this.showAlert(
         "Error",
@@ -226,8 +222,13 @@ export class FormPage implements OnInit {
       });
 
       this.filterModels();
+
+      if (this.vehicleForm.get("brand_id")?.value) {
+        this.vehicleForm.get("model_id")?.enable();
+      } else {
+        this.vehicleForm.get("model_id")?.disable();
+      }
     } catch (error) {
-      console.log("Error al cargar el vehículo", error);
 
       await this.showAlert(
         "Error",
@@ -299,7 +300,6 @@ export class FormPage implements OnInit {
         saved: true,
       });
     } catch (error) {
-      console.log("Error al guardar vehículo", error);
 
       await this.showAlert(
         "Error",

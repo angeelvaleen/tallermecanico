@@ -1,0 +1,19 @@
+{
+  "name": "vexora-profile",
+  "version": "1.0.0",
+  "description": "Edicion del perfil propio (campos permitidos) para VEXORA",
+  "type": "module",
+  "main": "index.js",
+  "directus:extension": {
+    "type": "endpoint",
+    "path": "index.js",
+    "source": "index.js",
+    "host": "^12.6.0"
+  },
+  "keywords": [
+    "directus-extension",
+    "endpoint",
+    "vexora"
+  ],
+  "license": "UNLICENSED"
+}

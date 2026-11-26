@@ -3,22 +3,46 @@
 <ion-content>
   <app-searchbar
     [value]="search"
-    placeholder="Buscar servicio"
+    placeholder="Buscar por referencia"
     [debounce]="300"
     (changeText)="handleInput($event)">
   </app-searchbar>
-  <ion-list>
+
+  <div class="list-state" *ngIf="loading">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Cargando pagos...</p>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && loadError">
+    <ion-icon name="cloud-offline-outline"></ion-icon>
+    <p>No se pudieron cargar los pagos.</p>
+    <ion-button fill="outline" (click)="retry()">Reintentar</ion-button>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && !loadError && payments.length === 0">
+    <ion-icon name="cash-outline"></ion-icon>
+    <p>
+      {{ search ? 'No se encontraron pagos para "' + search + '".' : 'No hay pagos registrados.' }}
+    </p>
+  </div>
+
+  <ion-list *ngIf="!loading && !loadError">
     <ion-item *ngFor="let payment of payments">
-      <ion-label>
+      <ion-label class="ion-text-wrap">
         <h2>Monto: ${{ payment.amount }}</h2>
         <p>Referencia: {{ payment.reference || 'N/A' }}</p>
       </ion-label>
-      <ion-button [routerLink]="['/payment/detail',payment.id]" >
+      <ion-button
+        slot="end"
+        fill="clear"
+        [routerLink]="['/payment/detail',payment.id]"
+      >
         <ion-icon name="eye-outline" ></ion-icon>
       </ion-button>
     </ion-item>
   </ion-list>
   <app-pagination
+  *ngIf="!loading && !loadError && payments.length > 0"
   [total]="total"
   [perPage]="perPage"
   [currentPage]="currentPage"

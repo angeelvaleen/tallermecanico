@@ -1,0 +1,21 @@
+# Secretos y entorno local (nunca versionar)
+.env
+docker_moviles/.env
+*.bundle
+
+# Respaldos y volcados de base de datos (nunca versionar)
+docker_moviles/respaldos/
+docker_moviles/workshop_backup.sql
+docker_moviles_respaldo/
+
+# Material de referencia del profesor: se conserva sin modificar, fuera de Git
+docker_moviles/docs/manuales/
+
+# Capturas de validacion en la raiz del repositorio
+/docs_faseD_*.png
+/validacion-*.png
+
+# Artefactos de compilacion
+docker_moviles/mobile/node_modules/
+docker_moviles/mobile/www/
+docker_moviles/mobile/.angular/

@@ -1,15 +1,75 @@
-<app-toolbar name="Evidencias" color="dark"></app-toolbar>
+<app-toolbar name="Evidencias" color="primary"></app-toolbar>
 
 <ion-content>
-  <ion-list>
+  <div class="list-state" *ngIf="loading">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Cargando evidencias...</p>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && loadError">
+    <ion-icon name="cloud-offline-outline"></ion-icon>
+    <p>No se pudieron cargar las evidencias.</p>
+    <ion-button fill="outline" (click)="retry()">Reintentar</ion-button>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && !loadError && evidences.length === 0">
+    <ion-icon name="images-outline"></ion-icon>
+    <p>No hay evidencias registradas.</p>
+  </div>
+
+  <ion-list *ngIf="!loading && !loadError">
     <ion-item *ngFor="let evidence of evidences">
-      <ion-label>
-        <h2>Formato: {{ evidence.format }}</h2>
-        <p>{{ evidence.path }}</p>
-        <ion-button [routerLink]="['/evidences/detail', evidence.id]">
-          <ion-icon name="eye-outline"></ion-icon>
-        </ion-button>
+      <ion-thumbnail
+        *ngIf="thumbs[evidence.id]"
+        slot="start"
+        class="evidence-thumb"
+      >
+        <img
+          [src]="thumbs[evidence.id]"
+          [alt]="'Evidencia #' + evidence.id"
+          (error)="onThumbError(evidence)"
+        />
+      </ion-thumbnail>
+
+      <ion-icon
+        *ngIf="!thumbs[evidence.id] || thumbErrors[evidence.id]"
+        slot="start"
+        name="image-outline"
+      ></ion-icon>
+
+      <ion-label class="ion-text-wrap">
+        <h2>Evidencia #{{ evidence.id }} — Orden #{{ evidence.workorder_id }}</h2>
+        <p>Formato: {{ evidence.format }}</p>
+
+        <p *ngIf="!hasFile(evidence)">Ruta: {{ evidence.path }}</p>
+
+        <p
+          class="evidence-error"
+          *ngIf="hasFile(evidence) && thumbErrors[evidence.id]"
+        >
+          {{ thumbErrors[evidence.id] }}
+        </p>
       </ion-label>
+
+      <ion-button
+        *ngIf="thumbErrors[evidence.id] && thumbs[evidence.id]"
+        slot="end"
+        fill="outline"
+        size="small"
+        [href]="thumbs[evidence.id]"
+        [attr.download]="fileName(evidence)"
+      >
+        <ion-icon slot="start" name="download-outline"></ion-icon>
+        Descargar
+      </ion-button>
+
+      <ion-button
+        slot="end"
+        fill="clear"
+        [routerLink]="['/evidences/detail', evidence.id]"
+      >
+        <ion-icon name="eye-outline"></ion-icon>
+      </ion-button>
     </ion-item>
   </ion-list>
 </ion-content>

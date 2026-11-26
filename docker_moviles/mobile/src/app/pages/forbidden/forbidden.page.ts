@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-forbidden',
@@ -11,14 +10,14 @@ import { Location } from '@angular/common';
 export class ForbiddenPage implements OnInit {
 
   constructor(
-    private location: Location
+    private router: Router
   ) { }
 
   ngOnInit() {
   }
 
   goHome(): void {
-    this.location.back();
+    this.router.navigateByUrl('/tabs/workorders/list', { replaceUrl: true });
   }
 
 }

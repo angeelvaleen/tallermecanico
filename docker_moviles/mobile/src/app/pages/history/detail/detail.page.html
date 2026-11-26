@@ -1,11 +1,8 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
+<app-toolbar name="Detalle de Historial" color="primary">
+<ion-buttons slot="start">
       <ion-back-button defaultHref="/history/list"></ion-back-button>
     </ion-buttons>
-    <ion-title>Detalle de Historial</ion-title>
-  </ion-toolbar>
-</ion-header>
+</app-toolbar>
 
 <ion-content class="ion-padding">
   <ion-text color="danger" *ngIf="messageError">
@@ -15,7 +12,7 @@
   <div *ngIf="history">
     <ion-card>
       <ion-card-content>
-        <h2>Vehiculo ID: {{ history.vehicle_id }}</h2>
+        <h2>Vehículo ID: {{ history.vehicle_id }}</h2>
         <p><strong>Orden de Trabajo ID:</strong> {{ history.workorder_id }}</p>
         <p><strong>Registro:</strong> {{ history.created_at | date:'yyyy-MM-dd' }}</p>
       </ion-card-content>

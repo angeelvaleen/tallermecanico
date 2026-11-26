@@ -55,12 +55,35 @@ export class WorkorderServices {
     };
   }
 
-  private filter(search: string): Record<string, string> {
+  // Los estados se guardan en inglés en la BD pero se muestran en español.
+  private static readonly STATUS_ALIASES: { id: number; names: string[] }[] = [
+    { id: 4, names: ["recibida", "recibido", "received"] },
+    { id: 5, names: ["diagnostico", "diagnóstico", "diagnosis"] },
+    { id: 6, names: ["reparacion", "reparación", "repair"] },
+    { id: 7, names: ["lista", "listo", "ready"] },
+    { id: 8, names: ["entregada", "entregado", "delivered"] },
+  ];
+
+  private statusConditions(text: string): object[] {
+    const normalized = text
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+    return WorkorderServices.STATUS_ALIASES.filter((status) =>
+      status.names.some(
+        (name) =>
+          name.normalize("NFD").replace(/[\u0300-\u036f]/g, "") ===
+          normalized,
+      ),
+    ).map((status) => ({ status_id: { id: { _eq: status.id } } }));
+  }
+
+  private filterObject(search: string): object | null {
     const text = search.trim();
     return text
       ? {
-          filter: JSON.stringify({
-            _or: [
+          _or: [
               {
                 vehicle_id: {
                   plate: { _icontains: text },
@@ -73,7 +96,12 @@ export class WorkorderServices {
               },
               {
                 mechanic_id: {
-                  name: { _icontains: text },
+                  first_name: { _icontains: text },
+                },
+              },
+              {
+                mechanic_id: {
+                  last_name: { _icontains: text },
                 },
               },
               {
@@ -81,10 +109,28 @@ export class WorkorderServices {
                   name: { _icontains: text },
                 },
               },
+              ...this.statusConditions(text),
             ],
-          }),
-        }
-      : {};
+          }
+      : null;
+  }
+
+  private filter(search: string): Record<string, string> {
+    const searchFilter = this.filterObject(search);
+
+    return searchFilter ? { filter: JSON.stringify(searchFilter) } : {};
+  }
+
+  // El filtro de rol y el de búsqueda deben viajar en un único parámetro
+  // `filter`: Directus descarta la búsqueda si se envía además por query string.
+  private scopedFilter(base: object, search: string): Record<string, string> {
+    const searchFilter = this.filterObject(search);
+
+    return {
+      filter: JSON.stringify(
+        searchFilter ? { _and: [base, searchFilter] } : base,
+      ),
+    };
   }
 
   list(page = 1, perPage = 3, search = ""): Observable<Workorder[]> {
@@ -156,24 +202,54 @@ export class WorkorderServices {
     ).pipe(map((response) => Number(response.data.data[0]?.count ?? 0)));
   }
 
+  private scopedTotal(base: object, search = ""): Observable<number> {
+    return defer(() =>
+      axios.get<{ data: { count: string | number }[] }>(this.url, {
+        ...this.getAuthConfig(),
+        params: {
+          "aggregate[count]": "*",
+          ...this.scopedFilter(base, search),
+        },
+      }),
+    ).pipe(map((response) => Number(response.data.data[0]?.count ?? 0)));
+  }
+
+  totalMy(search = ""): Observable<number> {
+    return this.scopedTotal(
+      { vehicle_id: { user_id: { id: { _eq: this.authService.getID() } } } },
+      search,
+    );
+  }
+
+  totalMechanic(search = ""): Observable<number> {
+    return this.scopedTotal(
+      { mechanic_id: { id: { _eq: this.authService.getID() } } },
+      search,
+    );
+  }
+
+  totalInProgress(search = ""): Observable<number> {
+    return this.scopedTotal({ status_id: { id: { _in: [4, 5, 6] } } }, search);
+  }
+
   getMyWorkOrders(
     page = 1,
     perPage = 3,
     search = "",
   ): Observable<Workorder[]> {
     return defer(() =>
-      axios.get<{ data: Workorder[] }>(
-        `${this.url}?filter[vehicle_id][user_id][id][_eq]=${this.authService.getID()}`,
-        {
-          ...this.getAuthConfig(),
-          params: {
-            page: page,
-            limit: perPage,
-            sort: ["-status_id", "-created_at"],
-            ...this.filter(search),
-          },
+      axios.get<{ data: Workorder[] }>(this.url, {
+        ...this.getAuthConfig(),
+        params: {
+          page: page,
+          limit: perPage,
+          sort: ["-status_id", "-created_at"],
+          ...this.scopedFilter(
+            { vehicle_id: { user_id: { id: { _eq: this.authService.getID() } } } },
+            search,
+          ),
         },
-      ),
+      }),
     ).pipe(map((response) => response.data.data));
   }
 
@@ -183,18 +259,18 @@ export class WorkorderServices {
     search = "",
   ): Observable<Workorder[]> {
     return defer(() =>
-      axios.get<{ data: Workorder[] }>(
-        `${this.url}?filter[mechanic_id][id][_eq]=${this.authService.getID()}`,
-        {
-          ...this.getAuthConfig(),
-          params: {
-            page: page,
-            limit: perPage,
-            sort: ["-status_id", "-created_at"],
-            ...this.filter(search),
-          },
+      axios.get<{ data: Workorder[] }>(this.url, {
+        ...this.getAuthConfig(),
+        params: {
+          page: page,
+          limit: perPage,
+          sort: ["-status_id", "-created_at"],
+          ...this.scopedFilter(
+            { mechanic_id: { id: { _eq: this.authService.getID() } } },
+            search,
+          ),
         },
-      ),
+      }),
     ).pipe(map((response) => response.data.data));
   }
 
@@ -205,18 +281,18 @@ export class WorkorderServices {
     search = "",
   ): Observable<Workorder[]> {
     return defer(() =>
-      axios.get<{ data: Workorder[] }>(
-        `${this.url}?filter[status_id][id][_in]=4,5,6`,
-        {
-          ...this.getAuthConfig(),
-          params: {
-            page: page,
-            limit: perPage,
-            sort: ["-created_at"],
-            ...this.filter(search),
-          },
+      axios.get<{ data: Workorder[] }>(this.url, {
+        ...this.getAuthConfig(),
+        params: {
+          page: page,
+          limit: perPage,
+          sort: ["-created_at"],
+          ...this.scopedFilter(
+            { status_id: { id: { _in: [4, 5, 6] } } },
+            search,
+          ),
         },
-      ),
+      }),
     ).pipe(map((response) => response.data.data));
   }
 }

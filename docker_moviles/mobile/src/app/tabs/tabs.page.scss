@@ -1,1 +1,38 @@
+// ==========================================
+// TAB BAR — identidad visual VEXORA
+// ==========================================
 
+ion-tab-bar {
+  --background: #ffffff;
+  --border: 1px solid #e2e8f0;
+  --color: #64748b;
+
+  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: none;
+}
+
+ion-tab-button {
+  --color: #64748b;
+  --padding-top: 6px;
+  --padding-bottom: 6px;
+
+  letter-spacing: 0.2px;
+}
+
+ion-tab-button.tab-active {
+  --color: #f97316;
+}
+
+ion-tab-button ion-icon {
+  font-size: 22px;
+  margin-bottom: 2px;
+}
+
+ion-tab-button ion-label {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+ion-tab-button.tab-active ion-label {
+  font-weight: 600;
+}

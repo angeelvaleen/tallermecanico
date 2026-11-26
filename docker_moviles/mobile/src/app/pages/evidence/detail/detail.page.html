@@ -1,11 +1,8 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
+<app-toolbar name="Detalle de Evidencia" color="primary">
+<ion-buttons slot="start">
       <ion-back-button defaultHref="/evidences/list"></ion-back-button>
     </ion-buttons>
-    <ion-title>Detalle de Evidencia</ion-title>
-  </ion-toolbar>
-</ion-header>
+</app-toolbar>
 
 <ion-content class="ion-padding">
   <ion-text color="danger" *ngIf="messageError">
@@ -13,12 +10,39 @@
   </ion-text>
 
   <ion-card *ngIf="evidence">
+    <img
+      *ngIf="imageUrl && !imageError"
+      [src]="imageUrl"
+      alt="Evidencia de la orden de trabajo"
+      class="evidence-image"
+      (error)="onImageError()"
+    />
+
     <ion-card-content>
-        <h2>Orden de Trabajo: {{ evidence.workorder_id }}</h2>
-        <p><strong>Ruta:</strong> {{ evidence.path }}</p>
-        <p><strong>Formato:</strong> {{ evidence.format }}</p>
-        <p><strong>Tamaño:</strong> {{ evidence.size }} bytes</p>
-        <p><strong>Registro:</strong> {{ evidence.created_at | date:'yyyy-MM-dd' }}</p>
+      <h2>Orden de Trabajo: {{ evidence.workorder_id }}</h2>
+
+      <p *ngIf="!isImageReference()"><strong>Ruta:</strong> {{ evidence.path }}</p>
+      <p *ngIf="isImageReference() && (!imageUrl || imageError)">
+        <strong>Archivo:</strong> {{ evidence.path }}
+        <ng-container *ngIf="imageError">
+          — el navegador no puede mostrar este formato (HEIC/HEIF).
+        </ng-container>
+      </p>
+
+      <ion-button
+        *ngIf="imageUrl && imageError"
+        fill="outline"
+        size="small"
+        [href]="imageUrl"
+        [attr.download]="downloadName()"
+      >
+        <ion-icon slot="start" name="download-outline"></ion-icon>
+        Descargar archivo
+      </ion-button>
+
+      <p><strong>Formato:</strong> {{ evidence.format }}</p>
+      <p><strong>Tamaño:</strong> {{ evidence.size }} bytes</p>
+      <p><strong>Registro:</strong> {{ evidence.created_at | date:'yyyy-MM-dd' }}</p>
     </ion-card-content>
   </ion-card>
 </ion-content>

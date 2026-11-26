@@ -47,13 +47,34 @@ export class AppointmentServices {
     };
   }
 
-  private filter(search: string): Record<string, string> {
+  // Los estados se guardan en inglés en la BD pero se muestran en español.
+  private static readonly STATUS_ALIASES: { id: number; names: string[] }[] = [
+    { id: 1, names: ["pendiente", "pending"] },
+    { id: 2, names: ["confirmada", "confirmado", "confirmed"] },
+    { id: 3, names: ["cancelada", "cancelado", "cancelled"] },
+  ];
+
+  private statusConditions(text: string): object[] {
+    const normalized = text
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+    return AppointmentServices.STATUS_ALIASES.filter((status) =>
+      status.names.some(
+        (name) =>
+          name.normalize("NFD").replace(/[\u0300-\u036f]/g, "") ===
+          normalized,
+      ),
+    ).map((status) => ({ status_id: { id: { _eq: status.id } } }));
+  }
+
+  private filterObject(search: string): object | null {
     const text = search.trim();
 
     return text
       ? {
-          filter: JSON.stringify({
-            _or: [
+          _or: [
               {
                 vehicle_id: {
                   plate: {
@@ -71,16 +92,43 @@ export class AppointmentServices {
               {
                 vehicle_id: {
                   user_id: {
-                    name: {
+                    first_name: {
                       _icontains: text,
                     },
                   },
                 },
               },
+              {
+                vehicle_id: {
+                  user_id: {
+                    last_name: {
+                      _icontains: text,
+                    },
+                  },
+                },
+              },
+              ...this.statusConditions(text),
             ],
-          }),
-        }
-      : {};
+          }
+      : null;
+  }
+
+  private filter(search: string): Record<string, string> {
+    const searchFilter = this.filterObject(search);
+
+    return searchFilter ? { filter: JSON.stringify(searchFilter) } : {};
+  }
+
+  // El filtro de rol y el de búsqueda deben viajar en un único parámetro
+  // `filter`: Directus descarta la búsqueda si se envía además por query string.
+  private scopedFilter(base: object, search: string): Record<string, string> {
+    const searchFilter = this.filterObject(search);
+
+    return {
+      filter: JSON.stringify(
+        searchFilter ? { _and: [base, searchFilter] } : base,
+      ),
+    };
   }
 
   list(page = 1, perPage = 3, search = ""): Observable<Appointment[]> {
@@ -151,16 +199,37 @@ export class AppointmentServices {
     );
   }
 
+  private scopedTotal(base: object, search = ""): Observable<number> {
+    return defer(() =>
+      axios.get<{ data: { count: string | number }[] }>(this.url, {
+        ...this.getAuthConfig(),
+        params: {
+          "aggregate[count]": "*",
+          ...this.scopedFilter(base, search),
+        },
+      }),
+    ).pipe(map((response) => Number(response.data.data[0]?.count ?? 0)));
+  }
+
+  totalMy(search = ""): Observable<number> {
+    return this.scopedTotal(
+      { vehicle_id: { user_id: { id: { _eq: this.authService.getID() } } } },
+      search,
+    );
+  }
+
   getMyAppointments(page = 1, perPage = 3, search = ""): Observable<Appointment[]> {
     return defer(() =>
-      axios.get<{ data: Appointment[] }>(
-        `${this.url}?filter[vehicle_id][user_id][id][_eq]=${this.authService.getID()}`,{
+      axios.get<{ data: Appointment[] }>(this.url, {
         ...this.getAuthConfig(),
         params: {
           page: page,
           limit: perPage,
           sort: ["-status_id","-created_at"],
-          ...this.filter(search),
+          ...this.scopedFilter(
+            { vehicle_id: { user_id: { id: { _eq: this.authService.getID() } } } },
+            search,
+          ),
         },
       }),
     ).pipe(map((response) => response.data.data));
@@ -168,14 +237,13 @@ export class AppointmentServices {
 
   getAppointmentActive(page = 1, perPage = 3, search = ""):Observable<Appointment[]>{
     return defer(() =>
-      axios.get<{ data: Appointment[] }>(
-        `${this.url}?filter[status_id][id][_eq]=2}`,{
+      axios.get<{ data: Appointment[] }>(this.url, {
         ...this.getAuthConfig(),
         params: {
           page: page,
           limit: perPage,
           sort: ["-created_at"],
-          ...this.filter(search),
+          ...this.scopedFilter({ status_id: { id: { _eq: 2 } } }, search),
         },
       }),
     ).pipe(map((response) => response.data.data));

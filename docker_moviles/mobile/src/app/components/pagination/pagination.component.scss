@@ -3,18 +3,21 @@
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 4px;
-  margin-top: 16px;
+  gap: 6px;
+  margin: 16px 12px 0;
 }
 
 .pagination ion-button {
   margin: 0;
+  min-width: 40px;
+  font-size: 0.85rem;
   --padding-start: 12px;
   --padding-end: 12px;
 }
 
 .information {
   text-align: center;
-  margin-top: 8px;
-  margin-bottom: 0;
+  margin: 8px 12px 20px;
+  font-size: 0.8rem;
+  color: #64748b;
 }

@@ -53,11 +53,29 @@ export class PaymentServices {
     };
   }
 
-  private filter(search: string): Record<string, string> {
+  private filterObject(search: string): object | null {
     const text = search.trim();
-    return text ? { filter: JSON.stringify({ _or: [
+    return text ? { _or: [
       { reference: { _icontains: text } },
-    ] }) } : {};
+    ] } : null;
+  }
+
+  private filter(search: string): Record<string, string> {
+    const searchFilter = this.filterObject(search);
+
+    return searchFilter ? { filter: JSON.stringify(searchFilter) } : {};
+  }
+
+  // El filtro de rol y el de búsqueda deben viajar en un único parámetro
+  // `filter`: Directus descarta la búsqueda si se envía además por query string.
+  private scopedFilter(base: object, search: string): Record<string, string> {
+    const searchFilter = this.filterObject(search);
+
+    return {
+      filter: JSON.stringify(
+        searchFilter ? { _and: [base, searchFilter] } : base,
+      ),
+    };
   }
 
   list(page = 1, perPage = 3, search = ''): Observable<Payment[]> {
@@ -96,24 +114,38 @@ export class PaymentServices {
     })).pipe(map(response => Number(response.data.data[0]?.count ?? 0)));
   }
 
+  private scopedTotal(base: object, search = ''): Observable<number> {
+    return defer(() => axios.get<{ data: { count: string | number }[] }>(this.url, {
+      ...this.getAuthConfig(),
+      params: { 'aggregate[count]': '*', ...this.scopedFilter(base, search) },
+    })).pipe(map(response => Number(response.data.data[0]?.count ?? 0)));
+  }
+
+  totalMy(search = ''): Observable<number> {
+    return this.scopedTotal(
+      { user_id: { id: { _eq: this.authService.getID() } } },
+      search,
+    );
+  }
+
   getMyPayments(
       page = 1,
       perPage = 3,
       search = "",
     ): Observable<Payment[]> {
       return defer(() =>
-        axios.get<{ data: Payment[] }>(
-          `${this.url}?filter[user_id][id][_eq]=${this.authService.getID()}`,
-          {
-            ...this.getAuthConfig(),
-            params: {
-              page: page,
-              limit: perPage,
-              sort: ["-paid_at"],
-              ...this.filter(search),
-            },
+        axios.get<{ data: Payment[] }>(this.url, {
+          ...this.getAuthConfig(),
+          params: {
+            page: page,
+            limit: perPage,
+            sort: ["-paid_at"],
+            ...this.scopedFilter(
+              { user_id: { id: { _eq: this.authService.getID() } } },
+              search,
+            ),
           },
-        ),
+        }),
       ).pipe(map((response) => response.data.data));
     }
 }

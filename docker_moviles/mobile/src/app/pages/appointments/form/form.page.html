@@ -1,7 +1,5 @@
-<ion-header>
-  <ion-toolbar>
-
-    <ion-buttons slot="start">
+<app-toolbar name="{{ isEdition ? 'Editar Cita' : 'Nueva Cita' }}" color="primary" [showMenu]="false">
+<ion-buttons slot="start">
       <ion-button
         (click)="closeModal()"
       >
@@ -10,17 +8,7 @@
         ></ion-icon>
       </ion-button>
     </ion-buttons>
-
-    <ion-title>
-      {{
-        isEdition
-          ? "Editar Cita"
-          : "Nueva Cita"
-      }}
-    </ion-title>
-
-  </ion-toolbar>
-</ion-header>
+</app-toolbar>
 
 <ion-content class="ion-padding">
 

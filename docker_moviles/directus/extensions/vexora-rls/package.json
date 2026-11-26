@@ -1,0 +1,19 @@
+{
+  "name": "vexora-rls",
+  "version": "1.0.0",
+  "description": "Aislamiento por fila (S2) y proteccion de usuarios (S3) para VEXORA",
+  "type": "module",
+  "main": "index.js",
+  "directus:extension": {
+    "type": "hook",
+    "path": "index.js",
+    "source": "index.js",
+    "host": "^12.6.0"
+  },
+  "keywords": [
+    "directus-extension",
+    "hook",
+    "vexora"
+  ],
+  "license": "UNLICENSED"
+}

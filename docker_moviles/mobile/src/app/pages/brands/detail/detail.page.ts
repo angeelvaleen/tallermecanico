@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
+import { AuthService } from 'src/app/services/auth/auth';
 
 interface Brand {
   id: number;
@@ -24,6 +25,7 @@ export class DetailPage implements OnInit{
   constructor(
     private route: ActivatedRoute,
     private loading: LoadingController,
+    private authService: AuthService,
   ) {}
 
   ngOnInit():void{
@@ -50,7 +52,12 @@ export class DetailPage implements OnInit{
 
     try {
     const response = await axios.get<{ data: Brand }>(
-      `${environment.apiUrl}/brands/${encodeURIComponent(id)}`
+      `${environment.apiUrl}/brands/${encodeURIComponent(id)}`,
+      {
+        headers: {
+          Authorization: `Bearer ${this.authService.getAccessToken()}`,
+        },
+      }
     );
 
     this.brand = response.data.data;

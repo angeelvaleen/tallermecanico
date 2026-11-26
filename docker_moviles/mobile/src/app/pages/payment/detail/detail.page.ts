@@ -43,7 +43,6 @@ export class DetailPage implements OnInit {
       this.payment = await firstValueFrom(this.paymentServices.detail(Number(id)));
     } catch (error) {
       this.messageError = "Revisar id, conexion a base de datos o permisos";
-      console.log("Error al cargar detalle de pago", error);
     } finally {
       await loading.dismiss();
     }

@@ -28,6 +28,9 @@ export class ListPage  {
   perPage: number = 15;
   search: string = "";
 
+  loading: boolean = false;
+  loadError: boolean = false;
+
   constructor(
     private modalController:ModalController,
     private quoteServices: QuoteServices,
@@ -42,7 +45,8 @@ export class ListPage  {
       
       this.quotes = await firstValueFrom(this.quoteServices.list(this.currentPage,this.perPage,this.search))
     } catch (error) {
-      console.log('Error al cargar cotizaciones', error);
+
+      this.loadError = true;
     }
   }
 
@@ -66,9 +70,10 @@ export class ListPage  {
     try {
       this.total = await firstValueFrom(this.quoteServices.total(this.search)); 
     } catch (error) {
-      console.error("Error al obtener el total de coutas:", error);
+      console.error("Error al obtener el total de cotizaciones:", error);
 
       this.total = 0;
+      this.loadError = true;
     }
   }
 
@@ -87,15 +92,33 @@ export class ListPage  {
 
 
   async chargerData(): Promise<void> {
-    await this.chargerTotal();
-    this.adjustCurrentPage();
-    await this.loadQuotes();
+    this.loading = true;
+    this.loadError = false;
+
+    try {
+      await this.chargerTotal();
+      this.adjustCurrentPage();
+      await this.loadQuotes();
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  async retry(): Promise<void> {
+    await this.chargerData();
   }
 
 
   async changePage(page: number): Promise<void> {
     this.currentPage = page;
-    await this.loadQuotes();
+    this.loading = true;
+    this.loadError = false;
+
+    try {
+      await this.loadQuotes();
+    } finally {
+      this.loading = false;
+    }
   }
 
 

@@ -1,0 +1,24 @@
+.profile-photo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.profile-photo__image {
+  width: 96px;
+  height: 96px;
+  margin-bottom: 4px;
+  background: var(--ion-color-light);
+  color: var(--ion-color-medium);
+}
+
+.profile-photo__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-photo__image ion-icon {
+  font-size: 48px;
+}

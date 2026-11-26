@@ -1,5 +1,19 @@
 import { Component } from "@angular/core";
 
+import { AuthService } from "./services/auth/auth";
+import {
+  ADMIN_CATALOG_LINKS,
+  ADMIN_STANDALONE_LINKS,
+} from "./constants/admin_menu";
+
+// ==========================================
+// MENÚ DESPLEGABLE EXCLUSIVO DEL ADMINISTRATOR
+// Contiene únicamente: Catálogos, Diagnóstico,
+// Evidencias. Las pestañas principales no se
+// duplican aquí. Los permisos reales de
+// Directus siguen protegiendo cada operación.
+// ==========================================
+
 @Component({
   selector: "app-root",
   templateUrl: "app.component.html",
@@ -7,24 +21,13 @@ import { Component } from "@angular/core";
   standalone: false,
 })
 export class AppComponent {
-  constructor() {}
-  links: { path: string; text: string }[] = [
-    { path: "/colors/list", text: "Colores" },
-    { path: "/brands/list", text: "Marcas" },
-    { path: "/models/list", text: "Modelos" },
-    { path: "/fuels/list", text: "Combustibles" },
-    { path: "/parts/list", text: "Refacciones" },
-    { path: "/services/list", text: "Servicios" },
-    { path: "/vehicles/list", text: "Vehiculos" },
-    { path: "/quotes/list", text: "Coutas" },
-    { path: "/workorders/list", text: "Ordenes" },
-    { path: "/appointments/list", text: "Citas" },
-    { path: "/payment/list", text: "Pagos" },
-    { path: "/methods/list", text: "Metodos de pago" },
-    { path: "/diagnoses/list", text: "Diagnosticos" },
-    { path: "/evidences/list", text: "Evidencias" },
+  catalogLinks = ADMIN_CATALOG_LINKS;
+  standaloneLinks = ADMIN_STANDALONE_LINKS;
 
+  constructor(private auth: AuthService) {}
 
-
-  ];
+  // Solo Administrator ve el menú desplegable
+  get isAdmin(): boolean {
+    return this.auth.canByRole(["Administrator"]);
+  }
 }

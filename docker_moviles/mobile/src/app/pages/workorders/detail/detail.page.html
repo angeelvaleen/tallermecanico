@@ -1,18 +1,10 @@
-<ion-header>
-  <ion-toolbar>
-
-    <ion-buttons slot="start">
+<app-toolbar name="Detalle de Orden" color="primary">
+<ion-buttons slot="start">
       <ion-back-button
         defaultHref="/workorders/list"
       ></ion-back-button>
     </ion-buttons>
-
-    <ion-title>
-      Detalle de Orden
-    </ion-title>
-
-  </ion-toolbar>
-</ion-header>
+</app-toolbar>
 
 
 <ion-content class="ion-padding">
@@ -58,7 +50,7 @@
           <strong>Estado:</strong>
           <span [ngSwitch]="workorder.status_id.id">
             <span *ngSwitchCase="4">Recibido</span>
-            <span *ngSwitchCase="5">En Diagnostico</span>
+            <span *ngSwitchCase="5">En diagnóstico</span>
             <span *ngSwitchCase="6">Reparando</span>
             <span *ngSwitchCase="7">Listo</span>
             <span *ngSwitchCase="8">Entregado</span>
@@ -233,18 +225,40 @@
           >
 
             <ion-icon
+              *ngIf="!evidenceThumbs[evidence.id] || evidenceThumbErrors[evidence.id]"
               slot="start"
               name="image-outline"
             ></ion-icon>
 
-            <ion-label>
+            <ion-thumbnail
+              *ngIf="evidenceThumbs[evidence.id]"
+              slot="start"
+              class="evidence-thumb"
+            >
+
+              <img
+                [src]="evidenceThumbs[evidence.id]"
+                [alt]="'Evidencia #' + evidence.id"
+                (error)="onEvidenceThumbError(evidence)"
+              />
+
+            </ion-thumbnail>
+
+            <ion-label class="ion-text-wrap">
 
               <h2>
                 Evidencia #{{ evidence.id }}
               </h2>
 
-              <p>
-                {{ evidence.path }}
+              <p *ngIf="!hasEvidenceFile(evidence)">
+                Ruta: {{ evidence.path }}
+              </p>
+
+              <p
+                class="evidence-error"
+                *ngIf="hasEvidenceFile(evidence) && evidenceThumbErrors[evidence.id]"
+              >
+                {{ evidenceThumbErrors[evidence.id] }}
               </p>
 
               <p>
@@ -252,6 +266,18 @@
               </p>
 
             </ion-label>
+
+            <ion-button
+              *ngIf="evidenceThumbErrors[evidence.id] && evidenceThumbs[evidence.id]"
+              slot="end"
+              fill="outline"
+              size="small"
+              [href]="evidenceThumbs[evidence.id]"
+              [attr.download]="evidenceFileName(evidence)"
+            >
+              <ion-icon slot="start" name="download-outline"></ion-icon>
+              Descargar
+            </ion-button>
 
           </ion-item>
 
@@ -392,7 +418,7 @@
         <!-- EXISTE COTIZACIÓN PENDIENTE -->
         <ion-text
           color="warning"
-          *ngIf="!canCreateQuote()"
+          *ngIf="canAddQuote && !canCreateQuote()"
         >
 
           <p class="quote-message">

@@ -9,12 +9,30 @@
 <ion-content>
   <app-searchbar
     [value]="search"
-    placeholder="Buscar servicio"
+    placeholder="Buscar por placa, VIN o cliente"
     [debounce]="300"
     (changeText)="handleInput($event)">
   </app-searchbar>
-  
-  <ion-list>
+
+  <div class="list-state" *ngIf="loading">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Cargando citas...</p>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && loadError">
+    <ion-icon name="cloud-offline-outline"></ion-icon>
+    <p>No se pudieron cargar las citas.</p>
+    <ion-button fill="outline" (click)="retry()">Reintentar</ion-button>
+  </div>
+
+  <div class="list-state" *ngIf="!loading && !loadError && appointments.length === 0">
+    <ion-icon name="calendar-outline"></ion-icon>
+    <p>
+      {{ search ? 'No se encontraron citas para "' + search + '".' : 'No hay citas registradas.' }}
+    </p>
+  </div>
+
+  <ion-list *ngIf="!loading && !loadError">
 
     <ion-item *ngFor="let item of appointments">
 
@@ -80,6 +98,7 @@
 
 
   <app-pagination
+  *ngIf="!loading && !loadError && appointments.length > 0"
   [total]="total"
   [perPage]="perPage"
   [currentPage]="currentPage"

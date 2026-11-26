@@ -1,12 +1,54 @@
 <ion-app>
-  <ion-menu contentId="main" menuId="principal">
+  <ion-menu
+    *ngIf="isAdmin"
+    contentId="main"
+    menuId="principal"
+    [swipeGesture]="isAdmin"
+  >
     <ion-header>
       <ion-toolbar color="primary"><ion-title>Menú</ion-title></ion-toolbar>
     </ion-header>
     <ion-content>
       <ion-list>
-        <ion-menu-toggle *ngFor="let link of links" autoHide="false">
-          <ion-item [routerLink]="link.path" routerDirection="root" button detail="false">
+        <ion-accordion-group>
+          <ion-accordion value="catalogos">
+            <ion-item slot="header">
+              <ion-label>Catálogos</ion-label>
+            </ion-item>
+            <ion-list slot="content">
+              <ion-menu-toggle
+                *ngFor="let link of catalogLinks"
+                autoHide="false"
+              >
+                <ion-item
+                  [routerLink]="link.path"
+                  routerDirection="root"
+                  routerLinkActive="menu-item-active"
+                  [routerLinkActiveOptions]="{ exact: true }"
+                  button
+                  detail="false"
+                  lines="none"
+                >
+                  <ion-label>{{ link.text }}</ion-label>
+                </ion-item>
+              </ion-menu-toggle>
+            </ion-list>
+          </ion-accordion>
+        </ion-accordion-group>
+
+        <ion-menu-toggle
+          *ngFor="let link of standaloneLinks"
+          autoHide="false"
+        >
+          <ion-item
+            [routerLink]="link.path"
+            routerDirection="root"
+            routerLinkActive="menu-item-active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            button
+            detail="false"
+            lines="none"
+          >
             <ion-label>{{ link.text }}</ion-label>
           </ion-item>
         </ion-menu-toggle>

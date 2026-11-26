@@ -265,7 +265,7 @@ MariaDB se utiliza principalmente mediante la red interna de Docker.
 
 ```text
 Correo: ADMIN_EMAIL_PROPIO
-Contraseña: ${ADMIN_PASSWORD}
+Contraseña: ${DIRECTUS_ADMIN_PASSWORD}
 ```
 
 Directus se conecta a MariaDB mediante:

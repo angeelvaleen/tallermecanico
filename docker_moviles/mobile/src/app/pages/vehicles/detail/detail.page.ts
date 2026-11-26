@@ -45,7 +45,6 @@ export class DetailPage implements OnInit {
     try {
 
       this.vehicle = await firstValueFrom(this.vehicleService.detail(Number(id)));
-      console.log(this.vehicle);
       
       
     } catch (error) {
@@ -53,10 +52,6 @@ export class DetailPage implements OnInit {
       this.messageError =
         'Revisar ID, conexión a base de datos o permisos';
 
-      console.log(
-        'Error al cargar detalle del vehículo',
-        error
-      );
 
     } finally {
 

@@ -29,7 +29,7 @@ export class LoginPage implements OnInit {
     try {
       await this.auth.signin(this.form.value.email, this.form.value.password);
       const destino = new URLSearchParams(location.search).get('returnUrl');
-      await this.router.navigateByUrl(destino?.startsWith('/') && !destino.startsWith('//') ? destino : '/workorders/list', { replaceUrl: true });
+      await this.router.navigateByUrl(destino?.startsWith('/') && !destino.startsWith('//') ? destino : '/tabs/workorders/list', { replaceUrl: true });
       this.form.reset();
     } catch { this.message = 'No fue posible iniciar sesión. Revisa tus datos y el acceso al servidor.'; }
     finally { this.sending = false; }
