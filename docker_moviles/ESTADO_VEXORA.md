@@ -996,3 +996,38 @@ Responsable: OpenCode. Alcance autorizado por el usuario: recuperar el VEXORA or
 - **Integridad:** users 9, files 2, evidence 2, quotes 4, quoteitems 2, quoteparts 2, workorders 5, revisions 410, sessions 291; identicos antes y despues. Sin escrituras en Directus.
 - **Pendiente real:** redireccion de assistant/client en navegador, guardado de cotizacion con fallo forzado y una evidencia HEIC real. No se probaron por requerir escrituras.
 - **Archivos modificados:** `app-routing.module.ts`, `pages/quotes/form/form.page.ts`, `pages/evidence/list/list.page.ts|html`, `pages/evidence/detail/detail.page.ts|html`, `pages/workorders/detail/detail.page.ts|html`. **Nuevos:** `pruebas/fase10-entry.js`, `pruebas/fase10-validacion.mjs`.
+
+## Fase 12 - Seguridad, limpieza de historial y cierre (2026-11-26, Freebuff)
+
+### Seguridad de GitHub (completada)
+- Historial reescrito con `git filter-branch` en todas las ramas locales y remotas: los valores literales (`Angelito04.`, `moviles-directus-clave-2026`, `admin@moviles.local`, `admin123`, `moviles123`) se reemplazaron por referencias a variables de entorno en `docker-compose.yml` y en la documentacion (`docs/correcciones/*.md`, `docs/manuales/01_listado_elementos.md`, `README.md`, `README-restaurar-directus.md`).
+- `docker_moviles/workshop_backup.sql` (hashes argon2id) eliminado de todas las refs y del historial.
+- Eliminados refs originales, stash, worktree obsoleto (`wind-reminder`) y commit-graph; `git gc --prune=now`.
+- Push forzado de todas las ramas a `origin` (https://github.com/angeelvaleen/tallermecanico.git); `sounds/opti` publicada como nueva rama.
+- Verificacion: `git log --all -S '<secreto>'` devuelve 0 resultados para cada valor; `workshop_backup.sql` ausente de todas las refs.
+
+### Credenciales activas
+- Los valores expuestos en el historial antiguo NO estan activos: login con `admin@vexora.dev / admin123` devuelve `INVALID_CREDENTIALS`; MariaDB rechaza `Angel`/`root` con `Angelito04.` (`Access denied`).
+- El `.env` actual (gitignored) contiene valores regenerados el 2026-11-15 y no los valores expuestos; no se rotaron credenciales activas para no romper el sistema.
+- Los nueve usuarios actuales se conservan (verificado: `directus_users = 9`).
+
+### H-500 (marca vacia)
+- Causa raiz: `saveBrand()` hacia `.trim()` despues de la validacion, por lo que un nombre solo de espacios pasaba `Validators.required` y llegaba a Directus vacio, provocando HTTP 500 (fallo de Directus 12.6.0 al traducir el error de indice unico).
+- Correccion aplicada (siguiendo el patron de formularios reactivos de los manuales): se añadio `Validators.pattern(/\S/)` y su mensaje `pattern` en `mobile/src/app/pages/brands/form/form.page.ts`. Un duplicado real sigue respondiendo 400.
+- Build de produccion: EXIT 0, Hash `c0f9cfc7835bfd01`, Build at `2026-11-26T03:21:50.346Z`.
+
+### H-403 (archivo)
+- No es defecto de la aplicacion: la ruta correcta es `DELETE /files/<id>`; `DELETE /items/files/<id>` devuelve 403. Era un error del script de pruebas. Sin cambios de codigo ni permisos.
+
+### RLS
+- Los fallos reportados eran falsos positivos: URL mal construida en el script y politicas de lectura permitidas por Directus. La lectura real respeta RLS (mechanic/assistant ven 9 usuarios, client ve solo su ficha). No se modificaron permisos.
+
+### Infraestructura (verificada)
+- Contenedores: `moviles-db` (healthy), `moviles-api` (Directus ping 200), `moviles-ionic` (200), `moviles-swagger` (200), `moviles-cloudbeaver` (200). Red `vexora_net`, volumenes `vexora_*` intactos.
+- Entorno de pruebas aislado (`vexora_test_net`, `vexora_test_*`) sin residuos de PRU-FINAL. Conteos: brands 11, models 10, colors 10, fuels 5, methods 5, services 10, parts 10, vehicles 4, appointments 5, workorders 5, diagnoses 1, evidence 2, quotes 4, quoteitems 2, quoteparts 2, payment 2, files 2, users 9.
+
+### Pendientes abiertos
+- Escrituras desde la interfaz (cotizacion y evidencia) no se ejecutaron para no crear registros en la base original.
+- Segunda pagina real de Combustibles y Metodos de pago (5 registros, perPage 5).
+- Limpieza opcional de `console.log` de depuracion.
+- Karma no ejecutable en el contenedor (sin Chrome); no es fallo de la aplicacion.

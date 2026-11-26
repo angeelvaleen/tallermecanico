@@ -23,6 +23,7 @@ export class FormPage implements OnInit {
   validationMessages: Record<string, Record<string, string>> = {
     name: {
       required: 'El nombre es obligatorio.',
+      pattern: 'El nombre no puede estar vacío.',
       maxlength: 'El nombre no debe superar los 100 caracteres.',
     },
   };
@@ -44,7 +45,7 @@ export class FormPage implements OnInit {
 
   private createForm(): void {
     this.brandForm = this.formBuilder.group({
-      name: ['', [Validators.required, Validators.maxLength(100)]],
+      name: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(100)]],
     });
   }
 
