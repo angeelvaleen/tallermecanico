@@ -2,6 +2,8 @@
 
 Este repositorio contiene el entorno de desarrollo utilizado en la materia **Desarrollo de Aplicaciones Móviles**.
 
+> **Nota para VEXORA (2026-11-27).** Este README es el material original del entorno del curso y se conserva sin cambios en su contenido técnico. En la instalación de VEXORA el repositorio es `angeelvaleen/tallermecanico`, la base de datos es `workshop` (usuario `Angel`), los contenedores se llaman `moviles-*` dentro del proyecto Compose `vexora` y los volúmenes son `vexora_*`. El estado real del proyecto se documenta en `ESTADO_VEXORA.md`.
+
 El objetivo es que todos los estudiantes trabajen con el mismo entorno, las mismas herramientas y las mismas versiones, evitando problemas de configuración local como diferencias entre versiones de Node.js, Ionic, bases de datos o dependencias.
 
 El entorno completo se ejecuta mediante **Docker Compose**.

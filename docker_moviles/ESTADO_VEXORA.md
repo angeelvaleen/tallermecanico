@@ -2,13 +2,214 @@
 
 ## Información general
 - Proyecto: VEXORA
-- Ruta: `C:\docker_moviles\docker_moviles\docker_moviles`
-- Repositorio base: `angeelvaleen/tallermecanico`
-- Commit original: `05294bf`
+- Ruta del proyecto: `C:\docker_moviles\docker_moviles` (la raíz Git es `C:\docker_moviles`)
+- Repositorio: `angeelvaleen/tallermecanico` (remoto `origin`)
+- Commit original de referencia: `05294bf`
+- Estado Git actual: `main` = `a9c3740` (igual a `origin/main`); 10 ramas locales = 10 remotas; 0 etiquetas
 - Agentes: OpenCode y Freebuff.
-- Responsable del último trabajo: Freebuff (turno 2026-11-19: extensión local `vexora-rls` para S2/S3; turnos anteriores: OpenCode 2026-11-17 con 5 requisitos del compañero, flujo Cotización→Aprobación→Pago y Fase D).
+- Última actualización de este documento: 2026-11-27 (Freebuff, revisión documental sin cambios de código)
 
-## Estado conocido
+> **Cómo leer este documento.** La sección «Estado actual» describe el proyecto tal como está verificado el 2026-11-27. A partir de «Historial de turnos» se conserva el registro cronológico del trabajo de OpenCode y Freebuff: es histórico y algunas de sus afirmaciones ya fueron superadas (se indica cuando corresponde).
+
+---
+
+# Estado actual (verificado el 2026-11-27)
+
+## 1. Descripción y estructura
+
+VEXORA es un sistema de gestión de taller mecánico: vehículos, citas, órdenes de trabajo, diagnósticos, evidencias fotográficas, cotizaciones, pagos y catálogos. La interfaz es una SPA Ionic/Angular que consume la API REST generada por Directus sobre MariaDB; todo se ejecuta con Docker Compose.
+
+```
+C:\docker_moviles\                 raíz Git (repo angeelvaleen/tallermecanico)
+└── docker_moviles\                proyecto real (aquí está docker-compose.yml)
+    ├── docker-compose.yml         5 servicios, red vexora_net, volúmenes vexora_*
+    ├── .env                       secretos locales (no versionado)
+    ├── directus.config.json       configuración de referencia del CLI de Directus
+    ├── database\                  01_database.sql, init/02_database.sql, seed/catalogo.sql
+    ├── directus\
+    │   ├── default\               volcado de configuración (data/ y 49 archivos de schema/)
+    │   └── extensions\            vexora-rls/ (index.js + lib/rules.js) y vexora-profile/
+    ├── mobile\                    app Ionic/Angular (Dockerfile propio)
+    ├── docs\                      documentación (ver sección 10)
+    ├── pruebas\                  13 scripts de validación (harness Node + E2E + seguridad)
+    ├── respaldos\                 respaldos locales del proyecto (ignorados por Git)
+    ├── seguridad\                 scripts de instalación/rollback de RLS y verificación
+    ├── AGENTS.md, README.md, README-restaurar-directus.md, ESTADO_VEXORA.md
+    └── reorganizar-vexora.ps1     script de la reorganización de carpetas (24/11)
+```
+
+## 2. Tecnologías utilizadas
+
+| Capa | Tecnología | Versión real |
+|---|---|---|
+| Interfaz | Ionic | 8.8.17 |
+| Interfaz | Angular (NgModules, `standalone: false`) | 20.3.30 |
+| Interfaz | TypeScript | 5.9.3 |
+| Móvil | Capacitor | 8.5.0 |
+| HTTP | axios + RxJS (`defer`/`map`/`firstValueFrom`) | según `package.json` |
+| Backend | Directus | 12.6.0 (`directus/directus:12.6.0`) |
+| Base de datos | MariaDB | 11.8 |
+| Infraestructura | Docker Compose, proyecto `vexora`, red `vexora_net` | — |
+| Auxiliares | Swagger UI (`swaggerapi/swagger-ui:latest`), CloudBeaver (`dbeaver/cloudbeaver:latest`) | — |
+
+Versiones tomadas de `mobile/package.json` y de las imágenes en ejecución; no se instaló ni actualizó nada.
+
+## 3. Estado de los cinco servicios Docker
+
+Verificado con `docker compose ps` el 2026-11-27 (proyecto Compose `vexora`, `working_dir` = este proyecto):
+
+| Servicio | Contenedor | Imagen | Puertos publicados | Estado |
+|---|---|---|---|---|
+| db | `moviles-db` | `mariadb:11.8` | 3306 solo interno | Up (healthy) |
+| api | `moviles-api` | `directus/directus:12.6.0` | 8000 → 8055 | Up |
+| mobile | `moviles-ionic` | `vexora-mobile` (build local) | 8100 → 8100 | Up |
+| swagger | `moviles-swagger` | `swaggerapi/swagger-ui:latest` | 8081 → 8080 | Up |
+| cloudbeaver | `moviles-cloudbeaver` | `dbeaver/cloudbeaver:latest` | 8978 → 8978 | Up |
+
+- Extensiones cargadas en el runtime (log de `moviles-api`): `Loaded extensions: vexora-profile, vexora-rls`.
+- Volúmenes del compose: `vexora_mariadb_data`, `vexora_directus_uploads`, `vexora_directus_extensions`, `vexora_ionic_node_modules`, `vexora_cloudbeaver_data`.
+- Existen además volúmenes antiguos `docker_moviles_*` y de pruebas (`vexora_test_*`, `vexora_db_copy/dump/verify_20261125`, `test_isolated_*`) que **no** usa el stack actual; no se tocaron.
+
+## 4. Base de datos y sus componentes
+
+Base `workshop`, usuario de aplicación `Angel`, 51 tablas en total: 18 colecciones de negocio + tablas del sistema Directus.
+
+Metadatos de Directus (verificados): 4 roles, 5 políticas, **85 filas de permisos**, 9 usuarios, 18 colecciones, 11 estados, 4 archivos en `directus_files`.
+
+Contenido real de las colecciones de negocio el 2026-11-27:
+
+| Colección | Registros | Colección | Registros |
+|---|---|---|---|
+| brands | 11 | workorders | 8 |
+| models | 10 | diagnoses | 2 |
+| colors | 10 | evidence | 4 |
+| fuels | 5 | quotes | 5 |
+| methods | 5 | quoteitems | 3 |
+| services | 10 | quoteparts | 3 |
+| parts | 10 | payment | 3 |
+| vehicles | 4 | status | 11 |
+| appointments | 6 | history | 0 |
+
+- Archivos en el volumen `vexora_directus_uploads` (5): `2863f725-…png`, `45fed52e-…png`, `537b9848-…png`, `73db4fed-…jpg` y `directus-health-file`. Dos de los PNG comparten contenido (duplicado real en el volumen).
+- Scripts SQL del repositorio: `database/01_database.sql`, `database/init/02_database.sql` y `database/seed/catalogo.sql` (esquema y catálogos iniciales; no se ejecutaron).
+- Relaciones: claves foráneas reales entre vehículos→marcas/modelos/colores/combustibles/usuarios, órdenes→vehículos/mecánico/estado, cotizaciones→orden/usuario, renglones→cotización/servicio/refacción, pagos→cotización/usuario/método, diagnósticos y evidencias→orden.
+
+## 5. Directus, extensiones y configuraciones
+
+- Directus 12.6.0 expone `/items/<coleccion>`, `/auth/*`, `/files`, `/assets/:id`, `/users`, `/permissions/me`, `/server/ping` y la especificación OpenAPI en `/server/specs/oas`.
+- CORS habilitado para la interfaz en `localhost:8100`.
+- `docker-compose.yml` define los 5 servicios, `container_name` `moviles-*`, red `vexora_net`, volúmenes `vexora_*`, variables por `${VAR}` desde `.env` y el bind mount del código de `mobile/` (recarga en vivo con `ng serve`).
+- **`vexora-rls`** (`directus/extensions/vexora-rls/index.js` + `lib/rules.js`, hook in-process): inyecta el filtro obligatorio por rol en `items.query` y `users.query` (S2/S3), valida escrituras y recorta campos sensibles en expansiones. Fallo seguro: rol desconocido → 403, error interno → 503.
+- **`vexora-profile`** (`directus/extensions/vexora-profile/index.js`): endpoint `PATCH /vexora-profile/me` con lista blanca (`first_name`, `last_name`, `description`, `avatar`); el usuario sale de `req.accountability` y se rechaza apuntar el avatar a un archivo de otro usuario. Permite la edición del perfil propio sin conceder `update` sobre `directus_users`.
+- `directus/default/` conserva un volcado de configuración (`data/` y 49 archivos de `schema/`) como referencia; no es el mecanismo de arranque del stack.
+- `seguridad/`: `instalar-extension.sh`, `rollback-extension.sh`, `verify.js`, `apply.js`/`rollback.js` (estos dos últimos son referencia histórica de reglas por fila y no se usan) y respaldos JSON de permisos/políticas/roles/access.
+
+## 6. Aplicación móvil Ionic/Angular
+
+- Estructura: 20 carpetas en `mobile/src/app/pages` (list/detail/form por dominio + login, register, profile, forbidden), 17 servicios en `src/app/services`, 3 componentes compartidos (`toolbar`, `searchbar`, `pagination`), 4 constantes (`view_access`, `role_actions`, `roles`, `admin_menu`), 1 guard (`auth-guard.ts`) y `tabs/`.
+- 54 declaraciones de ruta en `app-routing.module.ts`; las páginas se cargan con `loadChildren`.
+- Servicios con `defer` + `map` + `firstValueFrom`; cada petición adjunta `Authorization: Bearer <token>`.
+- La sesión vive **solo en memoria**: recargar la página obliga a iniciar sesión de nuevo.
+- Entornos: `environment.ts` apunta a `http://localhost:8000` (`apiUrl` con `/items`, `authUrl` sin sufijo).
+- El contenedor ejecuta `ng serve` (dev) con polling; la compilación de producción se hace con `ng build --configuration production` dentro de `moviles-ionic`.
+
+## 7. Módulos y funcionalidades existentes
+
+Estados según las pruebas registradas en este documento (UI = navegador real; API = peticiones HTTP). No se repitieron pruebas en la revisión del 2026-11-27.
+
+| Módulo | Alcance | Estado real |
+|---|---|---|
+| Login / registro | 4 roles; registro público habilitado | Login probado en UI con los 4 roles; registro solo validado por API/validaciones |
+| Perfil | Datos del usuario, edición propia (nombre, apellido, descripción, foto) | Probado en UI; el correo y el rol son de solo lectura |
+| Usuarios | Listar, ver, crear, editar | Probado en UI como Administrator; sin borrado en la UI (por diseño) |
+| Marcas, Modelos, Colores, Combustibles, Métodos, Servicios, Refacciones | Listado, búsqueda, paginación, alta/edición por modal | CRUD probado (UI y API) en turnos previos; borrado solo por API |
+| Vehículos | Listado, detalle, alta/edición (client) | Probado en UI |
+| Citas | Listado con búsqueda, alta (client), confirmar (Administrator), editar/cancelar | Probado en UI; confirmar crea la orden |
+| Órdenes | Listado por rol, detalle con diagnósticos/evidencias/cotizaciones, cambio de estado | Probado en UI; el filtro por mecánico lo aplica `vexora-rls` |
+| Cotizaciones | Cabecera + renglones de servicios y refacciones, totales con IVA 16 % | Cálculo y modal probados en UI; guardado real solo en el clon aislado |
+| Aprobación de cotización | Aprobar/rechazar y pasar al pago | Probado en UI (flujo hasta el pago) |
+| Pagos | Registro contra cotización y detalle | Probado en UI (pago simulado) |
+| Diagnósticos | Alta desde la orden | Probado en UI (modal abierto; hay 2 registros reales) |
+| Evidencias | Subida de archivo, registro y miniaturas autenticadas, visor ampliado | Probado en UI; visor añadido el 26/11 y verificado en navegador con dos imágenes |
+| Historial | Listado y formulario | Implementado; colección vacía (0 registros) |
+| Swagger / CloudBeaver | Documentación de API y administración de BD | Servicios arriba y accesibles |
+
+## 8. Roles, permisos y restricciones actuales
+
+- Roles de Directus: `Administrator` (política con `admin_access`), `client`, `mechanic`, `assistant`.
+- `VIEW_ACCESS` (frontend) decide qué rutas se pueden activar; `ROLE_ACTIONS` decide qué botones se muestran. El guard vuelve a comprobar `access.permission` para acciones concretas (p. ej. `workorders.update`, `directus_files.create`).
+- Restricciones efectivas por rol (backend, `vexora-rls`): `client` solo ve su cadena vehículo→cita/orden→cotización→pago y su propia ficha; `mechanic` solo las órdenes asignadas a él y sus cotizaciones; `assistant` sin filtro de fila; `Administrator` sin restricciones.
+- Lecturas: las colecciones no tienen lectura anónima (403 sin token). Los roles no administradores conservan lectura de `directus_users`, `directus_permissions`, `directus_policies` y `directus_roles` (la necesita `/permissions/me`); en `directus_users` `vexora-rls` limita campos y filas.
+- Escrituras: `client` crea/edita vehículos, citas y pagos y actualiza cotizaciones; `mechanic` crea cotizaciones/renglones y edita sus órdenes; `assistant` y `mechanic` crean diagnósticos y evidencias; solo `Administrator` gestiona usuarios y catálogos. El borrado de catálogos y usuarios **no existe en la interfaz**.
+- Perfil: la edición pasa por `vexora-profile`; nadie puede cambiar su propio rol (`PATCH` con `role` → 400/403 según la ruta).
+- La carga de foto de perfil depende de `create` en `directus_files`; `client` no lo tiene, por lo que ve la foto y puede quitarla, pero no subirla.
+- Permisos: 85 filas en `directus_permissions`, 5 políticas, 4 roles. No se modificó ningún permiso en esta revisión.
+
+## 9. Rutas y navegación
+
+- Login (`/login`) y registro (`/register`) sin sesión; tras autenticar se va a `/tabs/workorders/list` (o al `returnUrl`).
+- Pestañas por rol: Administrator y client → Órdenes, Citas, Vehículos, Pagos, Perfil; mechanic y assistant → Órdenes y Perfil. Rutas hijas reales bajo `/tabs/...` con el mismo guard.
+- Menú lateral exclusivo de Administrator: Catálogos (Colores, Marcas, Modelos, Combustibles, Refacciones, Servicios, Métodos de pago), Diagnóstico y Evidencias. El botón de menú solo se renderiza para Administrator.
+- Rutas de módulos: `/<dominio>/list`, `/<dominio>/detail/:id`, `/<dominio>/form` (`users`, `brands`, `models`, `colors`, `fuels`, `methods`, `services`, `parts`, `vehicles`, `appointments`, `workorders`, `quotes`, `diagnoses`, `evidences`, `history`, `payment`) y `profile`.
+- Ruta no permitida → `/forbidden`, cuyo botón vuelve a `/tabs/workorders/list` con `replaceUrl` (sin bucle).
+- El toolbar administrativo muestra una flecha de regreso a Órdenes en los listados de catálogos (desactivada en el panel de diagnóstico mediante `[showBack]="false"`).
+
+## 10. Manuales y documentación disponible
+
+| Documento | Contenido | Estado |
+|---|---|---|
+| `ESTADO_VEXORA.md` | estado e historial de turnos | Actualizado el 2026-11-27 |
+| `docs/MANUAL_TECNICO_VEXORA.md` | manual técnico completo (arquitectura, código, RLS, anexos) | Revisado el 2026-11-27 |
+| `docs/MANUAL_DEFENSA_VEXORA.md` | guía de exposición, matriz de módulos y pendientes | Revisado el 2026-11-27 |
+| `docs/DOCUMENTACION_FINAL.md` | resumen de arquitectura, roles, módulos, endpoints y seguridad | Revisado el 2026-11-27 |
+| `docs/REVISION_MANUALES_PROFESOR.md` | clasificación de los manuales del profesor aplicados a VEXORA | Vigente |
+| `docs/correcciones/01–03` + `Dockerfile` | material del curso (FastAPI→Directus, Ionic, Swagger UI) | Se conserva; se añadió nota de vigencia |
+| `docs/manuales/` (21 archivos) + `imagenes/` (89) + `recursos/` | manuales originales del profesor | Se conservan sin cambios |
+| `README.md` | README original del entorno del curso | Se conserva (material del profesor) |
+| `README-restaurar-directus.md` | restauración de Directus | Vigente |
+| `AGENTS.md` | reglas de trabajo de los agentes | Vigente (su ruta aún dice el nivel antiguo) |
+
+## 11. Respaldos existentes
+
+| Ubicación | Contenido | Verificación |
+|---|---|---|
+| `C:\VEXORA_RESPALDO_20261127` | respaldo definitivo: código, bundle con 23 refs, parche de cambios locales, volcado `workshop`, evidencias, configuración, `.env` protegido, archivos únicos rescatados | 743 archivos con SHA-256; `sha256sum -c` = 0 fallos |
+| `docker_moviles\respaldos\historial_20261127\` | bundle de Git (4,7 MB), parche de los cambios locales, `manifiesto_refs.txt`, `SHA256SUMS.txt` | Bundle verificado |
+| `docker_moviles\respaldos\` | `respaldo_workshop_20261121.sql`, `respaldo_compose_20261121.yml`, `respaldo_directus_20261121.tgz`, `respaldo_huella_20261121.txt`, `workshop_backup.sql` (histórico), `01_listado_elementos_local_2026-11-25.md` | Presentes; ignorados por Git |
+| `C:\vexora_entrega_20261125` (17 MB) | entrega del 25/11 con manuales ignorados, dump y 3 uploads | 705/705 hashes OK |
+| `C:\vexora_snapshot_20261125` y `_git` | instantánea del proyecto y repositorio en `05294bf` | Verificados |
+| `C:\vexora_verify_clone`, `C:\vexora_rewrite.git`, `C:\vexora_mirror_backup`, `C:\vexora_entrega_git_mirror`, `C:\vexora_test_env` | copias y experimentos de historial/entorno de pruebas | No forman parte del stack |
+
+Limpieza del 2026-11-27: se eliminaron `C:\vexora_git_tmp` (740 KB, historial duplicado sin información única) y `C:\vexora_lab4` (vacía). `C:\vexora_lab` y `C:\vexora_old` **se conservaron**: contienen 30 archivos que no están en el respaldo (extensiones antiguas, respaldos SQL históricos, `snapshot_20261115_153747.yaml`, `id_map.json`, `users.ts`, dos scripts `.ps1`), pendientes de rescate.
+
+## 12. Cambios realizados recientemente
+
+- **2026-11-25/26:** correcciones H1–H5 (foto de perfil según permisos, índice de la orden en cotizaciones, archivos huérfanos de evidencias, documentación, avatar asignado por administrador) y auditoría H1–H3 de acceso por rol, integridad de cotizaciones y HEIC/HEIF.
+- **2026-11-26:** visor ampliado de evidencias en el detalle de la orden, con la X de cierre corregida (causa: `ion-modal` declarativo con varios `*ngIf`); verificado en navegador con dos imágenes.
+- **2026-11-27:** redacción de credenciales antiguas en este documento; respaldo definitivo `C:\VEXORA_RESPALDO_20261127`; retiro de la flecha de regreso en el panel de diagnóstico y corrección de la navegación de esa flecha en `/diagnoses/list`; eliminación de `vexora_git_tmp` y `vexora_lab4`.
+- Sin commit ni push: `git status` sigue con 9 archivos modificados y `pruebas/cierre-final-aislado.js` sin seguimiento.
+
+## 13. Pendientes reales
+
+1. **Rescatar los 30 archivos únicos de `C:\vexora_old`** (y sus copias en `C:\vexora_lab`) al respaldo; solo después podrán eliminarse esas carpetas (≈1,9 GB).
+2. **Commit y push** de los 10 elementos actuales, con autorización expresa y sin stagear `.env`.
+3. **Reescritura del historial publicado**: `a9c3740` (`origin/main`) todavía contiene los valores antiguos citados en la versión publicada de este documento. Requiere autorización y `git filter-repo` (no instalado) o `filter-branch`.
+4. **Guardado real desde la interfaz** de una cotización y de una evidencia: se validaron por API en un clon aislado, no en la base original.
+5. **HEIC/HEIF real** no probado en navegador; solo se validó el flujo y el mensaje de descarga.
+6. **Karma** no ejecutable dentro del contenedor (no hay Chrome instalado).
+7. **Segunda página real** en Combustibles y Métodos de pago: 5 registros con `perPage = 5`; el componente ya se validó con Servicios.
+8. **Eliminación desde la UI** de usuarios y catálogos: no existe por diseño; agregarla requiere autorización.
+9. **Limpieza opcional** de `console.log` de depuración.
+10. **`AGENTS.md`** conserva la ruta antigua de tres niveles; corregirla requiere decidir si se edita ese archivo de reglas.
+11. Contenedores y volúmenes de pruebas detenidos (`vexora-test-*`, `test_isolated_*`, `vexora_db_*_20261125`): sin uso, pendientes de decisión.
+
+---
+
+# Historial de turnos (registro cronológico)
+
+> Las secciones siguientes son el registro de trabajo de OpenCode y Freebuff entre el 16 y el 27 de noviembre. Se conservan como evidencia; algunas afirmaciones fueron superadas por turnos posteriores.
+
+## Estado conocido (histórico, 2026-11-16 — superado por «Estado actual»)
 
 ### Infraestructura
 - Docker Compose: proyecto local `vexora`.
@@ -1000,14 +1201,15 @@ Responsable: OpenCode. Alcance autorizado por el usuario: recuperar el VEXORA or
 ## Fase 12 - Seguridad, limpieza de historial y cierre (2026-11-26, Freebuff)
 
 ### Seguridad de GitHub (completada)
-- Historial reescrito con `git filter-branch` en todas las ramas locales y remotas: los valores literales (`Angelito04.`, `moviles-directus-clave-2026`, `admin@moviles.local`, `admin123`, `moviles123`) se reemplazaron por referencias a variables de entorno en `docker-compose.yml` y en la documentacion (`docs/correcciones/*.md`, `docs/manuales/01_listado_elementos.md`, `README.md`, `README-restaurar-directus.md`).
+- Historial reescrito con `git filter-branch` en todas las ramas locales y remotas: los valores literales (`[REDACTADO]`, `[REDACTADO]`, `[REDACTADO]`, `[REDACTADO]`, `[REDACTADO]`) se reemplazaron por referencias a variables de entorno en `docker-compose.yml` y en la documentacion (`docs/correcciones/*.md`, `docs/manuales/01_listado_elementos.md`, `README.md`, `README-restaurar-directus.md`).
 - `docker_moviles/workshop_backup.sql` (hashes argon2id) eliminado de todas las refs y del historial.
 - Eliminados refs originales, stash, worktree obsoleto (`wind-reminder`) y commit-graph; `git gc --prune=now`.
 - Push forzado de todas las ramas a `origin` (https://github.com/angeelvaleen/tallermecanico.git); `sounds/opti` publicada como nueva rama.
 - Verificacion: `git log --all -S '<secreto>'` devuelve 0 resultados para cada valor; `workshop_backup.sql` ausente de todas las refs.
 
 ### Credenciales activas
-- Los valores expuestos en el historial antiguo NO estan activos: login con `admin@vexora.dev / admin123` devuelve `INVALID_CREDENTIALS`; MariaDB rechaza `Angel`/`root` con `Angelito04.` (`Access denied`).
+- Los valores expuestos en el historial antiguo NO estan activos: login con `admin@vexora.dev / [REDACTADO]` devuelve `INVALID_CREDENTIALS`; MariaDB rechaza `Angel`/`root` con `[REDACTADO]` (`Access denied`).
+- Valores antiguos redactados el 2026-11-27 en el arbol de trabajo (la copia publicada sigue en el historial de Git hasta que se autorice la reescritura).
 - El `.env` actual (gitignored) contiene valores regenerados el 2026-11-15 y no los valores expuestos; no se rotaron credenciales activas para no romper el sistema.
 - Los nueve usuarios actuales se conservan (verificado: `directus_users = 9`).
 
@@ -1031,3 +1233,203 @@ Responsable: OpenCode. Alcance autorizado por el usuario: recuperar el VEXORA or
 - Segunda pagina real de Combustibles y Metodos de pago (5 registros, perPage 5).
 - Limpieza opcional de `console.log` de depuracion.
 - Karma no ejecutable en el contenedor (sin Chrome); no es fallo de la aplicacion.
+
+## Fase 13 - Cierre final: auditoria, pruebas reales aisladas y compilacion (2026-11-26, Freebuff)
+
+### GitHub (sin reescrituras ni force-push)
+- `origin/main` = `a9c3740` (fetch verificado; 0 adelante / 0 atras). 10 ramas remotas, sin etiquetas.
+- `workshop_backup.sql`: no existe en ningun objeto de `git rev-list --all --objects`; solo aparece como texto en la documentacion.
+- `.env` no esta en el arbol (`git ls-files`).
+- **Riesgo residual:** `ESTADO_VEXORA.md` de `a9c3740` cita literalmente los 5 valores antiguos al documentar la limpieza. Los 9 hashes actuales no coinciden con ninguno (argon2: 0 coincidencias) y MariaDB rechaza los valores con `Angel` y `root` (10/10 `AUTH_FAIL`). No se reescribio el historial ni se hizo push (instruccion expresa). Queda pendiente, si se autoriza, redactarlos y reescribir en un turno futuro.
+
+### Entorno aislado
+- `vexora-test-db` (mariadb:11.8) + `vexora-test-api` (Directus 12.6.0, puerto 8200, red `vexora_test_net`), copia de la base (9 usuarios y mismos conteos). Extensiones `vexora-rls` y `vexora-profile` con SHA-256 identico al repositorio.
+- Solo en el clon se asigno una contrasena temporal al administrador y a client/mechanic/assistant/prutest01 para ejecutar las pruebas; la base original no se modifico. El stack de pruebas se detuvo al terminar.
+
+### Pruebas reales (42/42, EXIT 0)
+- Archivo: `pruebas/cierre-final-aislado.js`. Ejecutar: `VEXORA_TEST_PW=... VEXORA_TEST_BASE=http://127.0.0.1:8200 node pruebas/cierre-final-aislado.js`.
+- Cuatro roles: login 200 y rol real correcto (Administrator, client, mechanic, assistant).
+- Cotizacion real: cabecera + servicio + refaccion (importes 350 y 160), lectura con `ofQuote`, totales coherentes; RLS impide cotizar una orden de otro mecanico (403).
+- Evidencia real: `POST /files` + fila con UUID + `GET /assets` 200 `image/png`; el cliente dueno la lee y otro cliente recibe 403.
+- Paginacion: con 8 combustibles/metodos, pagina 1 = 5 y pagina 2 = 3; los ids nuevos solo aparecen en la pagina 2.
+- Permisos/RLS: anonimo 403; client no crea marcas ni cotizaciones; assistant no cotiza; mechanic solo 5 ordenes propias; client solo su ficha; Administrator 9 usuarios; cliente sin vehiculos 0 ordenes; PATCH de rol propio 400 "No esta permitido modificar: role"; PATCH sin sesion 401.
+- Limpieza: quotes 4, quoteitems 2, quoteparts 2, evidence 2, files 2, fuels 5, methods 5, workorders 5; identicos al inicio. Base original: users 9, files 2, evidence 2, quotes 4, brands 11, workorders 5, vehicles 4, payments 2; sin cambios.
+
+### Compilacion e interfaz
+- `npx tsc -p tsconfig.app.json --noEmit`: EXIT 0.
+- `npx ng build`: EXIT 0, Hash `c0f9cfc7835bfd01`, Build at `2026-11-26T16:08:06.282Z`.
+- Consola del navegador en `/login`: solo avisos informativos de Angular/webpack; sin errores; respuestas 200 en scripts e imagenes.
+
+### Infraestructura y credenciales
+- 5 contenedores originales arriba: `moviles-db` (healthy), `moviles-api` (ping 200), `moviles-ionic` (200), `moviles-swagger` (200), `moviles-cloudbeaver` (200). 5 volumenes `vexora_*` presentes.
+- Credenciales activas: `MARIADB_PASSWORD`, `DIRECTUS_SECRET` y `DIRECTUS_ADMIN_PASSWORD` del `.env` coinciden (SHA-256) con las variables de los contenedores; los 9 usuarios permanecen activos.
+- Valores antiguos: 0 coincidencias con los hashes actuales; MariaDB los rechaza.
+
+### Revision de codigo
+- Sin cambios en el codigo de la aplicacion en este turno (`git diff a9c3740` vacio). Unico archivo nuevo: el harness de pruebas.
+- Se mantienen H-500 (`Validators.pattern(/\\S/)` en `brands/form`), H1/H2/H3/H5 y las correcciones previas; sin funcionalidades nuevas ni cambios de diseno, arquitectura o navegacion.
+
+### Pendientes
+- Redactar los valores antiguos de `ESTADO_VEXORA.md` y, con autorizacion, reescribir el historial (no ejecutado en este turno).
+- Las escrituras desde la interfaz siguen sin repetirse: las pruebas reales de cotizacion y evidencia fueron por API contra el clon.
+- Karma no ejecutable (sin Chrome en el contenedor); HEIC real no probado.
+- Limpieza opcional de `console.log`.
+
+## Fase 14 - Visor ampliado de evidencias en el detalle de la orden (2026-11-26, Freebuff)
+
+### Problema
+- En `workorders/detail`, la seccion Evidencias mostraba miniatura, nombre y fecha, pero la fila no tenia accion: no existia visor y la unica salida era el boton de descarga para HEIC/HEIF.
+
+### Solucion (solo la pagina de detalle, sin modulos nuevos)
+- `mobile/src/app/pages/workorders/detail/detail.page.html`: la miniatura pasa a un `<button slot="start">` que abre el visor; la etiqueta de la fila tambien lo abre; se agrega un boton `eye-outline` y un `<ion-modal>` declarativo con encabezado, boton de cierre y `<img>` con `object-fit: contain`.
+- `detail.page.ts`: `openEvidenceViewer()`, `closeEvidenceViewer()` y `onViewerImageError()`. Reutiliza el object URL ya autenticado (`evidenceThumbs`), sin descargar de nuevo ni tocar registros. Si la miniatura fallo (HEIC/HEIF) no abre el visor y se conserva la descarga.
+- `detail.page.scss`: estilos del boton de miniatura y del visor a pantalla completa (fondo `#0f172a`, imagen centrada conservando proporciones).
+
+### Pruebas
+- `npx ng build --configuration development`: EXIT 0 (Hash `2bb879d5bf3bb800`, Build at `2026-11-26T17:00:03.615Z`). El primer intento fallo con NG8002 por `[is-open]`; corregido a `[isOpen]`.
+- No se abrio el navegador ni se pulsaron evidencias reales: la comprobacion visual queda pendiente.
+- Karma no ejecutable (sin Chrome en el contenedor).
+- Sin cambios en base de datos, registros, permisos, RLS, `.env`, volumenes ni Git.
+
+### Ajuste: X visible en el visor (2026-11-26, Freebuff)
+- El boton de cierre del `ion-toolbar` no resultaba visible; se sustituyo por una X flotante dentro del modal: `.evidence-viewer-close` (`position: fixed`, esquina superior derecha, 44x44 px, circulo `rgba(15,23,42,0.8)`, borde blanco y icono blanco de 26 px, `z-index: 100`).
+- La X cierra con `closeEvidenceViewer()` (mismo metodo que el backdrop y `didDismiss`) y regresa al detalle sin recargar la orden.
+- La posicion de la X depende del visor, no de la imagen: con `max-width: 100%`, `max-height: calc(100vh - 120px)` y `object-fit: contain`, imagenes pequenas, grandes o verticales se ajustan sin tapar ni desplazar el boton.
+- Archivos: `detail.page.html` (X dentro del `ion-modal`, fuera del `ion-content` para que no la recorte el scroll) y `detail.page.scss` (estilos de `.evidence-viewer-close`).
+- `npx ng build --configuration development`: EXIT 0 (Hash `9bcd86665d899c35`, Build at `2026-11-26T17:04:16.744Z`).
+- Pendiente: comprobacion visual con evidencias reales de distintos tamanos (no se abrio el navegador en este turno).
+
+### Causa raiz y verificacion real de la X (2026-11-26, Freebuff)
+- **Causa:** en Ionic Angular, un `ion-modal` declarativo no proyecta su contenido: pinta el `TemplateRef` que captura su `@ContentChild(TemplateRef)`. El detalle de la orden tenia `*ngIf` sobre el `<img>`, `<ion-text>` y `<ion-button>`, asi que Ionic tomaba el **primer** `ng-template` (el del `<img>`) y solo renderizaba la imagen; el `ion-header`, el `ion-content` y cualquier boton quedaban fuera del DOM del modal. Por eso la X del `ion-toolbar` y la flotante nunca aparecian (el DOM del modal solo contenia `<img>`).
+- **Solucion:** envolver todo el contenido del modal en `<ng-template>` (`detail.page.html`). La X queda dentro de `.evidence-viewer-body`, con `position: absolute`, `top: 16px`, `right: 16px`, `44x44 px`, `background: var(--ion-color-primary)` (azul oscuro), icono blanco, `z-index: 10`; mantiene `closeEvidenceViewer()`.
+- **Verificacion real en navegador (Chromium, `http://127.0.0.1:8100`, sesion Administrator):**
+  - Orden #1 (evidencia #5, PNG 320x180): la X aparece en la esquina superior derecha (`x=654, y=72, 44x44`, fondo `rgb(15,23,42)`, icono blanco, `z-index: 10`, `position: absolute`, hueco de 16 px con el borde del visor) y es el elemento superior en su centro (`elementFromPoint` = `ion-icon`). Al pulsarla el modal se cierra y se vuelve a "Orden #1" (`ion-modal.show-modal` = 0).
+  - Orden #16 (evidencia #9, PNG 2048x2048): imagen mostrada 682x682 dentro de un visor de 714 px de ancho (`imageFits = true`); la X conserva posicion y tamano y al pulsarla cierra el visor y vuelve a "Orden #16".
+- **Prueba de compilacion:** `npx ng build --configuration development` EXIT 0, Hash `82939882f913acb3`, `2026-11-26T17:11:42.761Z`.
+- **Sin cambios** en registros de evidencias, permisos, roles, base de datos, `.env`, volumenes ni Git. Solo se inicio sesion como Administrator para la prueba y no se modifico ningun dato; la contrasena usada se copio al portapapeles para no exponerla y el portapapeles se vacio al terminar.
+
+## Ajuste visual: panel Editar diagnóstico (2026-11-27, Freebuff)
+
+### Cambio
+- Se quitó la flecha de regreso (`arrow-back`) del toolbar en el panel de edición de diagnósticos, conservando la X de cierre.
+- `mobile/src/app/components/toolbar/toolbar.component.ts`: se agregó el input opcional `showBack` (default `true`) y se condicionó `showBackToWorkorders` con `this.showBack`; el comportamiento por defecto no cambia en otros módulos.
+- `mobile/src/app/pages/diagnoses/form/form.page.html`: se agregó `[showBack]="false"` al `app-toolbar` del panel. La X existente sigue llamando `closeModal()`.
+
+### Pruebas
+- `npx ng build --configuration development`: EXIT 0, Hash `2d402c8abf7c17a2`, Build at `2026-11-27T05:08:17.938Z`.
+- Verificación visual/navegación real del panel pendiente en dispositivo/emulador (no se abrió navegador en este turno).
+- Sin cambios en base de datos, registros, permisos, rutas globales, `.env`, volúmenes ni Git.
+
+## Corrección navegación flecha en /diagnoses/list (2026-11-27, Freebuff)
+
+### Causa
+- `goToWorkorders()` en `toolbar.component.ts` tenía una rama que, si `router.url` incluía `/diagnoses`, navegaba a `/diagnoses/list`. Como la flecha del toolbar solo se muestra en rutas de listado administrativo, en `/diagnoses/list` esa rama provocaba un no-op en lugar de regresar al menú principal (`/tabs/workorders/list`).
+
+### Solución
+- Se eliminó la rama especial de `/diagnoses` en `goToWorkorders()`; ahora todas las listas administrativas, incluida Diagnósticos, regresan a `/tabs/workorders/list`, igual que el resto.
+- El panel de edición de diagnósticos mantiene `[showBack]="false"`, por lo que solo muestra la X.
+
+### Archivos modificados
+- `mobile/src/app/components/toolbar/toolbar.component.ts`
+
+### Pruebas
+- `npx ng build --configuration development`: EXIT 0, Hash `941d3e83a31a73eb`, Build at `2026-11-27T05:21:48.203Z`.
+- Verificación visual/navegación real pendiente (no se abrió navegador en este turno).
+
+## Fase 15 - Limpieza controlada y redaccion de credenciales antiguas (2026-11-27, Freebuff)
+
+### Redaccion aplicada (solo arbol de trabajo)
+- En `ESTADO_VEXORA.md`, epigrafe "Seguridad de GitHub", los cinco valores literales antiguos se sustituyeron por `[REDACTADO]` (7 ocurrencias). Verificado contra la version publicada en `HEAD`: 0 ocurrencias en el documento.
+- No se modifico `.env`, ni usuarios, contrasenas, roles o permisos; no se toco la base de datos.
+- La copia publicada en el historial de Git (`a9c3740`, `origin/main`) sigue conteniendo los valores; la reescritura queda pendiente de autorizacion expresa.
+- `respaldos/01_listado_elementos_local_2026-11-25.md` (ignorado por Git, no publicado) conserva 4 ocurrencias: es un respaldo local, no se modifico.
+
+### Auditoria de residuos (solo lectura, nada eliminado)
+- Servicios en ejecucion: `moviles-db`, `moviles-api`, `moviles-ionic`, `moviles-swagger`, `moviles-cloudbeaver` y los cinco volumenes `vexora_*` del `docker-compose.yml`: intactos.
+- Contenedores detenidos: `vexora-test-api` y `vexora-test-db` (stack aislado de pruebas del 2026-11-26); volumenes `vexora_test_*`. `klassio-*` y `gmc_*` pertenecen a otros proyectos, fuera del alcance de VEXORA.
+- Volumenes VEXORA sin contenedor: `docker_moviles_*` (era de tres niveles), `vexora_db_copy_20261125`, `vexora_db_dump_20261125`, `vexora_db_verify_20261125`, `test_mariadb_data`, `test_isolated_test_mariadb_data`, `test_isolated_test_uploads`, `test_isolated_directus-extension-vexora-payments-hook`.
+- Artefactos regenerables e ignorados: `mobile/www` (28 MB), `mobile/.angular` (569 MB), `mobile/node_modules` (484 MB del host; el contenedor usa el volumen `vexora_ionic_node_modules`).
+- Artefactos de la interfaz: `docker exec moviles-api ls /directus/uploads` devuelve 5 archivos (evidencias actuales) y las extensiones `vexora-profile` y `vexora-rls` siguen desplegadas: no se tocan.
+- Respaldos disponibles verificados: `C:\vexora_snapshot_20261125`, `C:\vexora_snapshot_20261125_git` (`05294bf`), `C:\vexora_entrega_git_mirror` (`05294bf`), `C:\vexora_git_tmp` (`05294bf`), `C:\vexora_rewrite.git` (`d388cfe`), `C:\vexora_mirror_backup` (`d388cfe`).
+
+### Estado
+- No se elimino ningun archivo, contenedor, volumen ni referencia de Git. Sin commit ni push.
+- Pendiente de autorizacion: redactar y reescribir el historial publicado, retirar contenedores/volumenes de pruebas y artefactos regenerables.
+
+## Fase 16 - Respaldo definitivo del estado actual (2026-11-27, Freebuff)
+
+### Ubicacion
+- `C:\VEXORA_RESPALDO_20261127` (independiente del repositorio, 27 MB, 741 archivos verificados).
+- No se borro, movio ni publico nada. Sin commit ni push.
+
+### Contenido
+- `codigo/`: arbol de trabajo actual (686 archivos = 548 versionados + 137 de `docs/manuales/` ignorados por Git + `pruebas/cierre-final-aislado.js`), sin `node_modules`, `.angular`, `mobile/www` ni `respaldos/`.
+- `historial/vexora_all_refs_20261127.bundle`: 23 refs (10 ramas locales, 10 remotas, HEAD y HEAD del worktree), 62 commits. Mas `cambios-locales_20261127.patch` (565 lineas, los 9 modificados) y `manifiesto_refs.txt`.
+- `base_de_datos/workshop_20261127.sql`: 519 163 bytes, 51 CREATE TABLE y 31 INSERT, obtenido con `mariadb-dump --single-transaction` (sin modificar datos).
+- `evidencias/`: los 5 archivos del volumen `vexora_directus_uploads`, con hashes identicos al origen.
+- `configuracion/`: `docker-compose.yml`, `directus.config.json`, extensiones desplegadas y de repositorio, imagenes/IDs de los 5 contenedores y red `vexora_net`.
+- `credenciales/.env`: `.env` vigente (475 bytes), carpeta con ACL restringida al usuario `valen`.
+- `unicos_lab/` (16 capturas PNG) y `unicos_vexora_old/` (3 documentos y 4 scripts SQL que no existen en el proyecto).
+
+### Verificaciones
+- `sha256sum -c SHA256SUMS.txt`: OK en todos los archivos, 0 fallos.
+- `git bundle verify`: "The bundle records a complete history". Clon aislado: `git fsck --full` exit 0, 62 commits, 548 archivos, `HEAD` = `a9c3740`.
+- Restauracion en carpeta temporal: parche aplicado (`9 files changed, 362 insertions(+), 31 deletions(-)`), manuales y archivo sin seguimiento restaurados, `git status` identico al del proyecto (9 modificados + 1 sin seguimiento) y 0 diferencias de contenido contra `codigo/` ignorando CRLF.
+- Evidencias: 5/5 hashes iguales al volumen; los archivos `45fed52e-...` y `537b9848-...` comparten contenido (duplicado real en el volumen).
+
+### Revision de carpetas pendientes
+- `C:\vexora_old`: 609 MB; `.git` en `05294bf`, arbol duplicado y `docker_moviles_respaldo` con `node_modules` (485 MB). Unicos rescatados: `AVANCES_VEXORA.md`, `CONTINUAR_VEXORA.md`, `INVENTARIO_PRUEBAS_VEXORA.md`, `init_test_data.sql`, `insert_payment.sql`, `insert_test_data.sql`, `insert_user.sql`. Sus 16 PNG son identicas a las de `vexora_lab`.
+- `C:\vexora_git_tmp`: 740 KB, repo bare en `05294bf`; historial duplicado, sin informacion unica.
+
+### Estado
+- Pendiente de autorizacion: eliminar carpetas duplicadas. La base de datos, `.env`, usuarios, roles, permisos y contenedores no se modificaron.
+
+## Fase 17 - Simplificacion estructural: retiro de pruebas/ y seguridad/ (2026-11-27, Freebuff)
+
+### Decision
+- Estructura principal conservada: `database/`, `directus/`, `docs/` y `mobile/`, con `directus/extensions/vexora-profile` y `directus/extensions/vexora-rls` en su sitio.
+- Restaurados los cinco documentos que estaban borrados solo en disco: `docs/correcciones/01_cambio_fastapi_directus.md`, `02_correccion_ionic.md`, `03_agregar_swagger_ui.md`, `docs/correcciones/Dockerfile` y `docs/manuales/01_listado_elementos.md`, con el contenido de `HEAD`. La version del companero de `01_listado_elementos.md` sigue disponible en el commit `397339b`.
+- Se mantienen borrados `reorganizar-vexora.ps1` y `docs/REVISION_MANUALES_PROFESOR.md`.
+- Retiradas `pruebas/` (13 archivos, incluido `cierre-final-aislado.js`, que no estaba en Git) y `seguridad/` (9 archivos).
+
+### Comprobacion de dependencias antes de retirar
+- `docker-compose.yml`, `mobile/Dockerfile`, `mobile/package.json`, `directus.config.json` y `directus/extensions/**`: ninguna referencia a `pruebas/` ni a `seguridad/`.
+- Las extensiones desplegadas en el volumen `vexora_directus_extensions` (`vexora-profile`, `vexora-rls`) siguen presentes y no dependen de esas carpetas. Los cinco contenedores siguen `Up`.
+
+### Informacion unica preservada
+- `docs/respaldo-pruebas-seguridad-2026-11-27.zip` (56 203 bytes, 22 archivos, integridad verificada). Incluye los cuatro `seguridad/backup_*.json`, que contienen asignaciones usuario-rol y 19 permisos que no estan en `directus/default/data/`; los scripts de instalacion y rollback de `vexora-rls`; y `pruebas/cierre-final-aislado.js`, que no existia en ningun commit.
+- El resto de ambos directorios sigue disponible en el commit `a9c3740`.
+
+### Verificacion
+- `sha256sum -c` sobre los ocho archivos de codigo modificados: 8/8 OK, sin cambios durante la operacion.
+- Sin cambios en usuarios, contrasenas, roles, permisos, base de datos, `.env`, Docker ni Git.
+- Sin commit ni push.
+- Pendiente: `docs/DOCUMENTACION_FINAL.md`, `docs/MANUAL_DEFENSA_VEXORA.md` y `docs/MANUAL_TECNICO_VEXORA.md` aun citan rutas de `pruebas/` y `seguridad/`.
+
+## Fase 18 - Cierre de entrega: documentación, respaldos y verificación final (2026-11-27, OpenCode)
+
+### Documentación y respaldos
+- Se corrigieron las 22 referencias a `pruebas/` y `seguridad/` en `docs/DOCUMENTACION_FINAL.md`, `docs/MANUAL_DEFENSA_VEXORA.md` y `docs/MANUAL_TECNICO_VEXORA.md`: ahora apuntan al respaldo protegido externo `VEXORA_RESPALDO_20261127` (`codigo/pruebas/`, `codigo/seguridad/`) y al archivo `respaldo-pruebas-seguridad-2026-11-27.zip`.
+- El ZIP se copió a `VEXORA_RESPALDO_20261127/codigo/docs/` (SHA-256 `520eeb07...`, idéntico al original), se añadió su hash a `SHA256SUMS.txt` y se retiró del árbol del proyecto. Su ruta queda en `.gitignore`.
+- Se restauraron los 137 manuales del profesor en `docs/manuales/` desde el respaldo (136 faltaban en disco; `01_listado_elementos.md` ya estaba). Carpetas ignoradas por Git, sin impacto en el repositorio.
+- La copia duplicada `C:\Users\valen\Documents\Valencia\docker_moviles` se verificó redundante (`.env` idéntico al del proyecto y al respaldo; manuales 137/137; `respaldos/` en `vexora_entrega_20261125`; `pruebas/` y `seguridad/` en el ZIP/respaldo) y se retiró. El proyecto principal `C:\docker_moviles` no se tocó.
+
+### Visor de evidencias (prueba real en navegador)
+- Sesión real como `mechanic@vexora.dev`: login → Órdenes → Orden #1 → Evidencia #5 (PNG 24 691 B).
+- Abrir: el modal `ion-modal.evidence-viewer-modal` pasa a `isOpen=true`.
+- Visualizar: imagen `blob:` cargada (320×180, `complete=true`).
+- Cerrar: `X` deja `isOpen=false` y libera la selección.
+- Descargar: botón visible en el caso normal; descarga `evidencia-5.png` (24 691 B) y su SHA-256 coincide con el archivo del volumen `vexora_directus_uploads` (`d6aa2c62...`).
+- Sin errores de consola. Se ajustó el botón Descargar para que aparezca siempre que haya una evidencia cargada (antes solo si la imagen fallaba).
+
+### Verificación técnica
+- `npx tsc --noEmit`: EXIT 0.
+- `npx ng build --configuration production`: EXIT 0, hash `f5ef50623d3d00b7` (2026-11-27T21:20:03Z).
+- Cinco contenedores `moviles-*` arriba; `moviles-db` healthy; API `:8000`, Ionic `:8100`, Swagger `:8081` y CloudBeaver `:8978` responden 200.
+- Datos intactos: 8 órdenes, 2 diagnósticos, 4 evidencias, 5 cotizaciones, 3/3 ítems, 3 pagos, 6 citas, 4 vehículos, 9 usuarios activos, 4 archivos (5 en el volumen), 11 marcas, 85 permisos, 5 políticas, 4 roles. Sin cambios en usuarios, roles, permisos ni evidencias.
+- Volúmenes `vexora_*` y de pruebas conservados; no se eliminó ninguno.
+
+### Git y autoría
+- Sin reescritura de historial ni `push --force`. Se conservan los 55 commits de `carrilloedgar408@gmail.com` y los 7 de `valencialopez046@gmail.com`; 0 commits con committer distinto del autor.
+- `397339b` sigue atribuido a `EddyDS23` en la API de GitHub; las ramas `develop` y `feature/guard` permanecen en el remoto.
+- Commits de cierre preparados con la identidad real del proyecto (`Angel Valencia <valencialopez046@gmail.com>`).

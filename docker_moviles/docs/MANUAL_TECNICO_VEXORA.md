@@ -59,9 +59,10 @@ docker_moviles/
 │   │   ├── environments/
 │   │   └── assets/
 │   └── package.json
-├── pruebas/                      # scripts E2E y de seguridad
-└── seguridad/                    # scripts apply/verify/rollback + backups
+└── (pruebas/ y seguridad/)       # archivados en el respaldo protegido externo
 ```
+
+> **Archivos archivados:** `pruebas/` y `seguridad/` no forman parte del árbol publicado. Se conservan íntegros en el respaldo protegido externo `VEXORA_RESPALDO_20261127` (carpetas `codigo/pruebas/` y `codigo/seguridad/`). El archivo `respaldo-pruebas-seguridad-2026-11-27.zip` no se versiona ni se publica.
 
 ---
 
@@ -79,8 +80,7 @@ docker_moviles/
   - `services/` — un servicio por entidad (axios + RxJS).
   - `tabs/` — contenedor de pestañas dinámicas por rol.
 - `docker_moviles/directus/extensions/vexora-rls/` — extensión hook de Directus.
-- `docker_moviles/seguridad/` — scripts de instalación, verificación y rollback.
-- `docker_moviles/pruebas/` — `cierre-e2e.js`, `seguridad-s2s3.js`.
+- `docker_moviles/seguridad/` y `docker_moviles/pruebas/` — **archivados** en el respaldo protegido externo `VEXORA_RESPALDO_20261127` (`codigo/seguridad/` y `codigo/pruebas/`); no forman parte del árbol publicado.
 
 ### 2.2 Archivos importantes
 
@@ -476,9 +476,11 @@ workorders: {
 
 Las páginas lo consultan con `authService.canByRole(ROLE_ACTIONS.workorders.create)` y guardan el resultado en propiedades como `canCreate` o `canAddEvidence`.
 
-### 5.7 Extensión de seguridad `vexora-rls`
+### 5.7 Extensiones locales: `vexora-rls` y `vexora-profile`
 
-Ver la sección 9 para el detalle completo del hook, los archivos y las operaciones que controla.
+`vexora-rls` aplica el aislamiento por fila y la protección de `/users`; ver el anexo B para el detalle del hook, los archivos y las operaciones que controla.
+
+`vexora-profile` expone `PATCH /vexora-profile/me` con lista blanca (`first_name`, `last_name`, `description`, `avatar`) para que cada usuario edite su propio perfil sin recibir `update` sobre `directus_users`; el usuario se toma de `req.accountability` y se rechaza un avatar subido por otra cuenta. Es la única vía de edición del perfil y no permite cambiar correo, rol ni contraseña.
 
 ---
 
@@ -766,7 +768,7 @@ assetObjectUrl(fileId: string): Observable<string> {
 
 `isFileReference(path)` comprueba con una expresión regular que `path` sea un UUID; solo entonces se intenta descargar la imagen. El detalle libera el object URL en `ngOnDestroy()` con `URL.revokeObjectURL(this.imageUrl)`.
 
-> **PROBADO (UI):** la carga de una evidencia se ejecutó desde la interfaz en una orden temporal: se seleccionó un PNG, se subió a `/files`, se creó el registro en `evidence` y la miniatura se mostró en el detalle. La evidencia temporal y su archivo se eliminaron al terminar la prueba. Hoy el volumen `vexora_directus_uploads` conserva los archivos de las evidencias #5 y #9, y `/evidences/list` muestra ambas miniaturas.
+> **PROBADO (UI):** la carga de una evidencia se ejecutó desde la interfaz en una orden temporal: se seleccionó un PNG, se subió a `/files`, se creó el registro en `evidence` y la miniatura se mostró en el detalle. La evidencia temporal y su archivo se eliminaron al terminar la prueba. El volumen `vexora_directus_uploads` conserva 5 archivos (4 con UUID y `directus-health-file`); al 2026-11-27 hay 4 evidencias registradas y `/evidences/list` muestra sus miniaturas.
 
 ---
 
@@ -1287,12 +1289,12 @@ POST /auth/login { email, password, mode: 'json' }
 | `directus/extensions/vexora-rls/index.js` | Registra los hooks y resuelve el rol del actor |
 | `directus/extensions/vexora-rls/lib/rules.js` | Define filtros obligatorios, saneo de campos y validaciones de escritura |
 | `directus/extensions/vexora-rls/package.json` | Metadatos de la extensión |
-| `seguridad/instalar-extension.sh` | Copia la extensión al contenedor, reinicia y verifica |
-| `seguridad/rollback-extension.sh` | Elimina la extensión y reinicia el API |
-| `seguridad/apply.js` | Aplica permisos de fila en Directus (S1/S2/S3) y elimina lecturas públicas |
-| `seguridad/verify.js` | Verificación de solo lectura del aislamiento |
-| `seguridad/rollback.js` | Restaura `backup_permissions.json` |
-| `seguridad/backup_*.json` | Respaldos de roles, políticas, permisos y accesos |
+| `codigo/seguridad/instalar-extension.sh` | Copia la extensión al contenedor, reinicia y verifica |
+| `codigo/seguridad/rollback-extension.sh` | Elimina la extensión y reinicia el API |
+| `codigo/seguridad/apply.js` | Aplica permisos de fila en Directus (S1/S2/S3) y elimina lecturas públicas |
+| `codigo/seguridad/verify.js` | Verificación de solo lectura del aislamiento |
+| `codigo/seguridad/rollback.js` | Restaura `backup_permissions.json` |
+| `codigo/seguridad/backup_*.json` | Respaldos de roles, políticas, permisos y accesos |
 
 ### B.3 Resolución del actor
 
@@ -1358,7 +1360,7 @@ filter('users.delete', scopeUsersWrite('delete'));
 | `diagnoses` / `evidence` / `history` | `{ workorder_id: { mechanic_id: { _eq: userId } } }` |
 | `vehicles` | `{ id: { _in: [ids de vehículos de sus órdenes] } }` |
 
-**assistant**: `scopeQuery` **no aplica filtro** desde la extensión (`if (actor.kind === 'assistant') return query;`). La restricción del asistente a los estados 4, 5 y 6 proviene de los permisos de Directus configurados por `seguridad/apply.js` (`status_id: { _in: [4, 5, 6] }`).
+**assistant**: `scopeQuery` **no aplica filtro** desde la extensión (`if (actor.kind === 'assistant') return query;`). La restricción del asistente a los estados 4, 5 y 6 proviene de los permisos de Directus configurados por `apply.js` (respaldo protegido `codigo/seguridad/`; `status_id: { _in: [4, 5, 6] }`).
 
 **Administrator y procesos internos**: sin restricción.
 
@@ -1448,7 +1450,7 @@ Sin commits, push ni cambios de rama. Los archivos modificados y sin seguimiento
 
 ### C.5 Referencias consultadas
 
-- Repositorio del compañero `https://github.com/JonathanDeLaCruz/docker_moviles` y su carpeta `docs/manuales/` (19 manuales). Los más afines a VEXORA: 09 (menú), 10 (búsqueda), 11 (servicios), 12 (login/registro), 13 (guard), 15 (subir archivos), 16 (imagen en formulario/detalle), 17 (campos de formulario), 18 (tabs por colección).
+- Repositorio del compañero `https://github.com/JonathanDeLaCruz/docker_moviles` y su carpeta `docs/manuales/` (21 archivos). Los más afines a VEXORA: 09 (menú), 10 (búsqueda), 11 (servicios), 12 (login/registro), 13 (guard), 15 (subir archivos), 16 (imagen en formulario/detalle), 17 (campos de formulario), 18 (tabs por colección).
 - Manuales locales: `docs/manuales/01_listado_elementos.md` y `docs/correcciones/01..03`.
 
 VEXORA conserva el estilo del compañero (NgModules, servicios con axios + `defer` + `map`, `firstValueFrom`, `ionViewWillEnter`, paginación y búsqueda con `_icontains`), organizado en carpetas por entidad.
@@ -1527,7 +1529,7 @@ Lanza `forbidden()` (403). Si ocurre un error inesperado, el wrapper lanza `unav
 `sanitizeFields` limita los campos a `USER_SELF_FIELDS` para el propio usuario y `sanitizeRelationPath` reduce las relaciones a `id`, `first_name`, `last_name` y `role.id/name`, evitando correos y secretos.
 
 **24. ¿Cómo se verifica que la seguridad funciona?**
-Con `seguridad/verify.js` (solo lectura) y los scripts de pruebas S2/S3, que intentan accesos anónimos, filtros manipulados, IDs ajenos y consultas GraphQL.
+Con `verify.js` (solo lectura, respaldo protegido `codigo/seguridad/`) y los scripts de pruebas S2/S3 (respaldo protegido `codigo/pruebas/`), que intentan accesos anónimos, filtros manipulados, IDs ajenos y consultas GraphQL.
 
 **25. ¿Qué pasa si se desinstala la extensión?**
 Se ejecuta `rollback-extension.sh`, que elimina la carpeta y reinicia el API. Los datos no se tocan; la fila de `directus_extensions` queda inerte. Hay que advertir que S2/S3 vuelven a estar expuestas.

@@ -6,6 +6,7 @@ docker_moviles/.env
 # Respaldos y volcados de base de datos (nunca versionar)
 docker_moviles/respaldos/
 docker_moviles/workshop_backup.sql
+docker_moviles/docs/respaldo-pruebas-seguridad-*.zip
 docker_moviles_respaldo/
 
 # Material de referencia del profesor: se conserva sin modificar, fuera de Git

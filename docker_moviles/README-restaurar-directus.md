@@ -47,7 +47,9 @@ docker_moviles/
 │   │   ├── data/
 │   │   └── schema/
 │   │
-│   └── snapshot.yaml
+│   └── extensions/
+│       ├── vexora-rls/
+│       └── vexora-profile/
 │
 ├── database/
 │   ├── init/
@@ -195,6 +197,8 @@ api:
   networks:
     - moviles
 ```
+
+En este proyecto los volúmenes del Compose se llaman `vexora_mariadb_data`, `vexora_directus_uploads`, `vexora_directus_extensions`, `vexora_ionic_node_modules` y `vexora_cloudbeaver_data`, y la red es `vexora_net`.
 
 Los valores de conexión de MariaDB y Directus deben coincidir.
 

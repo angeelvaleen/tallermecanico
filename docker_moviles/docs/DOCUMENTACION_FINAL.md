@@ -26,7 +26,7 @@ El frontend habla **directamente** con Directus usando el token de sesión (`Aut
 
 | Capa | Tecnología |
 |---|---|
-| UI | Ionic 8 + Angular (standalone modules por página), SCSS |
+| UI | Ionic 8.8.17 + Angular 20.3.30 (NgModules, `standalone: false`), SCSS |
 | Estado/servicios | RxJS `Observable` + `axios`, un servicio por colección en `src/app/services` |
 | Backend | Directus 12.6.0 (REST `/items`, `/users`, `/auth`, `/permissions`) |
 | Base de datos | MariaDB, esquema `workshop`, claves foráneas reales |
@@ -45,10 +45,12 @@ docker_moviles/
 │   ├── components/           # toolbar, searchbar, pagination compartidos
 │   ├── pages/<módulo>/       # list / detail / form
 │   └── tabs/                 # tab bar dinámica según rol
-├── directus/extensions/vexora-rls/  # extension local: aislamiento por fila S2 y /users S3 (sin licencia)
-├── seguridad/                # respaldo de permisos, scripts S1, instalacion/rollback de la extension
-└── pruebas/                  # E2E reversible (PRU-TEST-CIERRE) + suite de seguridad S2/S3
+├── directus/extensions/vexora-rls/      # extension local: aislamiento por fila S2 y /users S3 (sin licencia)
+├── directus/extensions/vexora-profile/  # extension local: edicion del perfil propio con lista blanca
+└── docs/                     # manuales principales del proyecto (sin pruebas/ ni seguridad/)
 ```
+
+> **Respaldo de pruebas y seguridad:** los scripts E2E (`cierre-e2e.js`, `cierre-final-aislado.js`), la suite S2/S3 (`seguridad-s2s3.js`) y los scripts de instalación, verificación y rollback (`instalar-extension.sh`, `verify.js`, `apply.js`, etc.) ya **no viven en el árbol del repositorio**. Se conservan íntegros, junto con sus JSON de respaldo de permisos, en el respaldo protegido externo `VEXORA_RESPALDO_20261127` (carpetas `codigo/pruebas/` y `codigo/seguridad/`, y el archivo `respaldo-pruebas-seguridad-2026-11-27.zip`). No se publican en GitHub.
 
 ---
 
@@ -78,7 +80,7 @@ docker_moviles/
 | Vehículos: crear / editar | — | ✔ | — | — |
 | Pagos: registrar | — | ✔ | — | — |
 | Usuarios / catálogos | ✔ | — | — | — |
-| Perfil: editar / contraseña | ✔ | ✔ | ✔ | ✔ |
+| Perfil: editar datos y foto | ✔ | ✔ (sin subir foto) | ✔ | ✔ |
 
 ### Matriz de permisos Directus (estado actual)
 
@@ -101,7 +103,7 @@ Todas las filas tienen `permissions = NULL` (sin filtro por fila) porque la inst
 
 Administrator usa la política con `admin_access = 1` (sin restricciones).
 
-> **Limitación conocida:** al no haber filtros por fila, el aislamiento por registro depende de los filtros que envía el frontend, no del backend. Ver §9.
+> **Nota:** las filas de esta tabla describen los permisos de colección de Directus. El aislamiento por registro (S2) lo aplica la extensión local `vexora-rls` en el servidor, no el frontend; ver §11.
 
 ---
 
@@ -218,10 +220,10 @@ docker exec -w /app moviles-ionic ./node_modules/.bin/ng build --configuration p
 | Rutas restringidas por rol | acceso directo por URL en las 4 cuentas | Administrator: todas 200; client/mechanic/assistant: redirección a `/forbidden` en cada módulo fuera de su matriz; pestañas propias accesibles |
 | Permisos por rol | peticiones con token de cada cuenta | 200/403 según matriz; sin error 400/500 |
 | Acceso anónimo | `GET` sin token a colecciones | 403 en todas (S1) |
-| Flujo completo | `docker_moviles/pruebas/cierre-e2e.js` | **41 comprobaciones OK / 0 FAIL**, con limpieza y conteos idénticos antes/después |
+| Flujo completo | `cierre-e2e.js` (respaldo protegido, `codigo/pruebas/`) | **41 comprobaciones OK / 0 FAIL**, con limpieza y conteos idénticos antes/después |
 | Consola del navegador | sesión completa de Administrator | sin errores; XHR 200 y preflight 204 |
 | Build producción | `ng build --configuration production` | exit 0, hash `c0f166fd27aa3c08` |
-| Validación final API (`seguridad/verify.js`) | 5 cuentas + anónimo, solo lecturas | anónimo 403 en todas las colecciones; admin 200 en 15 colecciones y `/users`; mechanic 403 en citas/pagos; conteos y búsquedas por rol coherentes; sin 500 |
+| Validación final API (`verify.js`, respaldo protegido `codigo/seguridad/`) | 5 cuentas + anónimo, solo lecturas | anónimo 403 en todas las colecciones; admin 200 en 15 colecciones y `/users`; mechanic 403 en citas/pagos; conteos y búsquedas por rol coherentes; sin 500 |
 
 La prueba E2E crea y elimina fixtures con prefijo `PRU-TEST-CIERRE` (marca, servicio, vehículo, cita, orden, diagnóstico, evidencia, cotización, ítems, pago) y verifica al final que todos los conteos vuelven a su valor inicial.
 
@@ -238,18 +240,36 @@ La prueba E2E crea y elimina fixtures con prefijo `PRU-TEST-CIERRE` (marca, serv
 
 ---
 
-## 9. Limitaciones conocidas
+## 9. Estado de los datos (2026-11-27)
 
-1. **S2/S3 — CORREGIDAS sin licencia** con la extension local `vexora-rls` (ver §10). Residuales fuera de este turno: `/assets/:uuid` sigue dependiendo del permiso `directus_files`; `client` conserva lectura de `directus_permissions`, `directus_policies` y `directus_roles` (la necesita `/permissions/me`); MariaDB sigue accesible por CloudBeaver en `:8978` dentro del entorno local. Son cambios P2/licencia y no se abordaron.
-2. **Evidencias — carga real IMPLEMENTADA.** El formulario sube el archivo a `directus_files` (multipart), crea el registro en `evidence` y el detalle lo muestra con `GET /assets/{uuid}` autenticado (blob + objectURL revocado al salir). Formatos JPEG/JPG/PNG/HEIC/HEIF, máximo 10 MB. El volumen `directus_uploads` ya existía en `docker-compose.yml`, por lo que no hubo cambio de infraestructura. `evidence.path` guarda el UUID del archivo: la colección no tiene columna para el nombre original, así que el nombre visible es el de la orden.
-3. **Diagnósticos, evidencias e historial** están vacíos en el entorno actual; sus pantallas funcionan pero no hay datos reales que mostrar.
+Conteos reales de `workshop` en la fecha de revisión (solo lectura):
+
+| Colección | Registros | Colección | Registros |
+|---|---|---|---|
+| brands | 11 | workorders | 8 |
+| models | 10 | diagnoses | 2 |
+| colors | 10 | evidence | 4 |
+| fuels | 5 | quotes | 5 |
+| methods | 5 | quoteitems / quoteparts | 3 / 3 |
+| services | 10 | payment | 3 |
+| parts | 10 | status | 11 |
+| vehicles | 4 | history | 0 |
+| appointments | 6 | directus_users | 9 |
+
+Metadatos: 4 roles, 5 políticas, 85 filas de permisos, 18 colecciones, 11 estados, 4 registros en `directus_files` y 5 archivos en el volumen `vexora_directus_uploads`.
+
+## 10. Limitaciones conocidas
+
+1. **S2/S3 — CORREGIDAS sin licencia** con la extension local `vexora-rls` (ver §11). Residuales fuera de este turno: `/assets/:uuid` sigue dependiendo del permiso `directus_files`; `client` conserva lectura de `directus_permissions`, `directus_policies` y `directus_roles` (la necesita `/permissions/me`); MariaDB sigue accesible por CloudBeaver en `:8978` dentro del entorno local. Son cambios P2/licencia y no se abordaron.
+2. **Evidencias — carga real IMPLEMENTADA.** El formulario sube el archivo a `directus_files` (multipart), crea el registro en `evidence` y el detalle lo muestra con `GET /assets/{uuid}` autenticado (blob + objectURL revocado al salir). Formatos JPEG/JPG/PNG/HEIC/HEIF, máximo 10 MB. El volumen `vexora_directus_uploads` ya existía en `docker-compose.yml`, por lo que no hubo cambio de infraestructura. `evidence.path` guarda el UUID del archivo: la colección no tiene columna para el nombre original, así que el nombre visible es el de la orden.
+3. **Diagnósticos y evidencias ya tienen datos** (2 diagnósticos y 4 evidencias al 2026-11-27); **Historial sigue vacío** (0 registros) y su pantalla funciona sin datos que mostrar.
 4. **Administrator sin nombre ni apellido** (`NULL`): requiere decisión de negocio; no se inventó información.
 5. **Registros de prueba preexistentes** (`PRU-2026-A/B/C`, `PRU-T01`, marca `PRU-TEST MARCA EDIT`) se conservan: no se pudo demostrar que fueran desechables.
 6. El registro público (`/users/register`) no se probó para no crear cuentas.
 
 ---
 
-## 10. Seguridad — resumen
+## 11. Seguridad — resumen
 
 | ID | Descripción | Estado |
 |---|---|---|
@@ -264,8 +284,15 @@ La prueba E2E crea y elimina fixtures con prefijo `PRU-TEST-CIERRE` (marca, serv
 - **Escrituras:** se validan `items.create/update/delete` y `users.update/delete` contra la BD (claves individuales y masivas). client solo escribe sobre su propia cadena vehículo→orden→cotización→pago y no puede transferir un vehículo; mechanic solo sobre sus órdenes/cotizaciones y no puede reasignarlas. assistant y Administrator no se restringen.
 - **Saneo de campos:** client nunca recibe correo ni datos privados de otros usuarios: `users.*` se limita a una lista blanca y las expansiones `mechanic_id.*`, `user_id.*`, `user_id.email`, etc. se recortan a `id, first_name, last_name` (y `role.id/name`).
 - **Fallo seguro:** rol desconocido → 403; error interno del hook → 503. Nunca se ejecuta una consulta sin filtro.
-- **Operacion:** `VEXORA_PW=... VEXORA_ADMIN_PW=... bash seguridad/instalar-extension.sh` copia la extension al volumen `vexora_directus_extensions`, reinicia solo `moviles-api`, comprueba la carga y el aislamiento, y revierte automaticamente si algo falla. `bash seguridad/rollback-extension.sh` la desactiva.
-- **Pruebas:** `node pruebas/seguridad-s2s3.js` (166 comprobaciones: REST, GraphQL, filtros manipulados, agregados, masivas, fixtures de aislamiento entre clientes y entre mecanicos, `/users/me`, los 4 roles y snapshot de integridad).
-- `seguridad/apply.js` y `rollback.js` (reglas por fila de Directus) quedan como referencia historica: requieren licencia y no se usan.
+- **Operacion:** `VEXORA_PW=... VEXORA_ADMIN_PW=... bash instalar-extension.sh` (desde `codigo/seguridad/` del respaldo protegido) copia la extension al volumen `vexora_directus_extensions`, reinicia solo `moviles-api`, comprueba la carga y el aislamiento, y revierte automaticamente si algo falla. `bash rollback-extension.sh` (misma carpeta) la desactiva.
+- **Pruebas:** `node seguridad-s2s3.js` (desde `codigo/pruebas/` del respaldo protegido; 166 comprobaciones: REST, GraphQL, filtros manipulados, agregados, masivas, fixtures de aislamiento entre clientes y entre mecanicos, `/users/me`, los 4 roles y snapshot de integridad).
+- `apply.js` y `rollback.js` (respaldo protegido `codigo/seguridad/`; reglas por fila de Directus) quedan como referencia historica: requieren licencia y no se usan.
 
-Respaldo y revision de permisos: `docker_moviles/seguridad/backup_permissions.json` (+ `backup_policies/access/roles.json`). Verificacion: `verify.js` (incluye ahora las comprobaciones S2/S3).
+### Extension local `vexora-profile`
+
+- **Problema:** `PATCH /users/me` responde 403 para los roles de la app y conceder `update` amplio sobre `directus_users` permitiria el auto-escalado de rol.
+- **Solucion:** endpoint `PATCH /vexora-profile/me` en `docker_moviles/directus/extensions/vexora-profile/index.js`, con lista blanca `first_name`, `last_name`, `description`, `avatar`. El usuario se toma de `req.accountability`, nunca del cuerpo; se rechaza un avatar subido por otro usuario.
+- **Interfaz:** `pages/profile` es un formulario reactivo con nombre, apellido, descripcion y fotografia (JPG/PNG/WEBP, maximo 5 MB). El correo y el rol son de solo lectura. La foto se muestra con `GET /assets/:id` autenticado (object URL).
+- **Pruebas registradas:** API con usuario temporal (campos no permitidos, avatar invalido y sin token rechazados) y UI con los 4 roles; los valores de prueba se restauraron.
+
+Respaldo y revision de permisos: `backup_permissions.json` (+ `backup_policies/access/roles.json`) en el respaldo protegido `codigo/seguridad/`. Verificacion: `verify.js` (incluye ahora las comprobaciones S2/S3).

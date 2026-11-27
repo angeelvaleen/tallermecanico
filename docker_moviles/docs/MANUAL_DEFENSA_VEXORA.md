@@ -2,9 +2,9 @@
 
 **Sistema de gestión de taller mecánico**
 Stack: Ionic 8 + Angular 20 (NgModules, `standalone: false`) · Directus 12.6.0 · MariaDB 11.8 · Docker Compose
-Ruta del proyecto: `C:\docker_moviles\docker_moviles\docker_moviles`
+Ruta del proyecto: `C:\docker_moviles\docker_moviles` (raíz Git: `C:\docker_moviles`)
 Repositorio base: `angeelvaleen/tallermecanico` (commit `05294bf`)
-Última revisión funcional: Freebuff (turno 2026-11-22)
+Última revisión documental: Freebuff (2026-11-27)
 
 > Este manual complementa `docs/MANUAL_TECNICO_VEXORA.md` y `docs/REVISION_MANUALES_PROFESOR.md`. Se basa en el código real del árbol `docker_moviles/`, no en informes anteriores.
 
@@ -47,14 +47,14 @@ docker_moviles/
 ├── database/                 (scripts SQL iniciales)
 ├── directus/
 │   ├── extensions/vexora-rls/ (index.js, lib/rules.js)  <- RLS por rol
+│   ├── extensions/vexora-profile/ (index.js)            <- edicion del perfil propio
 │   └── ...
 ├── docs/
 │   ├── DOCUMENTACION_FINAL.md
 │   ├── MANUAL_TECNICO_VEXORA.md
-│   ├── REVISION_MANUALES_PROFESOR.md
-│   ├── MANUALES_DEFENSA... (este)
+│   ├── MANUAL_DEFENSA_VEXORA.md (este)
 │   ├── correcciones/
-│   └── manuales/             (manual 01 del profesor)
+│   └── manuales/             (21 manuales del profesor + imagenes y recursos)
 ├── mobile/                   (app Ionic/Angular)
 │   └── src/app/
 │       ├── app.component.*   (menú lateral, solo Administrator)
@@ -65,10 +65,10 @@ docker_moviles/
 │       ├── pages/            (un módulo por dominio)
 │       ├── services/         (un servicio por colección)
 │       └── tabs/             (tabs por rol)
-├── pruebas/                  (seguridad-s2s3.js, cierre-e2e.js, ...)
-├── respaldos/                (respaldos del 2026-11-21 + workshop_backup.sql)
-└── seguridad/                (instalar-extension.sh, rollback-extension.sh, verify.js)
+└── (pruebas/, seguridad/ y respaldos/)  # archivados en el respaldo protegido externo
 ```
+
+> **Archivos archivados:** `pruebas/`, `seguridad/` y `respaldos/` no forman parte del árbol publicado. Se conservan íntegros en el respaldo protegido externo `VEXORA_RESPALDO_20261127` (carpetas `codigo/pruebas/` y `codigo/seguridad/`); los respaldos del 2026-11-21 están en `vexora_entrega_20261125/tree/respaldos/`. El archivo `respaldo-pruebas-seguridad-2026-11-27.zip` no se versiona ni se publica.
 
 Regla de estilo (AGENTS.md): código original `angeelvaleen/tallermecanico@05294bf` es la referencia; NgModules con `standalone: false`, `FormBuilder`/`Validators`, `AlertController`/`ModalController`, `firstValueFrom`, servicios por colección. No se introdujeron patrones nuevos.
 
@@ -121,6 +121,7 @@ Servicios (`services/`): uno por colección + `auth`.
 - Directus 12.6.0 expone `/items/<coleccion>`, `/auth/login`, `/files`, `/assets/:id`, `/users`, `/permissions/me`.
 - MariaDB 11.8, base `workshop`, 18 tablas de negocio.
 - Extensión local `vexora-rls` (`directus/extensions/vexora-rls/`): hooks `items.*` y `users.*` que acotan por rol (S2/S3). No interviene en `/assets` ni `directus_files`.
+- Extensión local `vexora-profile` (`directus/extensions/vexora-profile/`): endpoint `PATCH /vexora-profile/me` para que cada usuario edite nombre, apellido, descripción y foto sin permiso de escritura sobre `directus_users`.
 - CORS habilitado en Directus para `localhost:8100`.
 
 ---
@@ -148,7 +149,7 @@ Navegación por tabs:
 
 Menú lateral (`app.component.html`): solo para `Administrator` (`*ngIf="isAdmin"`), contiene Catálogos, Diagnóstico, Evidencias. Sin duplicar pestañas.
 
-Permisos Directus: 84 importados; RLS por rol en `vexora-rls`. No se conceden permisos generales para resolver errores.
+Permisos Directus: 85 filas en `directus_permissions` sobre 5 politicas y 4 roles (verificado el 2026-11-27); RLS por rol en `vexora-rls`. No se conceden permisos generales para resolver errores.
 
 ---
 
@@ -182,7 +183,7 @@ Flujo completo:
 3. Las páginas `workorders/detail` y `evidence/list` precargan las miniaturas en `chargerEvidenceThumbs()`/`chargerThumbs()` y las liberan en `ngOnDestroy()` (`URL.revokeObjectURL`).
 4. `isFileReference(path)` valida que `path` sea un UUID antes de intentar descargar.
 
-Verificado con admin: `/workorders/detail/16` muestra "Evidencia #9"; `/evidences/list` muestra 2 evidencias con miniaturas. Sin token → `/assets/:id` devuelve 403. Acceso por rol respetado (no se modifican permisos).
+Verificado con admin: `/workorders/detail/16` muestra "Evidencia #9"; `/evidences/list` muestra las 4 evidencias registradas al 2026-11-27 con sus miniaturas. Sin token → `/assets/:id` devuelve 403. Acceso por rol respetado (no se modifican permisos).
 
 ---
 
@@ -310,7 +311,7 @@ Leyenda: ✅ implementado/probado · — no aplica o no existe.
 - `val.final.mechanic` no abre `/workorders/detail/16`: la orden está asignada a `mechanic@vexora.dev`, no a `val.final.mechanic`. La lista filtrada da 0 y el detalle 403 por el aislamiento de `vexora-rls`; no es un bug de consulta ni de permisos. El modal de cotización ya se probó con `mechanic@vexora.dev` (orden #16).
 - Guardado real de una cotización desde la UI: los cálculos y validaciones están probados, pero no se guardó para no crear registros. Requiere autorización.
 - Segunda página real en Combustibles y Métodos de pago: hoy tienen 5 registros y `perPage = 5`; probar el cambio de página exige crear registros temporales (requiere autorización). La paginación del componente ya se validó con Servicios.
-- Subida real de una evidencia (archivo) desde la UI: el modal está implementado y probado hasta el selector; la creación de archivos requiere autorización.
+- Subida real de una evidencia desde la UI: **PROBADA** (PNG subido en una orden temporal; registro y miniatura verificados; la evidencia y el archivo de prueba se eliminaron). El volumen conserva hoy los archivos de las evidencias registradas.
 - Eliminación de usuarios desde la interfaz: no existe; agregarla requiere autorización.
 - Limpieza opcional de `console.log` de depuración.
 - Agregar respaldos a `.gitignore` (pendiente de autorización; contienen hashes).
