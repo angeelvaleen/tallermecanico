@@ -126,7 +126,7 @@ export class ListPage implements OnInit {
     const { data } = await modal.onDidDismiss();
 
     if (data?.saved) {
-      await this.loadAppointments();
+      await this.chargerData();
     }
   }
 
@@ -157,7 +157,7 @@ export class ListPage implements OnInit {
     const { data } = await modal.onDidDismiss();
 
     if (data?.saved) {
-      await this.loadAppointments();
+      await this.chargerData();
     }
   }
 
@@ -188,7 +188,7 @@ export class ListPage implements OnInit {
     const { data } = await modal.onDidDismiss();
 
     if (data?.saved) {
-      await this.loadAppointments();
+      await this.chargerData();
     }
   }
 

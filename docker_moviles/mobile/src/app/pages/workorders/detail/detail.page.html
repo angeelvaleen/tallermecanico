@@ -230,21 +230,31 @@
               name="image-outline"
             ></ion-icon>
 
-            <ion-thumbnail
-              *ngIf="evidenceThumbs[evidence.id]"
+            <button
+              *ngIf="evidenceThumbs[evidence.id] && !evidenceThumbErrors[evidence.id]"
               slot="start"
-              class="evidence-thumb"
+              type="button"
+              class="evidence-thumb-button"
+              [attr.aria-label]="'Ver evidencia #' + evidence.id + ' ampliada'"
+              (click)="openEvidenceViewer(evidence)"
             >
 
-              <img
-                [src]="evidenceThumbs[evidence.id]"
-                [alt]="'Evidencia #' + evidence.id"
-                (error)="onEvidenceThumbError(evidence)"
-              />
+              <ion-thumbnail class="evidence-thumb">
 
-            </ion-thumbnail>
+                <img
+                  [src]="evidenceThumbs[evidence.id]"
+                  [alt]="'Evidencia #' + evidence.id"
+                  (error)="onEvidenceThumbError(evidence)"
+                />
 
-            <ion-label class="ion-text-wrap">
+              </ion-thumbnail>
+
+            </button>
+
+            <ion-label
+              class="ion-text-wrap evidence-info"
+              (click)="openEvidenceViewer(evidence)"
+            >
 
               <h2>
                 Evidencia #{{ evidence.id }}
@@ -266,6 +276,16 @@
               </p>
 
             </ion-label>
+
+            <ion-button
+              *ngIf="evidenceThumbs[evidence.id] && !evidenceThumbErrors[evidence.id]"
+              slot="end"
+              fill="clear"
+              [attr.aria-label]="'Ver evidencia #' + evidence.id + ' ampliada'"
+              (click)="openEvidenceViewer(evidence)"
+            >
+              <ion-icon slot="icon-only" name="eye-outline"></ion-icon>
+            </ion-button>
 
             <ion-button
               *ngIf="evidenceThumbErrors[evidence.id] && evidenceThumbs[evidence.id]"
@@ -436,3 +456,81 @@
   </div>
 
 </ion-content>
+
+
+<!-- VISOR AMPLIADO DE EVIDENCIAS -->
+<ion-modal
+  class="evidence-viewer-modal"
+  [isOpen]="isEvidenceViewerOpen"
+  [backdropDismiss]="true"
+  (didDismiss)="closeEvidenceViewer()"
+>
+
+  <!-- Ionic Angular solo pinta el contenido del modal dentro de un ng-template. -->
+  <ng-template>
+
+    <ion-header class="ion-no-border">
+
+      <ion-toolbar color="primary">
+
+        <ion-title>
+          Evidencia #{{ selectedEvidence?.id }}
+        </ion-title>
+
+      </ion-toolbar>
+
+    </ion-header>
+
+
+    <ion-content class="evidence-viewer-content">
+
+    <div class="evidence-viewer-body">
+
+      <!-- X dentro del visor visible: capa superior a la imagen. -->
+      <button
+        type="button"
+        class="evidence-viewer-close"
+        aria-label="Cerrar visor de evidencias"
+        (click)="closeEvidenceViewer()"
+      >
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+
+      <img
+        *ngIf="selectedEvidenceUrl && !viewerImageError"
+        class="evidence-viewer-image"
+        [src]="selectedEvidenceUrl"
+        [alt]="'Evidencia #' + selectedEvidence?.id + ' ampliada'"
+        (error)="onViewerImageError()"
+      />
+
+      <ion-text
+        color="light"
+        *ngIf="viewerImageError"
+      >
+
+        <p class="evidence-viewer-message">
+          No fue posible mostrar la imagen ampliada.
+          Descarga el archivo original para verlo.
+        </p>
+
+      </ion-text>
+
+      <ion-button
+        *ngIf="selectedEvidenceUrl && selectedEvidence"
+        fill="outline"
+        color="light"
+        [href]="selectedEvidenceUrl"
+        [attr.download]="evidenceFileName(selectedEvidence)"
+      >
+        <ion-icon slot="start" name="download-outline"></ion-icon>
+        Descargar
+      </ion-button>
+
+    </div>
+
+    </ion-content>
+
+  </ng-template>
+
+</ion-modal>

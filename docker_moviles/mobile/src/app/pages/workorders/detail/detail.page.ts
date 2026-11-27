@@ -38,6 +38,15 @@ export class DetailPage implements OnInit, OnDestroy {
 
   evidenceThumbErrors: Record<number, string> = {};
 
+  // Visor ampliado: reutiliza el object URL ya descargado con autenticacion.
+  isEvidenceViewerOpen: boolean = false;
+
+  selectedEvidence: Evidence | null = null;
+
+  selectedEvidenceUrl: string | null = null;
+
+  viewerImageError: boolean = false;
+
   quotes: QuoteWorkorder[] = [];
 
   messageError: string = "";
@@ -72,10 +81,14 @@ export class DetailPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.isEvidenceViewerOpen = false;
     this.releaseEvidenceThumbs();
   }
 
   private releaseEvidenceThumbs(): void {
+    this.selectedEvidence = null;
+    this.selectedEvidenceUrl = null;
+
     Object.values(this.evidenceThumbs).forEach((url) =>
       URL.revokeObjectURL(url),
     );
@@ -97,6 +110,32 @@ export class DetailPage implements OnInit, OnDestroy {
 
   evidenceFileName(evidence: Evidence): string {
     return `evidencia-${evidence.id}.${evidence.format}`;
+  }
+
+  // Abre la evidencia ampliada. Si la miniatura no se pudo cargar (por ejemplo
+  // HEIC/HEIF), no hay imagen que mostrar y se conserva la descarga.
+  openEvidenceViewer(evidence: Evidence): void {
+    const url = this.evidenceThumbs[evidence.id];
+
+    if (!url || this.evidenceThumbErrors[evidence.id]) {
+      return;
+    }
+
+    this.selectedEvidence = evidence;
+    this.selectedEvidenceUrl = url;
+    this.viewerImageError = false;
+    this.isEvidenceViewerOpen = true;
+  }
+
+  closeEvidenceViewer(): void {
+    this.isEvidenceViewerOpen = false;
+    this.selectedEvidence = null;
+    this.selectedEvidenceUrl = null;
+    this.viewerImageError = false;
+  }
+
+  onViewerImageError(): void {
+    this.viewerImageError = true;
   }
 
   async ionViewWillEnter(): Promise<void> {

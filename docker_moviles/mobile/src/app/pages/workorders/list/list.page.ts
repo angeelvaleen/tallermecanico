@@ -105,7 +105,7 @@ export class ListPage implements OnInit {
       await modal.onDidDismiss();
 
     if (data?.saved) {
-      await this.loadWorkorders();
+      await this.chargerData();
     }
   }
 
@@ -128,7 +128,7 @@ export class ListPage implements OnInit {
       await modal.onDidDismiss();
 
     if (data?.saved) {
-      await this.loadWorkorders();
+      await this.chargerData();
     }
   }
 

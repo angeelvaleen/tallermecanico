@@ -15,6 +15,7 @@ export class ToolbarComponent implements OnInit {
   @Input() name: string = '';
   @Input() color: string = 'primary';
   @Input() showMenu: boolean = true;
+  @Input() showBack: boolean = true;
 
   constructor(
     private auth: AuthService,
@@ -31,7 +32,7 @@ export class ToolbarComponent implements OnInit {
   get showBackToWorkorders(): boolean {
     const path = this.router.url.split('?')[0];
 
-    return this.isAdmin && ADMIN_LIST_ROUTES.includes(path);
+    return this.showBack && this.isAdmin && ADMIN_LIST_ROUTES.includes(path);
   }
 
   goToWorkorders(): void {
