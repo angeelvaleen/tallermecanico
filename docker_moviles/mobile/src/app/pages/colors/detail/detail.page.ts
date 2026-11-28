@@ -1,17 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { LoadingController } from "@ionic/angular";
-import axios from "axios";
-
-import { environment } from "src/environments/environment";
-import { AuthService } from "src/app/services/auth/auth";
-
-interface Color {
-  id: number;
-  name: string;
-  is_active: boolean;
-  created_at: string;
-}
+import { firstValueFrom } from "rxjs";
+import { Color, ColorServices } from "src/app/services/colors/colors";
 
 @Component({
   selector: "app-colors-detail",
@@ -26,7 +17,7 @@ export class DetailPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private loading: LoadingController,
-    private authService: AuthService,
+    private colorServices: ColorServices,
   ) {}
 
   ngOnInit() {
@@ -52,16 +43,7 @@ export class DetailPage implements OnInit {
     await loading.present();
 
     try {
-      const response = await axios.get<{ data: Color }>(
-        `${environment.apiUrl}/colors/${encodeURIComponent(id)}`,
-        {
-          headers: {
-            Authorization: `Bearer ${this.authService.getAccessToken()}`,
-          },
-        },
-      );
-
-      this.color = response.data.data;
+      this.color = await firstValueFrom(this.colorServices.detail(Number(id)));
     } catch (error) {
       console.error("Error al cargar el producto:", error);
       this.messageError =

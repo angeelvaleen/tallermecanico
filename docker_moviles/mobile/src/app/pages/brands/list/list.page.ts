@@ -52,7 +52,7 @@ export class ListPage {
     const { data } = await modal.onDidDismiss();
 
     if (data?.saved) {
-      await this.loadBrands();
+      await this.chargerData();
     }
   }
 
@@ -71,7 +71,7 @@ export class ListPage {
     const { data } = await modal.onDidDismiss();
 
     if (data?.saved) {
-      await this.loadBrands();
+      await this.chargerData();
     }
   }
 

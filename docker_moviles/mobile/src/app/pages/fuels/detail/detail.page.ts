@@ -1,16 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
-import { AuthService } from 'src/app/services/auth/auth';
-
-interface Fuel {
-  id: number;
-  name: string;
-  is_active: boolean;
-  created_at: string;
-}
+import { firstValueFrom } from 'rxjs';
+import { Fuel, FuelServices } from 'src/app/services/fuels/fuels';
 
 @Component({
   selector: 'app-fuels-detail',
@@ -25,7 +17,7 @@ export class DetailPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private loading: LoadingController,
-    private authService: AuthService,
+    private fuelServices: FuelServices,
   ) {}
 
   ngOnInit() {
@@ -48,15 +40,7 @@ export class DetailPage implements OnInit {
     await loading.present();
 
     try {
-      const response = await axios.get<{ data: Fuel }>(
-        `${environment.apiUrl}/fuels/${encodeURIComponent(id)}`,
-        {
-          headers: {
-            Authorization: `Bearer ${this.authService.getAccessToken()}`,
-          },
-        }
-      );
-      this.fuel = response.data.data;
+      this.fuel = await firstValueFrom(this.fuelServices.detail(Number(id)));
     } catch (error) {
       this.messageError = "No se pudo cargar el producto. Revisa el ID, la conexión y los permisos de lectura.";
     }finally{

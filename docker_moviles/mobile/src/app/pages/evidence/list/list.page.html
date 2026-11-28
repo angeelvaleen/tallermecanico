@@ -1,6 +1,13 @@
 <app-toolbar name="Evidencias" color="primary"></app-toolbar>
 
 <ion-content>
+  <app-searchbar
+    [value]="search"
+    placeholder="Buscar evidencia"
+    [debounce]="300"
+    (changeText)="handleInput($event)">
+  </app-searchbar>
+
   <div class="list-state" *ngIf="loading">
     <ion-spinner name="crescent" color="primary"></ion-spinner>
     <p>Cargando evidencias...</p>
@@ -72,4 +79,13 @@
       </ion-button>
     </ion-item>
   </ion-list>
+
+  <app-pagination
+    *ngIf="!loading && !loadError && evidences.length > 0"
+    [total]="total"
+    [perPage]="perPage"
+    [currentPage]="currentPage"
+    [maxVisiblePage]="5"
+    (changePage)="changePage($event)"
+  ></app-pagination>
 </ion-content>

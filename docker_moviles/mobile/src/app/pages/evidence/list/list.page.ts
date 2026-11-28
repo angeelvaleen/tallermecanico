@@ -10,6 +10,10 @@ import { firstValueFrom } from 'rxjs';
 })
 export class ListPage implements OnInit, OnDestroy {
   evidences: Evidence[] = [];
+  total: number = 0;
+  currentPage: number = 1;
+  perPage: number = 5;
+  search: string = '';
 
   // Miniaturas autenticadas: evidence.path guarda el UUID del archivo.
   thumbs: Record<number, string> = {};
@@ -32,15 +36,56 @@ export class ListPage implements OnInit, OnDestroy {
     this.loadError = false;
 
     try {
-      this.evidences = await firstValueFrom(this.evidenceServices.listWithOutFilters());
-
-      await this.chargerThumbs();
+      this.total = await firstValueFrom(this.evidenceServices.total(this.search));
+      this.adjustCurrentPage();
+      await this.loadEvidences();
     } catch (error) {
 
       this.loadError = true;
     } finally {
       this.loading = false;
     }
+  }
+
+  private async loadEvidences(): Promise<void> {
+    this.evidences = await firstValueFrom(
+      this.evidenceServices.list(this.currentPage, this.perPage, this.search),
+    );
+
+    await this.chargerThumbs();
+  }
+
+  private adjustCurrentPage(): void {
+    const totalPages = Math.ceil(this.total / this.perPage);
+
+    if (totalPages === 0) {
+      this.currentPage = 1;
+      return;
+    }
+
+    if (this.currentPage > totalPages) {
+      this.currentPage = totalPages;
+    }
+  }
+
+  async changePage(page: number): Promise<void> {
+    this.currentPage = page;
+    this.loading = true;
+    this.loadError = false;
+
+    try {
+      await this.loadEvidences();
+    } catch (error) {
+      this.loadError = true;
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  async handleInput(text: string): Promise<void> {
+    this.search = text;
+    this.currentPage = 1;
+    await this.chargerEvidences();
   }
 
   ngOnDestroy(): void {

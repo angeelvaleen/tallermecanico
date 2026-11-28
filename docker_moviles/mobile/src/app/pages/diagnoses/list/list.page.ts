@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component } from "@angular/core";
 import { ModalController } from "@ionic/angular";
 import { firstValueFrom } from 'rxjs';
 import { DiagnosisServices, Diagnosis } from "src/app/services/diagnoses/diagnoses";
@@ -12,8 +12,12 @@ import { FormPage } from "../form/form.page";
   styleUrls: ["./list.page.scss"],
   standalone: false,
 })
-export class ListPage implements OnInit {
+export class ListPage {
   diagnoses: Diagnosis[] = [];
+  total: number = 0;
+  currentPage: number = 1;
+  perPage: number = 5;
+  search: string = '';
 
   loading: boolean = false;
   loadError: boolean = false;
@@ -22,10 +26,6 @@ export class ListPage implements OnInit {
     private modalController: ModalController,
     private diagnosesServices: DiagnosisServices,
   ) {}
-
-  ngOnInit() {
-    this.chargerDiagnoses();
-  }
 
   async ionViewWillEnter(): Promise<void> {
     await this.chargerDiagnoses();
@@ -36,14 +36,62 @@ export class ListPage implements OnInit {
     this.loadError = false;
 
     try {
-      
-      this.diagnoses = await firstValueFrom(this.diagnosesServices.listWithOutFilters());
+      await this.chargerTotal();
+      this.adjustCurrentPage();
+      await this.loadDiagnoses();
     } catch (error) {
-
+      this.total = 0;
+      this.diagnoses = [];
       this.loadError = true;
     } finally {
       this.loading = false;
     }
+  }
+
+  private async chargerTotal(): Promise<void> {
+    this.total = await firstValueFrom(this.diagnosesServices.total(this.search));
+  }
+
+  private async loadDiagnoses(): Promise<void> {
+    try {
+      this.diagnoses = await firstValueFrom(
+        this.diagnosesServices.list(this.currentPage, this.perPage, this.search),
+      );
+    } catch (error) {
+      this.diagnoses = [];
+      this.loadError = true;
+    }
+  }
+
+  private adjustCurrentPage(): void {
+    const totalPages = Math.ceil(this.total / this.perPage);
+
+    if (totalPages === 0) {
+      this.currentPage = 1;
+      return;
+    }
+
+    if (this.currentPage > totalPages) {
+      this.currentPage = totalPages;
+    }
+  }
+
+  async changePage(page: number): Promise<void> {
+    this.currentPage = page;
+    this.loading = true;
+    this.loadError = false;
+
+    try {
+      await this.loadDiagnoses();
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  async handleInput(text: string): Promise<void> {
+    this.search = text;
+    this.currentPage = 1;
+    await this.chargerDiagnoses();
   }
 
   async retry(): Promise<void> {

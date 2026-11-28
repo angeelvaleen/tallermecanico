@@ -133,7 +133,7 @@ export class AuthService {
   // Renovar sesión
   async renew(): Promise<void> {
     const response = await axios.post<{ data: SessionDirectus }>(
-      environment.apiUrl + '/auth/refresh',
+      environment.authUrl + '/auth/refresh',
       {
         refresh_token: this.refreshToken,
         mode: 'json'

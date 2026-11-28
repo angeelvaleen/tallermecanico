@@ -80,3 +80,98 @@ ion-content.login-page {
   font-weight: 600;
   text-decoration: none;
 }
+
+@media (max-width: 767px) {
+  .login-wrapper {
+    position: relative;
+    isolation: isolate;
+    align-items: flex-start;
+    padding-block-start: calc(clamp(180px, 56.5vw, 300px) + 8px + env(safe-area-inset-top, 0px));
+    padding-block-end: max(14px, env(safe-area-inset-bottom, 0px));
+    padding-inline-start: max(14px, env(safe-area-inset-left, 0px));
+    padding-inline-end: max(14px, env(safe-area-inset-right, 0px));
+    background: #0f172a;
+  }
+
+  .login-wrapper::before {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    inset: 0 0 auto;
+    width: 100%;
+    height: clamp(180px, 56.5vw, 300px);
+    background-image:
+      linear-gradient(180deg, rgba(7, 18, 35, 0.03) 0%, rgba(7, 18, 35, 0.06) 62%, #0f172a 100%),
+      url('/assets/images/login-background.png');
+    background-size: 100% 100%, cover;
+    background-position: center, center 48%;
+    background-repeat: no-repeat;
+    pointer-events: none;
+  }
+
+  .login-card {
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box;
+    max-width: 420px;
+    min-width: 0;
+    padding: clamp(16px, 4.5vw, 20px) clamp(16px, 4.5vw, 20px) 16px;
+  }
+
+  .login-logo {
+    width: clamp(64px, 18vw, 76px);
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: contain;
+    margin-bottom: 7px;
+  }
+
+  .login-title {
+    font-size: clamp(1.15rem, 5vw, 1.3rem);
+  }
+
+  .login-card ion-input {
+    min-width: 0;
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .login-subtitle {
+    margin-bottom: 12px;
+  }
+
+  .login-card ion-note {
+    margin-bottom: 5px;
+    font-size: 0.75rem;
+  }
+
+  .login-card ion-button {
+    height: 42px;
+    margin-top: 2px;
+  }
+
+  .login-register {
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 767px) and (orientation: landscape) {
+  .login-wrapper {
+    padding-block-start: calc(clamp(180px, 48vw, 320px) + 8px + env(safe-area-inset-top, 0px));
+  }
+
+  .login-wrapper::before {
+    height: clamp(180px, 48vw, 320px);
+    background-position: center, center 50%;
+  }
+
+  .login-card {
+    max-width: 500px;
+    padding-block: 12px;
+  }
+
+  .login-logo {
+    width: 56px;
+    margin-bottom: 5px;
+  }
+}

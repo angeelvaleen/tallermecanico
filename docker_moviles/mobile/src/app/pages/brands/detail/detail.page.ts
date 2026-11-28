@@ -1,16 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
-import { AuthService } from 'src/app/services/auth/auth';
-
-interface Brand {
-  id: number;
-  name: string;
-  is_active: boolean;
-  created_at: string;
-}
+import { firstValueFrom } from 'rxjs';
+import { Brand, BrandServices } from 'src/app/services/brands/brands';
 
 @Component({
   selector: 'app-brands-detail',
@@ -25,7 +17,7 @@ export class DetailPage implements OnInit{
   constructor(
     private route: ActivatedRoute,
     private loading: LoadingController,
-    private authService: AuthService,
+    private brandServices: BrandServices,
   ) {}
 
   ngOnInit():void{
@@ -51,16 +43,7 @@ export class DetailPage implements OnInit{
     await loading.present();
 
     try {
-    const response = await axios.get<{ data: Brand }>(
-      `${environment.apiUrl}/brands/${encodeURIComponent(id)}`,
-      {
-        headers: {
-          Authorization: `Bearer ${this.authService.getAccessToken()}`,
-        },
-      }
-    );
-
-    this.brand = response.data.data;
+    this.brand = await firstValueFrom(this.brandServices.detail(Number(id)));
     } catch (error) {
       console.error('Error al cargar el producto:', error);
       this.messageError = 'No se pudo cargar el producto. Revisa el ID, la conexión y los permisos de lectura.';

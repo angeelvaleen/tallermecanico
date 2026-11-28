@@ -9,6 +9,8 @@ import { ListPageRoutingModule } from './list-routing.module';
 import { ListPage } from './list.page';
 
 import { ToolbarModule } from 'src/app/components/toolbar/toolbar.module';
+import { PaginationModule } from 'src/app/components/pagination/pagination.module';
+import { SearchbarModule } from 'src/app/components/searchbar/searchbar.module';
 
 @NgModule({
   imports: [
@@ -16,7 +18,9 @@ import { ToolbarModule } from 'src/app/components/toolbar/toolbar.module';
     FormsModule,
     IonicModule,
     ListPageRoutingModule,
-    ToolbarModule
+    ToolbarModule,
+    PaginationModule,
+    SearchbarModule,
   ],
   declarations: [ListPage]
 })

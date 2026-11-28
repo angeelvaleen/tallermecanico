@@ -1,16 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
-import { AuthService } from 'src/app/services/auth/auth';
-
-interface Method {
-  id: number;
-  name: string;
-  is_active: boolean;
-  created_at: string;
-}
+import { firstValueFrom } from 'rxjs';
+import { Method, MethodServices } from 'src/app/services/methods/methods';
 
 @Component({
   selector: 'app-methods-detail',
@@ -25,7 +17,7 @@ export class DetailPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private loading: LoadingController,
-    private authService: AuthService,
+    private methodServices: MethodServices,
   ) {}
 
   ngOnInit() {
@@ -49,16 +41,7 @@ export class DetailPage implements OnInit {
     await loading.present();
 
     try {
-      const response = await axios.get<{ data: Method }>(
-        `${environment.apiUrl}/methods/${encodeURIComponent(id)}`,
-        {
-          headers: {
-            Authorization: `Bearer ${this.authService.getAccessToken()}`,
-          },
-        }
-      );
-
-      this.method = response.data.data;
+      this.method = await firstValueFrom(this.methodServices.detail(Number(id)));
     } catch (error) {
       this.messageError="No se pudo cargar el producto. Revisa el ID, la conexión y los permisos de lectura."
     }finally{

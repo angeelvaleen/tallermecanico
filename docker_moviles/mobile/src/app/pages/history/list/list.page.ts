@@ -1,14 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
-import { AuthService } from 'src/app/services/auth/auth';
-
-interface History {
-  id: number;
-  vehicle_id: number;
-  workorder_id: number;
-  created_at: string;
-}
+import { firstValueFrom } from 'rxjs';
+import { History, HistoryServices } from 'src/app/services/history/history';
 
 @Component({
   selector: 'app-history-list',
@@ -22,7 +14,7 @@ export class ListPage implements OnInit {
   loading: boolean = false;
   loadError: boolean = false;
 
-  constructor(private authService: AuthService) {}
+  constructor(private historyServices: HistoryServices) {}
 
   ngOnInit() {
     this.chargerHistory();
@@ -33,15 +25,7 @@ export class ListPage implements OnInit {
     this.loadError = false;
 
     try {
-      const response = await axios.get<{ data: History[] }>(
-        `${environment.apiUrl}/history`,
-        {
-          headers: {
-            Authorization: `Bearer ${this.authService.getAccessToken()}`,
-          },
-        }
-      );
-      this.history = response.data.data;
+      this.history = await firstValueFrom(this.historyServices.list());
     } catch (error) {
 
       this.loadError = true;

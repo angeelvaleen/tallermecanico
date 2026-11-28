@@ -51,7 +51,7 @@ export class ListPage {
     const { data } = await modal.onDidDismiss();
 
     if (data?.saved) {
-      await this.loadColors();
+      await this.chargerData();
     }
   }
 
@@ -70,7 +70,7 @@ export class ListPage {
     const { data } = await modal.onDidDismiss();
 
     if (data?.saved) {
-      await this.loadColors();
+      await this.chargerData();
     }
   }
 

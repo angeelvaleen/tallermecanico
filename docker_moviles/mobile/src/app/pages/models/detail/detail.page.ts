@@ -1,23 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
-import { AuthService } from 'src/app/services/auth/auth';
-
-interface Model {
-  id: number;
-  brand_id: number;
-  name: string;
-  is_active: boolean;
-  created_at: string;
-}
-
-interface Brand {
-  id: number;
-  name: string;
-  is_active: boolean;
-}
+import { firstValueFrom } from 'rxjs';
+import { Brand, BrandServices } from 'src/app/services/brands/brands';
+import { Model, ModelServices } from 'src/app/services/models/models';
 
 @Component({
   selector: 'app-models-detail',
@@ -34,7 +20,8 @@ export class DetailPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private loading: LoadingController,
-    private authService: AuthService,
+    private modelServices: ModelServices,
+    private brandServices: BrandServices,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -61,16 +48,7 @@ export class DetailPage implements OnInit {
     await loading.present();
 
     try {
-      const response = await axios.get<{ data: Model }>(
-        `${environment.apiUrl}/models/${encodeURIComponent(id)}`,
-        {
-          headers: {
-            Authorization: `Bearer ${this.authService.getAccessToken()}`,
-          },
-        },
-      );
-
-      this.model = response.data.data;
+      this.model = await firstValueFrom(this.modelServices.detail(Number(id)));
 
       await this.loadBrand(this.model.brand_id);
     } catch (error) {
@@ -85,16 +63,7 @@ export class DetailPage implements OnInit {
 
   private async loadBrand(brandId: number): Promise<void> {
     try {
-      const response = await axios.get<{ data: Brand }>(
-        `${environment.apiUrl}/brands/${brandId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${this.authService.getAccessToken()}`,
-          },
-        },
-      );
-
-      this.brand = response.data.data;
+      this.brand = await firstValueFrom(this.brandServices.detail(brandId));
     } catch (error) {
       console.error('Error al cargar la marca:', error);
     }
